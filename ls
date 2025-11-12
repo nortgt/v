@@ -93,6 +93,14 @@ PercentText.TextColor3 = Color3.fromRGB(150, 150, 150)
 PercentText.Font = Enum.Font.Gotham
 PercentText.TextSize = 12
 
+TweenService:Create(Blur, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {Size = 20}):Play()
+TweenService:Create(Background, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0}):Play()
+TweenService:Create(BarContainer, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0}):Play()
+TweenService:Create(ProgressBar, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0}):Play()
+TweenService:Create(Title, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {TextTransparency = 0}):Play()
+TweenService:Create(Desc, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {TextTransparency = 0}):Play()
+TweenService:Create(PercentText, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {TextTransparency = 0}):Play()
+
 local totalTime = 6.5 -- Seconds
 local steps = 100
 local delayPerStep = totalTime / steps

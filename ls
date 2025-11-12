@@ -75,10 +75,14 @@ BarContainer.Size = UDim2.new(1, -40, 0, 6)
 BarContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 BarContainer.BorderSizePixel = 0
 
+local BarContainerCorner = Instance.new("UICorner")
+BarContainerCorner.Parent = BarContainer
+BarContainerCorner.CornerRadius = UDim.new(0.5,0)
+
 local ProgressBar = Instance.new("Frame")
 ProgressBar.Parent = BarContainer
 ProgressBar.Position = UDim2.new(0, 0, 0, 0)
-ProgressBar.Size = UDim2.new(1, 0, 0, 6)
+ProgressBar.Size = UDim2.new(0, 0, 0, 6)
 ProgressBar.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
 ProgressBar.BorderSizePixel = 0
 newGradient(ProgressBar)

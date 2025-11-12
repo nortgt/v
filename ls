@@ -5,6 +5,15 @@ pcall(function() LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("Hexagon")
 local Blur = Instance.new("BlurEffect", game.Lighting)
 Blur.Size = 20
 
+local function newGradient(parent)
+	local Gradient = Instance.new("UIGradient")
+	Gradient.Parent = parent
+	Gradient.Color = ColorSequence.new{
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(110, 150, 230)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(145, 110, 225))
+	}
+end
+
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.Name = "Hexagon"
@@ -30,13 +39,7 @@ Title.Text = "HEXAGON"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 32
-
-local TitleGradient = Instance.new("UIGradient")
-TitleGradient.Parent = Title
-TitleGradient.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(110, 150, 230)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(145, 110, 225))
-}
+newGradient(Title)
 
 local Desc = Instance.new("TextLabel")
 Desc.Parent = Background
@@ -49,10 +52,10 @@ Desc.Font = Enum.Font.Gotham
 Desc.TextSize = 16
 
 local messages = {
+	"by Roun95",
 	"Loading assets...",
 	"Optimizing scripts...",
-	"Finalizing setup...",
-	"by Roun95"
+	"Finalizing setup..."
 }
 
 task.spawn(function()
@@ -92,7 +95,7 @@ PercentText.TextColor3 = Color3.fromRGB(150, 150, 150)
 PercentText.Font = Enum.Font.Gotham
 PercentText.TextSize = 12
 
-local totalTime = 6 -- Seconds
+local totalTime = 7 -- Seconds
 local steps = 100
 local delayPerStep = totalTime / steps
 
@@ -103,17 +106,7 @@ for i = 1, steps do
 end
 
 Desc.Text = "Done!"
-
-task.wait(0.5)
-TweenService:Create(Background, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-	BackgroundTransparency = 1
-}):Play()
-
-for _, v in ipairs(Background:GetDescendants()) do
-	if v:IsA("TextLabel") or v:IsA("Frame") then
-		TweenService:Create(v, TweenInfo.new(1), {BackgroundTransparency = 1, TextTransparency = 1}):Play()
-	end
-end
+PercentText.Text = "100%"
 
 ScreenGui:Destroy()
 Blur:Destroy()

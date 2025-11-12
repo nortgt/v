@@ -26,10 +26,7 @@ Background.Size = UDim2.new(0, 380, 0, 190)
 Background.Position = UDim2.new(0.28, 0, 0.28, 0)
 Background.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 newGradient(Background)
-
-local bgCorner = Instance.new("UICorner")
-bgCorner.Parent = Background
-bgCorner.CornerRadius = UDim.new(0, 12)
+Instance.new("UICorner", Background).CornerRadius = UDim.new(0, 12)
 
 local Title = Instance.new("TextLabel")
 Title.Parent = Background
@@ -74,10 +71,7 @@ BarContainer.Position = UDim2.new(0, 20, 1, -30)
 BarContainer.Size = UDim2.new(1, -40, 0, 6)
 BarContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 BarContainer.BorderSizePixel = 0
-
-local BarContainerCorner = Instance.new("UICorner")
-BarContainerCorner.Parent = BarContainer
-BarContainerCorner.CornerRadius = UDim.new(0.5,0)
+Instance.new("UICorner", BarContainer).CornerRadius = UDim.new(0.5, 0)
 
 local ProgressBar = Instance.new("Frame")
 ProgressBar.Parent = BarContainer
@@ -86,10 +80,7 @@ ProgressBar.Size = UDim2.new(0, 0, 0, 6)
 ProgressBar.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
 ProgressBar.BorderSizePixel = 0
 newGradient(ProgressBar)
-
-local ProgressCorner = Instance.new("UICorner")
-ProgressCorner.Parent = ProgressBar
-ProgressCorner.CornerRadius = UDim.new(0.5,0)
+Instance.new("UICorner", ProgressBar).CornerRadius = UDim.new(0.5, 0)
 
 local PercentText = Instance.new("TextLabel")
 PercentText.Parent = Background

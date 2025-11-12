@@ -25,6 +25,7 @@ Background.Parent = ScreenGui
 Background.Size = UDim2.new(0, 380, 0, 190)
 Background.Position = UDim2.new(0.28, 0, 0.28, 0)
 Background.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+newGradient(Background)
 
 local bgCorner = Instance.new("UICorner")
 bgCorner.Parent = Background
@@ -73,17 +74,11 @@ ProgressBar.Position = UDim2.new(0, 20, 1, -30)
 ProgressBar.Size = UDim2.new(1, -40, 0, 6)
 ProgressBar.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
 ProgressBar.BorderSizePixel = 0
+newGradient(ProgressBar)
 
 local ProgressCorner = Instance.new("UICorner")
 ProgressCorner.Parent = ProgressBar
 ProgressCorner.CornerRadius = UDim.new(0.5,0)
-
-local ProgressGradient = Instance.new("UIGradient")
-ProgressGradient.Parent = ProgressBar
-ProgressGradient.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(110, 150, 230)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(145, 110, 225))
-}
 
 local PercentText = Instance.new("TextLabel")
 PercentText.Parent = Background
@@ -95,7 +90,7 @@ PercentText.TextColor3 = Color3.fromRGB(150, 150, 150)
 PercentText.Font = Enum.Font.Gotham
 PercentText.TextSize = 12
 
-local totalTime = 7 -- Seconds
+local totalTime = 6 -- Seconds
 local steps = 100
 local delayPerStep = totalTime / steps
 
@@ -105,8 +100,9 @@ for i = 1, steps do
     wait(delayPerStep)
 end
 
-Desc.Text = "Done!"
 PercentText.Text = "100%"
+Desc.Text = "Done!"
 
+task.wait(0.5)
 ScreenGui:Destroy()
 Blur:Destroy()

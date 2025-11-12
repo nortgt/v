@@ -1,4 +1,5 @@
 local LocalPlayer = game.Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
 
 pcall(function() LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("Hexagon"):Destroy() end)
 
@@ -104,7 +105,15 @@ end
 
 PercentText.Text = "100%"
 Desc.Text = "Done!"
-
 task.wait(0.5)
+
+TweenService:Create(Background, TweenInfo.new(0.8), {BackgroundTransparency = 1}):Play()
+TweenService:Create(BarContainer, TweenInfo.new(0.8), {BackgroundTransparency = 1}):Play()
+TweenService:Create(ProgressBar, TweenInfo.new(0.8), {BackgroundTransparency = 1}):Play()
+TweenService:Create(Title, TweenInfo.new(0.8), {TextTransparency = 1}):Play()
+TweenService:Create(Desc, TweenInfo.new(0.8), {TextTransparency = 1}):Play()
+TweenService:Create(PercentText, TweenInfo.new(0.8), {TextTransparency = 1}):Play()
+
+task.wait(1.2)
 ScreenGui:Destroy()
 Blur:Destroy()

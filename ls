@@ -77,8 +77,8 @@ BarContainer.BorderSizePixel = 0
 
 local ProgressBar = Instance.new("Frame")
 ProgressBar.Parent = BarContainer
-ProgressBar.Position = UDim2.new(0, 20, 1, -30)
-ProgressBar.Size = UDim2.new(1, -40, 0, 6)
+ProgressBar.Position = UDim2.new(0, 0, 0, 0)
+ProgressBar.Size = UDim2.new(1, 0, 0, 6)
 ProgressBar.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
 ProgressBar.BorderSizePixel = 0
 newGradient(ProgressBar)
@@ -102,7 +102,7 @@ local steps = 100
 local delayPerStep = totalTime / steps
 
 for i = 1, steps do
-    ProgressBar.Size = UDim2.new(i/steps, -40, 0, 6)
+    ProgressBar.Size = UDim2.new(i/steps, 0, 0, 6)
     PercentText.Text = i .. "%"
     wait(delayPerStep)
 end

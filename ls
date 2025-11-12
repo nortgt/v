@@ -90,13 +90,6 @@ PercentText.TextColor3 = Color3.fromRGB(150, 150, 150)
 PercentText.Font = Enum.Font.Gotham
 PercentText.TextSize = 12
 
-local TweenService = game:GetService("TweenService")
-TweenService:Create(Background, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0}):Play()
-TweenService:Create(Title, TweenInfo.new(1, Enum.EasingStyle.Quad), {TextTransparency = 0}):Play()
-TweenService:Create(SubTitle, TweenInfo.new(1.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0.3), {TextTransparency = 0}):Play()
-TweenService:Create(BarContainer, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0}):Play()
-TweenService:Create(PercentText, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {TextTransparency = 0}):Play()
-
 local totalTime = 6.5 -- Seconds
 local steps = 100
 local delayPerStep = totalTime / steps
@@ -109,12 +102,6 @@ end
 
 PercentText.Text = "100%"
 Desc.Text = "Done!"
-
-TweenService:Create(Background, TweenInfo.new(1, Enum.EasingStyle.Quad), {BackgroundTransparency = 1}):Play()
-TweenService:Create(Title, TweenInfo.new(0.8), {TextTransparency = 1}):Play()
-TweenService:Create(SubTitle, TweenInfo.new(0.8), {TextTransparency = 1}):Play()
-TweenService:Create(BarContainer, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
-TweenService:Create(PercentText, TweenInfo.new(0.8), {TextTransparency = 1}):Play()
 
 task.wait(0.5)
 ScreenGui:Destroy()

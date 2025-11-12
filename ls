@@ -42,15 +42,15 @@ Title.Font = Enum.Font.GothamBold
 Title.TextSize = 32
 newGradient(Title)
 
-local SubTitle = Instance.new("TextLabel")
-SubTitle.Parent = Background
-SubTitle.Size = UDim2.new(1, 0, 1, 0)
-SubTitle.Position = UDim2.new(0, 0, 0, 5)
-SubTitle.BackgroundTransparency = 1
-SubTitle.Text = "by Roun95"
-SubTitle.TextColor3 = Color3.fromRGB(200, 200, 200)
-SubTitle.Font = Enum.Font.Gotham
-SubTitle.TextSize = 16
+local Desc = Instance.new("TextLabel")
+Desc.Parent = Background
+Desc.Size = UDim2.new(1, 0, 1, 0)
+Desc.Position = UDim2.new(0, 0, 0, 5)
+Desc.BackgroundTransparency = 1
+Desc.Text = "by Roun95"
+Desc.TextColor3 = Color3.fromRGB(200, 200, 200)
+Desc.Font = Enum.Font.Gotham
+Desc.TextSize = 16
 
 local messages = {
 	"by Roun95",
@@ -62,23 +62,16 @@ local messages = {
 task.spawn(function()
 	while ScreenGui do
 		for _, msg in ipairs(messages) do
-			SubTitle.Text = msg
+			Desc.Text = msg
 			task.wait(2)
 		end
 	end
 end)
 
-local BarContainer = Instance.new("Frame")
-BarContainer.Parent = Background
-BarContainer.Position = UDim2.new(0, 20, 1, -30)
-BarContainer.Size = UDim2.new(1, -40, 0, 6)
-BarContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-BarContainer.BorderSizePixel = 0
-
 local ProgressBar = Instance.new("Frame")
-ProgressBar.Parent = BarContainer
-ProgressBar.Position = UDim2.new(0, 0, 0, 0)
-ProgressBar.Size = UDim2.new(1, 0, 0, 6)
+ProgressBar.Parent = Background
+ProgressBar.Position = UDim2.new(0, 20, 1, -30)
+ProgressBar.Size = UDim2.new(1, -40, 0, 6)
 ProgressBar.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
 ProgressBar.BorderSizePixel = 0
 newGradient(ProgressBar)
@@ -97,6 +90,8 @@ PercentText.TextColor3 = Color3.fromRGB(150, 150, 150)
 PercentText.Font = Enum.Font.Gotham
 PercentText.TextSize = 12
 
+local TweenService = game:GetService("TweenService")
+TweenService:Create(Background, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0}):Play()
 TweenService:Create(Title, TweenInfo.new(1, Enum.EasingStyle.Quad), {TextTransparency = 0}):Play()
 TweenService:Create(SubTitle, TweenInfo.new(1.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0.3), {TextTransparency = 0}):Play()
 TweenService:Create(BarContainer, TweenInfo.new(1.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0}):Play()
@@ -107,13 +102,19 @@ local steps = 100
 local delayPerStep = totalTime / steps
 
 for i = 1, steps do
-    ProgressBar.Size = UDim2.new(i/steps, 0, 0, 6)
+    ProgressBar.Size = UDim2.new(i/steps, -40, 0, 6)
     PercentText.Text = i .. "%"
     wait(delayPerStep)
 end
 
 PercentText.Text = "100%"
-SubTitle.Text = "Done!"
+Desc.Text = "Done!"
+
+TweenService:Create(Background, TweenInfo.new(1, Enum.EasingStyle.Quad), {BackgroundTransparency = 1}):Play()
+TweenService:Create(Title, TweenInfo.new(0.8), {TextTransparency = 1}):Play()
+TweenService:Create(SubTitle, TweenInfo.new(0.8), {TextTransparency = 1}):Play()
+TweenService:Create(BarContainer, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
+TweenService:Create(PercentText, TweenInfo.new(0.8), {TextTransparency = 1}):Play()
 
 task.wait(0.5)
 ScreenGui:Destroy()

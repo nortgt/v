@@ -90,7 +90,7 @@ PercentText.TextColor3 = Color3.fromRGB(150, 150, 150)
 PercentText.Font = Enum.Font.Gotham
 PercentText.TextSize = 12
 
-local totalTime = 6.5 -- Seconds
+local totalTime = 7 -- Seconds
 local steps = 100
 local delayPerStep = totalTime / steps
 
@@ -103,6 +103,6 @@ end
 PercentText.Text = "100%"
 Desc.Text = "Done!"
 
-task.wait(0.5)
+task.wait(1)
 ScreenGui:Destroy()
 Blur:Destroy()

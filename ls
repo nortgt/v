@@ -64,7 +64,7 @@ task.spawn(function()
 	while ScreenGui do
 		for _, msg in ipairs(messages) do
 			Desc.Text = msg
-			task.wait(2)
+			task.wait(3)
 		end
 	end
 end)
@@ -99,6 +99,14 @@ PercentText.Font = Enum.Font.Gotham
 PercentText.TextSize = 12
 PercentText.TextTransparency = 1
 
+local bgSound = Instance.new("Sound")
+bgSound.Name = "LoadingSound"
+bgSound.SoundId = "rbxassetid://1840695043"
+bgSound.Volume = 0.1
+bgSound.Looped = true
+bgSound.Parent = ScreenGui
+bgSound:Play()
+
 TweenService:Create(Blur, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {Size = 20}):Play()
 TweenService:Create(Background, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {BackgroundTransparency = 0}):Play()
 TweenService:Create(BarContainer, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {BackgroundTransparency = 0}):Play()
@@ -107,7 +115,7 @@ TweenService:Create(Title, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {TextTrans
 TweenService:Create(Desc, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {TextTransparency = 0}):Play()
 TweenService:Create(PercentText, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {TextTransparency = 0}):Play()
 
-local totalTime = 6.5 -- Seconds
+local totalTime = 10 -- Seconds
 local steps = 100
 local delayPerStep = totalTime / steps
 
@@ -132,3 +140,4 @@ TweenService:Create(Blur, TweenInfo.new(0.6), {Size = 0}):Play()
 task.wait(1.2)
 ScreenGui:Destroy()
 Blur:Destroy()
+bgSound:Destroy()

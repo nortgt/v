@@ -4,7 +4,7 @@ local TweenService = game:GetService("TweenService")
 pcall(function() LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("Hexagon"):Destroy() end)
 
 local Blur = Instance.new("BlurEffect", game.Lighting)
-Blur.Size = 20
+Blur.Size = 0
 
 local function newGradient(parent)
 	local Gradient = Instance.new("UIGradient")
@@ -93,13 +93,13 @@ PercentText.TextColor3 = Color3.fromRGB(150, 150, 150)
 PercentText.Font = Enum.Font.Gotham
 PercentText.TextSize = 12
 
-TweenService:Create(Blur, TweenInfo.new(0.8), {Size = 20}):Play()
-TweenService:Create(Background, TweenInfo.new(0.8), {BackgroundTransparency = 0}):Play()
-TweenService:Create(BarContainer, TweenInfo.new(0.8), {BackgroundTransparency = 0}):Play()
-TweenService:Create(ProgressBar, TweenInfo.new(0.8), {BackgroundTransparency = 0}):Play()
-TweenService:Create(Title, TweenInfo.new(0.8), {TextTransparency = 0}):Play()
-TweenService:Create(Desc, TweenInfo.new(0.8), {TextTransparency = 0}):Play()
-TweenService:Create(PercentText, TweenInfo.new(0.8), {TextTransparency = 0}):Play()
+TweenService:Create(Blur, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {Size = 20}):Play()
+TweenService:Create(Background, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {BackgroundTransparency = 0}):Play()
+TweenService:Create(BarContainer, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {BackgroundTransparency = 0}):Play()
+TweenService:Create(ProgressBar, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {BackgroundTransparency = 0}):Play()
+TweenService:Create(Title, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {TextTransparency = 0}):Play()
+TweenService:Create(Desc, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {TextTransparency = 0}):Play()
+TweenService:Create(PercentText, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {TextTransparency = 0}):Play()
 
 local totalTime = 6.5 -- Seconds
 local steps = 100
@@ -115,13 +115,13 @@ PercentText.Text = "100%"
 Desc.Text = "Done!"
 task.wait(0.5)
 
-TweenService:Create(Background, TweenInfo.new(0.8), {BackgroundTransparency = 1}):Play()
-TweenService:Create(BarContainer, TweenInfo.new(0.8), {BackgroundTransparency = 1}):Play()
-TweenService:Create(ProgressBar, TweenInfo.new(0.8), {BackgroundTransparency = 1}):Play()
-TweenService:Create(Title, TweenInfo.new(0.8), {TextTransparency = 1}):Play()
-TweenService:Create(Desc, TweenInfo.new(0.8), {TextTransparency = 1}):Play()
-TweenService:Create(PercentText, TweenInfo.new(0.8), {TextTransparency = 1}):Play()
-TweenService:Create(Blur, TweenInfo.new(0.8), {Size = 0}):Play()
+TweenService:Create(Background, TweenInfo.new(0.6), {BackgroundTransparency = 1}):Play()
+TweenService:Create(BarContainer, TweenInfo.new(0.6), {BackgroundTransparency = 1}):Play()
+TweenService:Create(ProgressBar, TweenInfo.new(0.6), {BackgroundTransparency = 1}):Play()
+TweenService:Create(Title, TweenInfo.new(0.6), {TextTransparency = 1}):Play()
+TweenService:Create(Desc, TweenInfo.new(0.6), {TextTransparency = 1}):Play()
+TweenService:Create(PercentText, TweenInfo.new(0.6), {TextTransparency = 1}):Play()
+TweenService:Create(Blur, TweenInfo.new(0.6), {Size = 0}):Play()
 
 task.wait(1.2)
 ScreenGui:Destroy()

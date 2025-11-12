@@ -1,3 +1,5 @@
+local LocalPlayer = game.Players.LocalPlayer
+
 pcall(function() LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("Hexagon"):Destroy() end)
 
 local Blur = Instance.new("BlurEffect", game.Lighting)
@@ -29,6 +31,13 @@ Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 32
 
+local TitleGradient = Instance.new("UIGradient")
+TitleGradient.Parent = Title
+TitleGradient.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(110, 150, 230)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(145, 110, 225))
+}
+
 local Desc = Instance.new("TextLabel")
 Desc.Parent = Background
 Desc.Size = UDim2.new(1, 0, 1, 0)
@@ -50,7 +59,7 @@ task.spawn(function()
 	while ScreenGui do
 		for _, msg in ipairs(messages) do
 			Desc.Text = msg
-			task.wait(3)
+			task.wait(2)
 		end
 	end
 end)
@@ -83,8 +92,7 @@ PercentText.TextColor3 = Color3.fromRGB(150, 150, 150)
 PercentText.Font = Enum.Font.Gotham
 PercentText.TextSize = 12
 
--- Loading Animation
-local totalTime = 18 -- Seconds
+local totalTime = 6 -- Seconds
 local steps = 100
 local delayPerStep = totalTime / steps
 
@@ -93,6 +101,19 @@ for i = 1, steps do
     PercentText.Text = i .. "%"
     wait(delayPerStep)
 end
--- Delete GUI and BLUR in the end
+
+Desc.Text = "Done!"
+
+task.wait(0.5)
+TweenService:Create(Background, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+	BackgroundTransparency = 1
+}):Play()
+
+for _, v in ipairs(Background:GetDescendants()) do
+	if v:IsA("TextLabel") or v:IsA("Frame") then
+		TweenService:Create(v, TweenInfo.new(1), {BackgroundTransparency = 1, TextTransparency = 1}):Play()
+	end
+end
+
 ScreenGui:Destroy()
 Blur:Destroy()

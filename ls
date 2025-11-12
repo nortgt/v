@@ -68,8 +68,15 @@ task.spawn(function()
 	end
 end)
 
+local BarContainer = Instance.new("Frame")
+BarContainer.Parent = Background
+BarContainer.Position = UDim2.new(0, 20, 1, -30)
+BarContainer.Size = UDim2.new(1, -40, 0, 6)
+BarContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+BarContainer.BorderSizePixel = 0
+
 local ProgressBar = Instance.new("Frame")
-ProgressBar.Parent = Background
+ProgressBar.Parent = BarContainer
 ProgressBar.Position = UDim2.new(0, 20, 1, -30)
 ProgressBar.Size = UDim2.new(1, -40, 0, 6)
 ProgressBar.BackgroundColor3 = Color3.fromRGB(150, 150, 150)

@@ -113,6 +113,7 @@ TweenService:Create(ProgressBar, TweenInfo.new(0.8), {BackgroundTransparency = 1
 TweenService:Create(Title, TweenInfo.new(0.8), {TextTransparency = 1}):Play()
 TweenService:Create(Desc, TweenInfo.new(0.8), {TextTransparency = 1}):Play()
 TweenService:Create(PercentText, TweenInfo.new(0.8), {TextTransparency = 1}):Play()
+TweenService:Create(Blur, TweenInfo.new(0.8), {Size = 0}):Play()
 
 task.wait(1.2)
 ScreenGui:Destroy()

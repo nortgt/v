@@ -1,0 +1,161 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+-- 🟣 RANGOS (AGREGA TUS USUARIOS)
+local Ranks = {
+    Owner = {2447093525},
+    Admin = {111111111},
+    Mod = {222222222},
+    VIP = {333333333},
+    Staff = {444444444}
+}
+
+-- 🖼 ÍCONOS POR RANGO (CAMBIA LAS IDS)
+local RankIcons = {
+    Owner = "rbxassetid://130681274976406",
+    Admin = "rbxassetid://ADMIN_ICON",
+    Mod = "rbxassetid://MOD_ICON",
+    VIP = "rbxassetid://VIP_ICON",
+    Staff = "rbxassetid://STAFF_ICON"
+}
+
+-- 🎨 COLOR BASE (no importa mucho porque habrá RGB)
+local RankColors = {
+    Owner = Color3.fromRGB(255, 70, 70),
+    Admin = Color3.fromRGB(255, 170, 0),
+    Mod = Color3.fromRGB(0, 170, 255),
+    VIP = Color3.fromRGB(255, 215, 0),
+    Staff = Color3.fromRGB(155, 60, 255)
+}
+
+-- 🔍 FUNCION PARA ENCONTRAR EL RANGO DEL JUGADOR
+local function GetRank(player)
+    for rank, list in pairs(Ranks) do
+        for _, id in ipairs(list) do
+            if player.UserId == id then
+                return rank
+            end
+        end
+    end
+    return nil
+end
+
+local function ApplyNametag(character)
+    local player = Players:GetPlayerFromCharacter(character)
+    if not player then return end
+
+    local rank = GetRank(player)
+    if not rank then return end -- Si no tiene rango, no crear nada
+
+    local head = character:WaitForChild("Head")
+
+    -- Borrar NameTag anterior
+    local old = head:FindFirstChild("NameTag")
+    if old then old:Destroy() end
+
+    -- Crear Billboard
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "NameTag"
+    billboard.Size = UDim2.new(5, 0, 2.8, 0)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
+    billboard.AlwaysOnTop = true
+    billboard.Parent = head
+
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.BackgroundTransparency = 1
+    frame.Parent = billboard
+
+    -- Ícono arriba (diferente por rango)
+    local icon = Instance.new("ImageLabel")
+    icon.Size = UDim2.new(0.3, 0, 0.52, 0)
+    icon.Position = UDim2.new(-0.2, 0, 0.47, 0)
+    icon.BackgroundTransparency = 1
+    icon.ImageTransparency = 0.2
+    icon.Image = RankIcons[rank] or ""
+    icon.Parent = frame
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 14)
+    corner.Parent = icon
+
+    -- Marco del rango
+    local rankFrame = Instance.new("Frame")
+    rankFrame.Size = UDim2.new(0.7, 0, 0.28, 0)
+    rankFrame.Position = UDim2.new(0.15, 0, 0.43, 0)
+    rankFrame.BackgroundColor3 = RankColors[rank]
+    rankFrame.BorderSizePixel = 4  -- El borde que tendrá el RGB
+    rankFrame.BackgroundTransparency = 0.2
+    rankFrame.Parent = frame
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 14)
+    corner.Parent = rankFrame
+	
+    local Gradient = Instance.new("UIGradient")
+    Gradient.Parent = rankFrame
+    Gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, RankColors[rank]),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
+    }
+
+    -- Texto del rango
+    local rankText = Instance.new("TextLabel")
+    rankText.Size = UDim2.new(1, 0, 1, 0)
+    rankText.BackgroundTransparency = 1
+    rankText.TextScaled = true
+    rankText.Font = Enum.Font.GothamBold
+    rankText.TextColor3 = Color3.new(1, 1, 1)
+    rankText.Text = rank
+    rankText.Parent = rankFrame
+
+    local messages = {
+	rank,
+	"Hexagon"
+    }
+
+    task.spawn(function()
+	while billboard do
+		for _, msg in ipairs(messages) do
+			rankText.Text = msg
+			task.wait(3)
+		end
+	end
+    end)
+
+    -- Nombre del jugador
+    local nameText = Instance.new("TextLabel")
+    nameText.Size = UDim2.new(1, 0, 0.3, 0)
+    nameText.Position = UDim2.new(0.15, 0, 0.73, 0)
+    nameText.BackgroundTransparency = 1
+    nameText.TextScaled = true
+    nameText.Font = Enum.Font.GothamMedium
+    nameText.TextColor3 = Color3.new(1, 1, 1)
+    nameText.Text = player.DisplayName
+    nameText.TextXAlignment = Enum.TextXAlignment.Left
+    nameText.Parent = frame
+
+    -- 🌈 ANIMACIÓN DE BORDE RGB NEÓN
+    task.spawn(function()
+        local t = 0
+        while nameText.Parent do
+            t += 0.02
+            local r = (math.sin(t) + 1) / 2
+            local g = (math.sin(t + 2) + 1) / 2
+            local b = (math.sin(t + 4) + 1) / 2
+            nameText.TextColor3 = Color3.new(r, g, b)
+            task.wait()
+        end
+    end)
+end
+
+-- Conectar spawns
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(ApplyNametag)
+end)
+
+for _, plr in ipairs(Players:GetPlayers()) do
+    if plr.Character then
+        ApplyNametag(plr.Character)
+    end
+end

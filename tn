@@ -3,7 +3,7 @@ local RunService = game:GetService("RunService")
 
 -- 🟣 RANGOS (AGREGA TUS USUARIOS)
 local Ranks = {
-    Owner = {2447093525},
+    Owner = {2447093525, 1468176050},
     Admin = {111111111},
     Mod = {222222222},
     VIP = {333333333},
@@ -13,7 +13,7 @@ local Ranks = {
 -- 🖼 ÍCONOS POR RANGO (CAMBIA LAS IDS)
 local RankIcons = {
     Owner = "rbxassetid://130681274976406",
-    Admin = "rbxassetid://ADMIN_ICON",
+    Admin = "rbxassetid://108946066610871",
     Mod = "rbxassetid://MOD_ICON",
     VIP = "rbxassetid://VIP_ICON",
     Staff = "rbxassetid://STAFF_ICON"
@@ -130,24 +130,11 @@ local function ApplyNametag(character)
     nameText.BackgroundTransparency = 1
     nameText.TextScaled = true
     nameText.Font = Enum.Font.GothamMedium
-    nameText.TextColor3 = Color3.new(1, 1, 1)
+    nameText.TextColor3 = Color3.new(0, 0, 0)
     nameText.Text = player.DisplayName
+    nameText.Font = Enum.Font.Gotham
     nameText.TextXAlignment = Enum.TextXAlignment.Left
     nameText.Parent = frame
-
-    -- 🌈 ANIMACIÓN DE BORDE RGB NEÓN
-    task.spawn(function()
-        local t = 0
-        while nameText.Parent do
-            t += 0.02
-            local r = (math.sin(t) + 1) / 2
-            local g = (math.sin(t + 2) + 1) / 2
-            local b = (math.sin(t + 4) + 1) / 2
-            nameText.TextColor3 = Color3.new(r, g, b)
-            task.wait()
-        end
-    end)
-end
 
 -- Conectar spawns
 Players.PlayerAdded:Connect(function(player)

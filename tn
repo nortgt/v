@@ -3,8 +3,8 @@ local RunService = game:GetService("RunService")
 
 -- 🟣 RANGOS (AGREGA TUS USUARIOS)
 local Ranks = {
-    Owner = {2447093525, 1468176050},
-    Admin = {111111111},
+    Owner = {1468176050},
+    Admin = {2447093525},
     Mod = {222222222},
     VIP = {333333333},
     Staff = {444444444}
@@ -132,9 +132,9 @@ local function ApplyNametag(character)
     nameText.TextScaled = true
     nameText.Font = Enum.Font.GothamMedium
     nameText.TextColor3 = Color3.new(0, 0, 0)
-    nameText.Text = player.DisplayName
+    nameText.Text = "@" .. player.DisplayName
     nameText.TextTransparency = 0.2
-    nameText.Font = Enum.Font.GothamBold
+    nameText.Font = Enum.Font.FredokaOne
     nameText.TextXAlignment = Enum.TextXAlignment.Left
     nameText.Parent = frame
 end

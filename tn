@@ -135,6 +135,7 @@ local function ApplyNametag(character)
     nameText.Font = Enum.Font.Gotham
     nameText.TextXAlignment = Enum.TextXAlignment.Left
     nameText.Parent = frame
+end
 
 -- Conectar spawns
 Players.PlayerAdded:Connect(function(player)

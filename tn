@@ -3,8 +3,8 @@ local RunService = game:GetService("RunService")
 
 -- 🟣 RANGOS (AGREGA TUS USUARIOS)
 local Ranks = {
-    Owner = {1468176050},
-    Admin = {2447093525},
+    Owner = {2447093525, 1468176050},
+    Admin = {111111111},
     Mod = {222222222},
     VIP = {333333333},
     Staff = {444444444}
@@ -13,8 +13,8 @@ local Ranks = {
 -- 🖼 ÍCONOS POR RANGO (CAMBIA LAS IDS)
 local RankIcons = {
     Owner = "rbxassetid://130681274976406",
-    Admin = "rbxassetid://108946066610871",
-    Mod = "rbxassetid://MOD_ICON",
+    Admin = "rbxassetid://130681274976406",
+    Mod = "rbxassetid://108946066610871",
     VIP = "rbxassetid://VIP_ICON",
     Staff = "rbxassetid://STAFF_ICON"
 }
@@ -59,6 +59,7 @@ local function ApplyNametag(character)
     billboard.Size = UDim2.new(5, 0, 2.8, 0)
     billboard.StudsOffset = Vector3.new(0, 3, 0)
     billboard.AlwaysOnTop = true
+    billboard.MaxDistance = 120
     billboard.Parent = head
 
     local frame = Instance.new("Frame")
@@ -95,8 +96,8 @@ local function ApplyNametag(character)
     local Gradient = Instance.new("UIGradient")
     Gradient.Parent = rankFrame
     Gradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, RankColors[rank]),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
+    	ColorSequenceKeypoint.new(0, RankColors[rank]),
+    	ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
     }
 
     -- Texto del rango

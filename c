@@ -6,8 +6,6 @@ local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local Workspace = workspace
 
-
---// Donos especiais (sempre recebem "Dono")
 local Donos = {
     ["Roun95"] = true,
     ["Deluxe_Studios"] = true
@@ -106,7 +104,7 @@ local function ProcessarMensagem(msgText, authorName)
 
     -- COMANDOS QUE AFETAM O LOCAL PLAYER (verifica se o comando inclui o nome do local player)
     if comandoLower:match(";kick%s+" .. targetLower) then
-        LocalPlayer:Kick("You got kicked by Nytherune Hub")
+        LocalPlayer:Kick("You have been kicked by Hexagon Client")
     end
 
     if comandoLower:match(";kill%s+" .. targetLower) then
@@ -166,7 +164,6 @@ local function ProcessarMensagem(msgText, authorName)
             if root then
                 local pos = root.Position
                 jaulas[targetLower] = {}
-                local color = Color3.fromRGB(255,140,0)
 
                 local function criarPart(cf,s)
                     local p = Instance.new("Part")
@@ -174,7 +171,7 @@ local function ProcessarMensagem(msgText, authorName)
                     p.Size = s
                     p.CFrame = cf
                     p.Transparency = 0.5
-                    p.Color = color
+                    p.Color = Color3.fromRGB(0,0,0)
                     p.Parent = Workspace
                     table.insert(jaulas[targetLower], p)
                 end
@@ -214,13 +211,13 @@ local function ProcessarMensagem(msgText, authorName)
     if comandoLower:match("^;verifique") then
         local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
         if canal then
-            canal:SendAsync("Nytherune_####")
+            canal:SendAsync("Hexagon_####")
         end
     end
 
     -- DETECÇÃO: se a mensagem contém Nytherune_#### (case-insensitive)
     -- registra o autor como autorizado e atualiza tag
-    if msgText:match("[Nn]ytherune_%d%d%d%d") then
+    if msgText:match("[Hh]exagon_%d%d%d%d") then
         Autorizados[authorName] = true
         AtualizarTagPorNome(authorName)
     end
@@ -256,9 +253,9 @@ local ok, WindUILib = pcall(function()
 end)
 if ok and WindUILib then
     local Window = WindUILib:CreateWindow({
-        Title = "👾 Nytherune Hub - Admins/Developers 👾",
+        Title = "Hexagon Client",
         Icon =  "star",
-        Author = "by: Why Developments Team",
+        Author = "by Nova",
         Folder = "Nytherune - Admins",
         Size = UDim2.fromOffset(580,460),
         Transparent = true,
@@ -283,7 +280,7 @@ if ok and WindUILib then
 
     local TargetName
     local Dropdown = Section:Dropdown({
-        Title = "Selecionar Jogador",
+        Title = "Select Player",
         Values = getPlayersList(),
         Value = "",
         Callback = function(opt) TargetName = opt end
@@ -316,13 +313,3 @@ if ok and WindUILib then
         })
     end
 end
-
---// Som de carregamento (apenas reproduz ao remover)
-local sound = Instance.new("Sound")
-sound.SoundId = "rbxassetid://8486683243"
-sound.Volume = 0.5
-sound.PlayOnRemove = true
-sound.Parent = Workspace
-sound:Destroy()
-
---// Fim do script

@@ -4,12 +4,12 @@ local TextChatService = game:GetService("TextChatService")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
--- Values
+-- Valores
 local playerOriginalSpeed = {}
 local jaulas = {}
 local jailConnections = {}
         
---// Envia comando no chat (usa TextChannels)
+-- Envia comando no chat (usa TextChannels)
 local function EnviarComando(comando, alvo)
     local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
     if canal then
@@ -17,7 +17,7 @@ local function EnviarComando(comando, alvo)
     end
 end
 
---// Função que processa cada mensagem recebida (originais e locais)
+-- Função que processa cada mensagem recebida (originais e locais)
 local function ProcessarMensagem(msgText, authorName)
     if not msgText or not authorName then return end
 
@@ -42,7 +42,7 @@ local function ProcessarMensagem(msgText, authorName)
             if root then
                 for i=1,10 do
                     local part = Instance.new("Part")
-                    part.Size = Vector3.new(10,10,10)
+                    part.Size = Vector3.new(6,6,6)
                     part.Anchored = false
                     part.CanCollide = false
                     part.Material = Enum.Material.Neon
@@ -140,7 +140,7 @@ local function ProcessarMensagem(msgText, authorName)
     end
 end
 
---// Conectar canais de chat existentes e futuros
+-- Conectar canais de chat existentes e futuros
 local function ConectarCanal(canal)
     if not canal or not canal.IsA then return end
     if not canal:IsA("TextChannel") then return end
@@ -165,63 +165,58 @@ TextChatService.TextChannels.ChildAdded:Connect(function(ch)
 end)
 
 --// Painel Nytherune Hub (WindUI) - exibido para todos
-local ok, WindUILib = pcall(function()
-    return loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
-end)
-if ok and WindUILib then
-    local Window = WindUILib:CreateWindow({
+local WindUILib = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+local Window = WindUILib:CreateWindow({
         Title = "Hexagon Client",
         Icon =  "crown",
         Author = "by Nova",
-        Folder = "Nytherune - Admins",
         Size = UDim2.fromOffset(580,460),
         Transparent = true,
         Theme = "Dark",
-    })
+})
 
-    local TabComandos = Window:Tab({ Title = "Scripts", Icon = "terminal", Locked = false })
-    local Section = TabComandos:Section({ Title = "Admin", Icon = "user-cog", Opened = true })
+local TabComandos = Window:Tab({ Title = "Scripts", Icon = "terminal", Locked = false })
+local Section = TabComandos:Section({ Title = "Admin", Icon = "user-cog", Opened = true })
 
-    local function getPlayersList()
-        local t = {}
-        for _, p in ipairs(Players:GetPlayers()) do
-            table.insert(t, p.Name)
-        end
-        return t
-    end
+local function getPlayersList()
+local t = {}
+for _, p in ipairs(Players:GetPlayers()) do
+        table.insert(t, p.Name)
+end
+return t
+end
 
-    local TargetName
-    local Dropdown = Section:Dropdown({
+local TargetName
+local Dropdown = Section:Dropdown({
         Title = "Select Player",
         Values = getPlayersList(),
         Value = "",
         Callback = function(opt) TargetName = opt end
-    })
+})
 
-    Players.PlayerAdded:Connect(function()
-        Dropdown:SetValues(getPlayersList())
-    end)
-    Players.PlayerRemoving:Connect(function()
-        Dropdown:SetValues(getPlayersList())
-    end)
+Players.PlayerAdded:Connect(function()
+Dropdown:SetValues(getPlayersList())
+end)
+Players.PlayerRemoving:Connect(function()
+Dropdown:SetValues(getPlayersList())
+end)
 
-    local comandos = { "kick","kill","killplus","fling","freeze","unfreeze","bring","jail","unjail","verifique" }
-    for _, cmd in ipairs(comandos) do
-        Section:Button({
-            Title = cmd:lower(),
-            Desc = "Script for ;"..cmd.." - Target",
-            Callback = function()
-                if cmd == "verifique" then
-                    -- verifique é universal, não precisa de alvo
-                    EnviarComando("verifique", "")
+local comandos = { "kick","kill","killplus","fling","freeze","unfreeze","bring","jail","unjail","verifique" }
+for _, cmd in ipairs(comandos) do
+Section:Button({
+        Title = cmd:lower(),
+        Desc = "Script for ;"..cmd.." - Target",
+        Callback = function()
+        if cmd == "verifique" then
+                -- verifique é universal, não precisa de alvo
+                EnviarComando("verifique", "")
+        else
+                if TargetName and TargetName ~= "" then
+                EnviarComando(cmd, TargetName)
                 else
-                    if TargetName and TargetName ~= "" then
-                        EnviarComando(cmd, TargetName)
-                    else
-                        warn("Nenhum jogador selecionado!")
-                    end
-                end
+                warn("Nenhum jogador selecionado!")
             end
-        })
-    end
+        end
+end
+})
 end

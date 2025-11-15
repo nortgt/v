@@ -168,15 +168,15 @@ end)
 local WindUILib = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Window = WindUILib:CreateWindow({
         Title = "Hexagon Client",
-        Icon =  "crown",
+        Icon =  "square-terminal",
         Author = "by Nova",
         Size = UDim2.fromOffset(580,460),
         Transparent = true,
         Theme = "Dark",
 })
 
-local TabComandos = Window:Tab({ Title = "Scripts", Icon = "terminal", Locked = false })
-local Section = TabComandos:Section({ Title = "Admin", Icon = "user-cog", Opened = true })
+local TabComandos = Window:Tab({ Title = "Admin", Icon = "crown", Locked = false })
+local Section = TabComandos:Section({ Title = "Admin Commands", Icon = "user-cog", Opened = true })
 
 local function getPlayersList()
 local t = {}

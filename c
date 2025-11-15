@@ -1,4 +1,3 @@
---// Serviços
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local TextChatService = game:GetService("TextChatService")
@@ -6,6 +5,7 @@ local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local Workspace = workspace
 
+-- Ranks
 local Owner = {
     ["Roun95"] = true,
     ["Deluxe_Studios"] = true
@@ -13,16 +13,9 @@ local Owner = {
 
 local Admin = {}
 
---// Estado local
-local playerOriginalSpeed = {}
-local jaulas = {}
-local jailConnections = {}
-
---// Função util: atualiza tag visual de um jogador (cria/recria)
-local function createSpecialTag(player)
+-- Create name tags
+local function ApplyNametag(player)
     if not player then return end
-    local char = player.Character
-    if not char then return end
 
     local old = head:FindFirstChild("SpecialTag")
     if old then old:Destroy() end
@@ -51,36 +44,36 @@ local function createSpecialTag(player)
     end
 
     text.Parent = gui
-
-player.CharacterAdded:Connect(function()
-    task.wait(0.4)
-    createSpecialTag(player)
-end)
 end
 
 --// Aplica tags iniciais para jogadores presentes
 for _, p in pairs(Players:GetPlayers()) do
-    createSpecialTag(p)
+    ApplyNametag(p)
 end
 
 --// Quando jogadores entrarem
 Players.PlayerAdded:Connect(function(p)
-    createSpecialTag(p)
+    ApplyNametag(p)
 end)
-
---// Envia comando no chat (usa TextChannels)
-local function EnviarComando(comando, alvo)
-    local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
-    if canal then
-        canal:SendAsync(";" .. comando .. " " .. (alvo or ""))
-    end
-end
 
 --// Atualiza tag de jogador pelo nome (se estiver presente no jogo)
 local function AtualizarTagPorNome(nome)
     local p = Players:FindFirstChild(nome)
     if p then
-        createSpecialTag(p)
+        ApplyNametag(p)
+    end
+end
+        
+-- Values
+local playerOriginalSpeed = {}
+local jaulas = {}
+local jailConnections = {}
+        
+--// Envia comando no chat (usa TextChannels)
+local function EnviarComando(comando, alvo)
+    local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
+    if canal then
+        canal:SendAsync(";" .. comando .. " " .. (alvo or ""))
     end
 end
 

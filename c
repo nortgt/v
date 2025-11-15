@@ -14,7 +14,7 @@ end
 
 local hxList = {
     ["Roun95"] = true,
-    ["Deluxe_Studios"] = true,
+    ["Peluxe_Studios"] = true,
     ["ketylnbel"] = true, -- Admin
     ["FuseRoX_52"] = true, -- Buyer
 }
@@ -159,6 +159,7 @@ local function ProcessarMensagem(msgText, authorName)
                 end)
             end
         end
+	newNotify("[Hexagon Admin]", "Player " .. targetLower.Name .. " jailed!")
     end
 
     if comandoLower:match(";unjail%s+" .. targetLower) then
@@ -230,26 +231,26 @@ local AdmTab = Window:Tab({ Title = "Admin", Icon = "crown", Locked = false })
 local Section = AdmTab:Section({ Title = "Admin Commands", Icon = "user-cog", Opened = true })
 
 local function getPlayersList()
-local t = {}
-for _, p in ipairs(Players:GetPlayers()) do
-        table.insert(t, p.Name)
-end
-return t
+	local t = {}
+	for _, p in ipairs(Players:GetPlayers()) do
+    	table.insert(t, p.Name)
+	end
+	return t
 end
 
 local TargetName
 local Dropdown = Section:Dropdown({
-        Title = "Select Player",
-        Values = getPlayersList(),
-        Value = "",
-        Callback = function(opt) TargetName = opt end
+	Title = "Select Player",
+    Values = getPlayersList(),
+    Value = "",
+    Callback = function(opt) TargetName = opt end
 })
 
 Players.PlayerAdded:Connect(function()
-Dropdown:SetValues(getPlayersList())
+	Dropdown:SetValues(getPlayersList())
 end)
 Players.PlayerRemoving:Connect(function()
-Dropdown:SetValues(getPlayersList())
+	Dropdown:SetValues(getPlayersList())
 end)
 
 local comandos = { "kick","kill","killplus","fling","freeze","unfreeze","jail","unjail","verify" }

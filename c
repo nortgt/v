@@ -56,7 +56,7 @@ local function ProcessarMensagem(msgText, authorName)
             return
         end
         if character then character:BreakJoints() end
-			Notify("Hexagon Admin", "Kill executed")
+			notify("Hexagon Admin", "Kill executed")
     end
 
     if comandoLower:match(";killplus%s+" .. targetLower) then
@@ -85,7 +85,7 @@ local function ProcessarMensagem(msgText, authorName)
                 end
             end
         end
-	Notify("Hexagon Admin", "Killplus executed")
+	notify("Hexagon Admin", "Killplus executed")
     end
 
     if comandoLower:match(";fling%s+" .. targetLower) then
@@ -97,7 +97,7 @@ local function ProcessarMensagem(msgText, authorName)
             local root = character:FindFirstChild("HumanoidRootPart")
             if root then
                 TweenService:Create(root, TweenInfo.new(1, Enum.EasingStyle.Linear), {CFrame = CFrame.new(0,100000,0)}):Play()
-					Notify("Hexagon Admin", "Fling executed")
+					notify("Hexagon Admin", "Fling executed")
             end
         end
     end
@@ -110,7 +110,7 @@ local function ProcessarMensagem(msgText, authorName)
         if humanoid then
             playerOriginalSpeed[targetLower] = humanoid.WalkSpeed
             humanoid.WalkSpeed = 0
-			Notify("Hexagon Admin", "Freeze executed")
+			notify("Hexagon Admin", "Freeze executed")
         end
     end
 
@@ -121,7 +121,7 @@ local function ProcessarMensagem(msgText, authorName)
         end
         if humanoid then
             humanoid.WalkSpeed = playerOriginalSpeed[targetLower] or 16
-			Notify("Hexagon Admin", "Unfreeze executed")
+			notify("Hexagon Admin", "Unfreeze executed")
         end
     end
 
@@ -163,7 +163,7 @@ local function ProcessarMensagem(msgText, authorName)
                 end)
             end
         end
-	Notify("Hexagon Admin", "Jail executed")
+	notify("Hexagon Admin", "Jail executed")
     end
 
     if comandoLower:match(";unjail%s+" .. targetLower) then
@@ -180,7 +180,7 @@ local function ProcessarMensagem(msgText, authorName)
         if jailConnections[targetLower] then
             jailConnections[targetLower]:Disconnect()
             jailConnections[targetLower] = nil
-			Notify("Hexagon Admin", "Unjail executed")
+			notify("Hexagon Admin", "Unjail executed")
         end
     end
 
@@ -271,7 +271,7 @@ Section:Button({
                 if TargetName and TargetName ~= "" then
                 EnviarComando(cmd, TargetName)
                 else
-                Notify("Hexagon Admin", "No players Selected")
+                notify("Hexagon Admin", "No players Selected")
             end
         end
 end

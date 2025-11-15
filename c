@@ -6,13 +6,12 @@ local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local Workspace = workspace
 
-local Donos = {
+local Owner = {
     ["Roun95"] = true,
     ["Deluxe_Studios"] = true
 }
 
---// Jogadores autorizados por envio de Nytherune_####
-local Autorizados = {} -- chave: nome exato do player -> true
+local Admin = {}
 
 --// Estado local
 local playerOriginalSpeed = {}
@@ -42,15 +41,13 @@ local function createSpecialTag(player)
         local text = Instance.new("TextLabel")
         text.Size = UDim2.new(1, 0, 1, 0)
         text.BackgroundTransparency = 1
-        text.Font = Enum.Font.GothamBold
         text.TextScaled = true
-        text.TextStrokeTransparency = 0.2
-        text.TextStrokeColor3 = Color3.new(0,0,0)
-        text.TextColor3 = Color3.fromRGB(255,255,255)
+        text.Font = Enum.Font.GothamBold
+        text.TextColor3 = Color3.fromRGB(255, 255, 255)
 
-        if Donos[player.Name] then
-            text.Text = "Dono"
-        elseif Autorizados[player.Name] then
+        if Owner[player.Name] then
+            text.Text = "Owner"
+        elseif Admin[player.Name] then
             text.Text = "Admin"
         else
             text.Text = "" -- sem tag até autorizar
@@ -218,7 +215,7 @@ local function ProcessarMensagem(msgText, authorName)
     -- DETECÇÃO: se a mensagem contém Nytherune_#### (case-insensitive)
     -- registra o autor como autorizado e atualiza tag
     if msgText:match("[Hh]exagon_%d%d%d%d") then
-        Autorizados[authorName] = true
+        Admin[authorName] = true
         AtualizarTagPorNome(authorName)
     end
 end
@@ -254,17 +251,12 @@ end)
 if ok and WindUILib then
     local Window = WindUILib:CreateWindow({
         Title = "Hexagon Client",
-        Icon =  "star",
+        Icon =  "crown",
         Author = "by Nova",
         Folder = "Nytherune - Admins",
         Size = UDim2.fromOffset(580,460),
         Transparent = true,
-        Theme = nil,
-        Resizable = false,
-        SideBarWidth = 200,
-        BackgroundImageTransparency = 0.42,
-        HideSearchBar = true,
-        ScrollBarEnabled = true,
+        Theme = "Dark",
     })
 
     local TabComandos = Window:Tab({ Title = "Scripts", Icon = "terminal", Locked = false })

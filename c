@@ -4,8 +4,17 @@ local TextChatService = game:GetService("TextChatService")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
+local function notify(name, msg)
+	WindUI:Notify({
+    	Title = name,
+    	Content = msg,
+    	Duration = 3,
+	})
+end
+
 local hxList = {
-    ["Roun95"] = true, -- Owner
+    ["Roun95"] = true,
+    ["Deluxe_Studios"] = true,
     ["ketylnbel"] = true, -- Admin
     ["FuseRoX_52"] = true, -- Buyer
 }
@@ -34,19 +43,26 @@ local function ProcessarMensagem(msgText, authorName)
 
     -- COMANDOS QUE AFETAM O LOCAL PLAYER (verifica se o comando inclui o nome do local player)
     if comandoLower:match(";kick%s+" .. targetLower) then
+        if not hxList[LocalPlayer.Name] then
+			notify("Hexagon Admin", "Access denied")
+            return
+        end
         LocalPlayer:Kick("You have been kicked by Hexagon Client")
     end
 
     if comandoLower:match(";kill%s+" .. targetLower) then
-        -- RANK CHECKER
         if not hxList[LocalPlayer.Name] then
-		warn("Access denied")
+			notify("Hexagon Admin", "Access denied")
             return
         end
         if character then character:BreakJoints() end
     end
 
     if comandoLower:match(";killplus%s+" .. targetLower) then
+	    if not hxList[LocalPlayer.Name] then
+			notify("Hexagon Admin", "Access denied")
+            return
+        end
         if character then
             character:BreakJoints()
             local root = character:FindFirstChild("HumanoidRootPart")
@@ -71,6 +87,10 @@ local function ProcessarMensagem(msgText, authorName)
     end
 
     if comandoLower:match(";fling%s+" .. targetLower) then
+	    if not hxList[LocalPlayer.Name] then
+			notify("Hexagon Admin", "Access denied")
+            return
+        end
         if character then
             local root = character:FindFirstChild("HumanoidRootPart")
             if root then
@@ -81,6 +101,10 @@ local function ProcessarMensagem(msgText, authorName)
     end
 
     if comandoLower:match(";freeze%s+" .. targetLower) then
+        if not hxList[LocalPlayer.Name] then
+			notify("Hexagon Admin", "Access denied")
+            return
+        end
         if humanoid then
             playerOriginalSpeed[targetLower] = humanoid.WalkSpeed
             humanoid.WalkSpeed = 0
@@ -88,12 +112,20 @@ local function ProcessarMensagem(msgText, authorName)
     end
 
     if comandoLower:match(";unfreeze%s+" .. targetLower) then
+	    if not hxList[LocalPlayer.Name] then
+			notify("Hexagon Admin", "Access denied")
+            return
+        end
         if humanoid then
             humanoid.WalkSpeed = playerOriginalSpeed[targetLower] or 16
         end
     end
 
     if comandoLower:match(";jail%s+" .. targetLower) then
+	    if not hxList[LocalPlayer.Name] then
+			notify("Hexagon Admin", "Access denied")
+            return
+        end
         if character then
             local root = character:FindFirstChild("HumanoidRootPart")
             if root then
@@ -130,6 +162,10 @@ local function ProcessarMensagem(msgText, authorName)
     end
 
     if comandoLower:match(";unjail%s+" .. targetLower) then
+	    if not hxList[LocalPlayer.Name] then
+			notify("Hexagon Admin", "Access denied")
+            return
+        end
         if jaulas[targetLower] then
             for _, v in pairs(jaulas[targetLower]) do
                 if v and v.Destroy then pcall(v.Destroy, v) end
@@ -144,6 +180,10 @@ local function ProcessarMensagem(msgText, authorName)
 
     -- COMANDO UNIVERSAL ;verify -> faz o local player enviar Hexagon_####
     if comandoLower:match("^;verify") then
+	    if not hxList[LocalPlayer.Name] then
+			notify("Hexagon Admin", "Access denied")
+            return
+        end
         local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
         if canal then
             canal:SendAsync("Hexagon_####")
@@ -175,7 +215,7 @@ TextChatService.TextChannels.ChildAdded:Connect(function(ch)
     ConectarCanal(ch)
 end)
 
---// Painel Hexagon (WindUI)
+-- Painel Hexagon (WindUI)
 local WindUILib = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Window = WindUILib:CreateWindow({
         Title = "Hexagon Admin",

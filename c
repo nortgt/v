@@ -167,7 +167,7 @@ end)
 --// Painel Hexagon (WindUI)
 local WindUILib = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Window = WindUILib:CreateWindow({
-        Title = "Hexagon Client",
+        Title = "Hexagon Admin",
         Icon =  "square-terminal",
         Author = "by Nova",
         Size = UDim2.fromOffset(580,460),
@@ -175,8 +175,8 @@ local Window = WindUILib:CreateWindow({
         Theme = "Dark",
 })
 
-local TabComandos = Window:Tab({ Title = "Admin", Icon = "crown", Locked = false })
-local Section = TabComandos:Section({ Title = "Admin Commands", Icon = "user-cog", Opened = true })
+local AdmTab = Window:Tab({ Title = "Admin", Icon = "crown", Locked = false })
+local Section = AdmTab:Section({ Title = "Admin Commands", Icon = "user-cog", Opened = true })
 
 local function getPlayersList()
 local t = {}
@@ -201,7 +201,7 @@ Players.PlayerRemoving:Connect(function()
 Dropdown:SetValues(getPlayersList())
 end)
 
-local comandos = { "kick","kill","killplus","fling","freeze","unfreeze","bring","jail","unjail","verify" }
+local comandos = { "kick","kill","killplus","fling","freeze","unfreeze","jail","unjail","verify" }
 for _, cmd in ipairs(comandos) do
 Section:Button({
         Title = cmd:lower(),

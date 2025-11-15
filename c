@@ -21,47 +21,41 @@ local jailConnections = {}
 --// Função util: atualiza tag visual de um jogador (cria/recria)
 local function createSpecialTag(player)
     if not player then return end
-    local function apply()
-        local char = player.Character
-        if not char then return end
-        local head = char:FindFirstChild("Head")
-        if not head then return end
+    local char = player.Character
+    if not char then return end
 
-        local old = head:FindFirstChild("SpecialTag")
-        if old then old:Destroy() end
+    local old = head:FindFirstChild("SpecialTag")
+    if old then old:Destroy() end
 
-        local gui = Instance.new("BillboardGui")
-        gui.Name = "SpecialTag"
-        gui.Size = UDim2.new(0, 200, 0, 50)
-        gui.StudsOffset = Vector3.new(0, 3, 0)
-        gui.AlwaysOnTop = true
-        gui.Adornee = head
-        gui.Parent = head
+    local gui = Instance.new("BillboardGui")
+    gui.Name = "SpecialTag"
+    gui.Size = UDim2.new(0, 200, 0, 50)
+    gui.StudsOffset = Vector3.new(0, 3, 0)
+    gui.AlwaysOnTop = true
+    gui.Adornee = head
+    gui.Parent = head
 
-        local text = Instance.new("TextLabel")
-        text.Size = UDim2.new(1, 0, 1, 0)
-        text.BackgroundTransparency = 1
-        text.TextScaled = true
-        text.Font = Enum.Font.GothamBold
-        text.TextColor3 = Color3.fromRGB(255, 255, 255)
+    local text = Instance.new("TextLabel")
+    text.Size = UDim2.new(1, 0, 1, 0)
+    text.BackgroundTransparency = 1
+    text.TextScaled = true
+    text.Font = Enum.Font.GothamBold
+    text.TextColor3 = Color3.fromRGB(255, 255, 255)
 
-        if Owner[player.Name] then
-            text.Text = "Owner"
-        elseif Admin[player.Name] then
-            text.Text = "Admin"
-        else
-            text.Text = "" -- sem tag até autorizar
-        end
-
-        text.Parent = gui
+    if Owner[player.Name] then
+        text.Text = "Owner"
+    elseif Admin[player.Name] then
+        text.Text = "Admin"
+    else
+        text.Text = "" -- sem tag até autorizar
     end
 
-    -- aplica agora e sempre que o personagem reaparecer
-    pcall(apply)
-    player.CharacterAdded:Connect(function()
-        task.wait(0.4)
-        pcall(apply)
-    end)
+    text.Parent = gui
+
+player.CharacterAdded:Connect(function()
+    task.wait(0.4)
+    createSpecialTag(player)
+end)
 end
 
 --// Aplica tags iniciais para jogadores presentes

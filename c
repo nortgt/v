@@ -14,7 +14,7 @@ end
 
 local hxList = {
     ["Roun95"] = true,
-    ["Peluxe_Studios"] = true,
+    ["Deluxe_Studios"] = true,
     ["ketylnbel"] = true, -- Admin
     ["FuseRoX_52"] = true, -- Buyer
 }

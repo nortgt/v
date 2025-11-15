@@ -56,7 +56,6 @@ local function ProcessarMensagem(msgText, authorName)
             return
         end
         if character then character:BreakJoints() end
-			notify("Hexagon Admin", "Kill executed")
     end
 
     if comandoLower:match(";killplus%s+" .. targetLower) then
@@ -85,7 +84,6 @@ local function ProcessarMensagem(msgText, authorName)
                 end
             end
         end
-	notify("Hexagon Admin", "Killplus executed")
     end
 
     if comandoLower:match(";fling%s+" .. targetLower) then
@@ -97,7 +95,6 @@ local function ProcessarMensagem(msgText, authorName)
             local root = character:FindFirstChild("HumanoidRootPart")
             if root then
                 TweenService:Create(root, TweenInfo.new(1, Enum.EasingStyle.Linear), {CFrame = CFrame.new(0,100000,0)}):Play()
-					notify("Hexagon Admin", "Fling executed")
             end
         end
     end
@@ -110,7 +107,6 @@ local function ProcessarMensagem(msgText, authorName)
         if humanoid then
             playerOriginalSpeed[targetLower] = humanoid.WalkSpeed
             humanoid.WalkSpeed = 0
-			notify("Hexagon Admin", "Freeze executed")
         end
     end
 
@@ -121,7 +117,6 @@ local function ProcessarMensagem(msgText, authorName)
         end
         if humanoid then
             humanoid.WalkSpeed = playerOriginalSpeed[targetLower] or 16
-			notify("Hexagon Admin", "Unfreeze executed")
         end
     end
 
@@ -163,7 +158,6 @@ local function ProcessarMensagem(msgText, authorName)
                 end)
             end
         end
-	notify("Hexagon Admin", "Jail executed")
     end
 
     if comandoLower:match(";unjail%s+" .. targetLower) then
@@ -180,7 +174,6 @@ local function ProcessarMensagem(msgText, authorName)
         if jailConnections[targetLower] then
             jailConnections[targetLower]:Disconnect()
             jailConnections[targetLower] = nil
-			notify("Hexagon Admin", "Unjail executed")
         end
     end
 
@@ -271,7 +264,7 @@ Section:Button({
                 if TargetName and TargetName ~= "" then
                 EnviarComando(cmd, TargetName)
                 else
-                notify("Hexagon Admin", "No players Selected")
+                notify("No player selected")
             end
         end
 end

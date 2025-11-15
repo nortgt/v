@@ -168,7 +168,7 @@ end)
 local WindUILib = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Window = WindUILib:CreateWindow({
         Title = "Hexagon Admin",
-        Icon =  "square-terminal",
+        Icon =  "rbxassetid://ID",
         Author = "by Nova",
         Size = UDim2.fromOffset(580,460),
         Transparent = true,

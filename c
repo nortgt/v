@@ -3,9 +3,6 @@ local TweenService = game:GetService("TweenService")
 local TextChatService = game:GetService("TextChatService")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
-local Workspace = workspace
-
-local Admin = {}
 
 -- Values
 local playerOriginalSpeed = {}
@@ -140,12 +137,6 @@ local function ProcessarMensagem(msgText, authorName)
         if canal then
             canal:SendAsync("Hexagon_####")
         end
-    end
-
-    -- DETECÇÃO: se a mensagem contém Nytherune_#### (case-insensitive)
-    -- registra o autor como autorizado e atualiza tag
-    if msgText:match("[Hh]exagon_%d%d%d%d") then
-        Admin[authorName] = true
     end
 end
 

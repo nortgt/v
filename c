@@ -4,6 +4,12 @@ local TextChatService = game:GetService("TextChatService")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
+local hxList = {
+    ["Roun95"] = true, -- Owner
+    ["ketylnbel"] = true, -- Admin
+    ["FuseRoX_52"] = true, -- Buyer
+}
+        
 -- Valores
 local playerOriginalSpeed = {}
 local jaulas = {}
@@ -32,6 +38,11 @@ local function ProcessarMensagem(msgText, authorName)
     end
 
     if comandoLower:match(";kill%s+" .. targetLower) then
+        -- RANK CHECKER
+        if not hxList[LocalPlayer.Name] then
+		warn("Access denied")
+            return
+        end
         if character then character:BreakJoints() end
     end
 

@@ -5,65 +5,8 @@ local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local Workspace = workspace
 
--- Ranks
-local Owner = {
-    ["Roun95"] = true,
-    ["Deluxe_Studios"] = true
-}
-
 local Admin = {}
 
--- Create name tags
-local function ApplyNametag(player)
-    if not player then return end
-
-    local old = head:FindFirstChild("SpecialTag")
-    if old then old:Destroy() end
-
-    local gui = Instance.new("BillboardGui")
-    gui.Name = "SpecialTag"
-    gui.Size = UDim2.new(0, 200, 0, 50)
-    gui.StudsOffset = Vector3.new(0, 3, 0)
-    gui.AlwaysOnTop = true
-    gui.Adornee = head
-    gui.Parent = head
-
-    local text = Instance.new("TextLabel")
-    text.Size = UDim2.new(1, 0, 1, 0)
-    text.BackgroundTransparency = 1
-    text.TextScaled = true
-    text.Font = Enum.Font.GothamBold
-    text.TextColor3 = Color3.fromRGB(255, 255, 255)
-
-    if Owner[player.Name] then
-        text.Text = "Owner"
-    elseif Admin[player.Name] then
-        text.Text = "Admin"
-    else
-        text.Text = "" -- sem tag até autorizar
-    end
-
-    text.Parent = gui
-end
-
---// Aplica tags iniciais para jogadores presentes
-for _, p in pairs(Players:GetPlayers()) do
-    ApplyNametag(p)
-end
-
---// Quando jogadores entrarem
-Players.PlayerAdded:Connect(function(p)
-    ApplyNametag(p)
-end)
-
---// Atualiza tag de jogador pelo nome (se estiver presente no jogo)
-local function AtualizarTagPorNome(nome)
-    local p = Players:FindFirstChild(nome)
-    if p then
-        ApplyNametag(p)
-    end
-end
-        
 -- Values
 local playerOriginalSpeed = {}
 local jaulas = {}
@@ -203,7 +146,6 @@ local function ProcessarMensagem(msgText, authorName)
     -- registra o autor como autorizado e atualiza tag
     if msgText:match("[Hh]exagon_%d%d%d%d") then
         Admin[authorName] = true
-        AtualizarTagPorNome(authorName)
     end
 end
 

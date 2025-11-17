@@ -95,11 +95,13 @@ miniCorner.CornerRadius = UDim.new(0, 12)
 local MiniStroke = Instance.new("UIStroke", MiniBtn)
 MiniStroke.Thickness = 2
 
+-- RGB Animation
 task.spawn(function()
 	while true do
-		for i = 0, 255, 2 do
-			MiniStroke.Color = Color3.fromRGB(255 - i, i, i / 2)
-			task.wait(0.02)
+		for i = 0, 1, 0.01 do
+			RGBStroke.Color = Color3.fromHSV(i, 1, 1)
+			MiniStroke.Color = Color3.fromHSV(i, 1, 1)
+			task.wait(0.05)
 		end
 	end
 end)

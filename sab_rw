@@ -171,7 +171,7 @@ local function Toggle(text)
 	c.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 	Instance.new("UICorner", c).CornerRadius = UDim.new(1, 0)
 
-	return frame, t, label, circle
+	return frame, label, t, c
 end
 
 --/// ADD BUTTONS
@@ -182,8 +182,8 @@ local ESP = Button("ESP: OFF")
 local Speed = Button("Speed Boost")
 local AutoJump = Button("Salto Automático")
 
-local NoclipFrame, NoclipToggle, NoclipLabel = Toggle("Noclip")
-local InfJFrame, InfJToggle, InfJLabel, InfJCircle = Toggle("Infinite Jump")
+local NoclipFrame, NoclipLabel, NoclipToggle = Toggle("Noclip")
+local InfJFrame, InfJLabel, InfJToggle, InfJCircle = Toggle("Infinite Jump")
 
 --/// FEATURES
 
@@ -216,9 +216,9 @@ end)
 local noclipOn = false
 NoclipToggle.MouseButton1Click:Connect(function()
 	noclipOn = not noclipOn
+	NoclipLabel.Text = "Noclip: " .. (noclipOn and "ON" or "OFF")
 	NoclipToggle.Text = noclipOn and "ON" or "OFF"
 	NoclipToggle.BackgroundColor3 = noclipOn and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-	NoclipLabel.Text = "Noclip: " .. (noclipOn and "ON" or "OFF")
 end)
 
 game:GetService("RunService").Stepped:Connect(function()

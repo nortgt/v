@@ -26,16 +26,6 @@ local RGBStroke = Instance.new("UIStroke", MainFrame)
 RGBStroke.Thickness = 2
 RGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
--- RGB Animation
-task.spawn(function()
-	while true do
-		for i = 0, 1, 0.01 do
-			RGBStroke.Color = Color3.fromHSV(i, 1, 1)
-			task.wait(0.05)
-		end
-	end
-end)
-
 --// TITLE TEXT
 local Title = Instance.new("TextLabel", MainFrame)
 Title.Position = UDim2.new(0.3, 0, 0, 20)
@@ -108,6 +98,27 @@ end)
 
 --/// UI CREATOR FUNCTIONS
 
+-- Update scroll size
+Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+	Scroll.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y + 20)
+end)
+
+--// MINIMIZE
+Minimize.MouseButton1Click:Connect(function()
+	MainFrame.Visible = false
+	MiniBtn.Visible = true
+end)
+
+MiniBtn.MouseButton1Click:Connect(function()
+	MainFrame.Visible = true
+	MiniBtn.Visible = false
+end)
+
+--// CLOSE WINDOW
+CloseButton.MouseButton1Click:Connect(function()
+	ScreenGui:Destroy()
+end)
+
 local function Button(text)
 	local b = Instance.new("TextButton", Scroll)
 	b.Size = UDim2.new(1, -10, 0, 40)
@@ -165,28 +176,7 @@ local Speed = Button("Speed Boost")
 local AutoJump = Button("Salto Automático")
 
 local NoclipFrame, NoclipToggle, NoclipLabel = Toggle("Noclip")
-local InfJFrame, InfJToggle, InfJLabel = Toggle("Salto Infinito")
-
--- Update scroll size
-Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-	Scroll.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y + 20)
-end)
-
---// MINIMIZE
-Minimize.MouseButton1Click:Connect(function()
-	MainFrame.Visible = false
-	MiniBtn.Visible = true
-end)
-
-MiniBtn.MouseButton1Click:Connect(function()
-	MainFrame.Visible = true
-	MiniBtn.Visible = false
-end)
-
---// CLOSE WINDOW
-CloseButton.MouseButton1Click:Connect(function()
-	ScreenGui:Destroy()
-end)
+local InfJFrame, InfJToggle, InfJLabel = Toggle("Infinite Jump")
 
 --/// FEATURES
 
@@ -240,7 +230,7 @@ InfJToggle.MouseButton1Click:Connect(function()
 	infJump = not infJump
 	InfJToggle.Text = infJump and "ON" or "OFF"
 	InfJToggle.BackgroundColor3 = infJump and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-	InfJLabel.Text = "Salto Infinito: " .. (infJump and "ON" or "OFF")
+	InfJLabel.Text = "Infinite Jump: " .. (infJump and "ON" or "OFF")
 end)
 
 mouse.KeyDown:Connect(function(key)

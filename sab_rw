@@ -194,31 +194,6 @@ local BFFrame, BFLabel, BFToggle, BFCircle = Toggle("Bubble Float")
 
 --/// FEATURES
 
--- Speed Boost
-local speedOn = false
-Speed.MouseButton1Click:Connect(function()
-	speedOn = not speedOn
-	if speedOn then
-		player.Character.Humanoid.WalkSpeed = 50
-		Speed.Text = "Speed Boost (ON)"
-	else
-		player.Character.Humanoid.WalkSpeed = 16
-		Speed.Text = "Speed Boost"
-	end
-end)
-
--- Auto Jump
-local autoJump = false
-AutoJump.MouseButton1Click:Connect(function()
-	autoJump = not autoJump
-	AutoJump.Text = autoJump and "Salto Automático (ON)" or "Salto Automático"
-
-	while autoJump do
-		player.Character.Humanoid.Jump = true
-		task.wait(0.1)
-	end
-end)
-
 -- Noclip
 local noclipOn = false
 NoclipToggle.MouseButton1Click:Connect(function()

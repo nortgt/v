@@ -1,0 +1,343 @@
+--// SERVICES
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
+
+local themes = {
+    dark = {
+        Frame = Color3.fromRGB(15,15,15),
+        Panel = Color3.fromRGB(30,30,30),
+        ToggleOff = Color3.fromRGB(40,40,40),
+        Text = Color3.fromRGB(255,255,255),
+        Accent = Color3.fromRGB(0,170,0)
+    },
+    light = {
+        Frame = Color3.fromRGB(255,255,255),
+        Panel = Color3.fromRGB(242,242,242),
+        ToggleOff = Color3.fromRGB(220,220,220),
+        Text = Color3.fromRGB(10,10,10),
+        Accent = Color3.fromRGB(0,170,255)
+    }
+}
+
+local currentTheme = "dark"
+
+--// GUI ROOT
+local ScreenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+ScreenGui.ResetOnSpawn = false
+
+--// MAIN FRAME
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 220, 0, 250)
+MainFrame.Position = UDim2.new(0.35, 0, 0, 0)
+MainFrame.BackgroundColor3 = themes.dark.Frame
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+local frameCorner = Instance.new("UICorner", MainFrame)
+frameCorner.CornerRadius = UDim.new(0, 12)
+
+--// RGB STROKE
+local RGBStroke = Instance.new("UIStroke", MainFrame)
+RGBStroke.Thickness = 2
+RGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+--// TITLE TEXT
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Position = UDim2.new(0.22, 0, 0, 20)
+Title.Text = "HEXAGON"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
+Title.TextColor3 = themes.dark.Text
+
+--// CLOSE BUTTON
+local CloseButton = Instance.new("TextButton", MainFrame)
+CloseButton.Size = UDim2.new(0, 35, 0, 30)
+CloseButton.Position = UDim2.new(1, -40, 0, 5)
+CloseButton.Text = "X"
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.TextSize = 14
+CloseButton.TextColor3 = themes.dark.Text
+CloseButton.BackgroundColor3 = themes.dark.Panel
+Instance.new("UICorner", CloseButton)
+
+--// MINIMIZE BUTTON
+local Minimize = Instance.new("TextButton", MainFrame)
+Minimize.Text = "-"
+Minimize.Font = Enum.Font.GothamBold
+Minimize.TextSize = 18
+Minimize.Size = UDim2.new(0, 35, 0, 30)
+Minimize.Position = UDim2.new(1, -80, 0, 5)
+Minimize.TextColor3 = themes.dark.Text
+Minimize.BackgroundColor3 = themes.dark.Panel
+Instance.new("UICorner", Minimize)
+
+--// THEME BUTTON
+local Theme = Instance.new("TextButton", MainFrame)
+Theme.Text = "☀"
+Theme.Font = Enum.Font.GothamBold
+Theme.TextSize = 18
+Theme.Size = UDim2.new(0, 35, 0, 30)
+Theme.Position = UDim2.new(1, -120, 0, 5)
+Theme.TextColor3 = themes.dark.Text
+Theme.BackgroundColor3 = themes.dark.Panel
+Instance.new("UICorner", Theme)
+
+--// SCROLLING FRAME
+local Scroll = Instance.new("ScrollingFrame", MainFrame)
+Scroll.Size = UDim2.new(1, -20, 1, -50)
+Scroll.Position = UDim2.new(0, 10, 0, 45)
+Scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+Scroll.ScrollBarThickness = 2
+Scroll.BackgroundTransparency = 1
+Scroll.ScrollingDirection = Enum.ScrollingDirection.Y
+
+local Layout = Instance.new("UIListLayout", Scroll)
+Layout.Padding = UDim.new(0, 10)
+
+--// MINIMIZED FLOATING BUTTON
+local MiniBtn = Instance.new("ImageButton", ScreenGui)
+MiniBtn.Size = UDim2.new(0, 40, 0, 40)
+MiniBtn.Position = UDim2.new(0.15, 0, 0.7, 0)
+MiniBtn.Image = "rbxassetid://108946066610871"
+MiniBtn.BackgroundColor3 = themes.dark.Panel
+MiniBtn.Visible = false
+MiniBtn.Active = true
+MiniBtn.Draggable = true
+
+local miniCorner = Instance.new("UICorner", MiniBtn)
+miniCorner.CornerRadius = UDim.new(0, 12)
+
+-- RGB Stroke for minimized button
+local MiniStroke = Instance.new("UIStroke", MiniBtn)
+MiniStroke.Thickness = 2
+
+-- RGB Animation
+task.spawn(function()
+	while true do
+		for i = 0, 1, 0.01 do
+			RGBStroke.Color = Color3.fromHSV(i, 1, 1)
+			MiniStroke.Color = Color3.fromHSV(i, 1, 1)
+			task.wait(0.05)
+		end
+	end
+end)
+
+--/// UI CREATOR FUNCTIONS
+
+-- Update scroll size
+Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+	Scroll.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y + 20)
+end)
+
+--// MINIMIZE
+Minimize.MouseButton1Click:Connect(function()
+	MainFrame.Visible = false
+	MiniBtn.Visible = true
+end)
+
+MiniBtn.MouseButton1Click:Connect(function()
+	MainFrame.Visible = true
+	MiniBtn.Visible = false
+end)
+
+--// CLOSE WINDOW
+CloseButton.MouseButton1Click:Connect(function()
+	ScreenGui:Destroy()
+end)
+
+Theme.MouseButton1Click:Connect(function()
+	MainFrame.Visible = false
+	MiniBtn.Visible = true
+end)
+
+local function Button(text)
+	local b = Instance.new("TextButton", Scroll)
+	b.Size = UDim2.new(1, -10, 0, 40)
+	b.BackgroundColor3 = themes.dark.ToggleOff
+	b.TextColor3 = themes.dark.Text
+	b.Font = Enum.Font.GothamBold
+	b.TextSize = 14
+	b.Text = text
+	Instance.new("UICorner", b)
+
+	-- Hover effect
+	b.MouseEnter:Connect(function()
+		TweenService:Create(b, TweenInfo.new(0.15), {Size = UDim2.new(1, -5, 0, 45), BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play()
+	end)
+
+	b.MouseLeave:Connect(function()
+		TweenService:Create(b, TweenInfo.new(0.15), {Size = UDim2.new(1, -10, 0, 40), BackgroundColor3 = Color3.fromRGB(40, 40, 40)}):Play()
+	end)
+
+	return b
+end
+
+local function Toggle(text)
+	local frame = Instance.new("Frame", Scroll)
+	frame.Size = UDim2.new(1, -10, 0, 40)
+	frame.BackgroundColor3 = themes.dark.ToggleOff
+	Instance.new("UICorner", frame)
+
+	local label = Instance.new("TextLabel", frame)
+	label.Size = UDim2.new(0.7, 0, 1, 0)
+	label.BackgroundTransparency = 1
+	label.Text = text .. ": OFF"
+	label.TextColor3 = themes.dark.Text
+	label.Font = Enum.Font.GothamBold
+	label.TextSize = 14
+
+	local t = Instance.new("TextButton", frame)
+	t.AnchorPoint = Vector2.new(1, 0.5)
+	t.Position = UDim2.new(0.97, 0, 0.5, 0)
+	t.Size = UDim2.new(0, 45, 0, 25)
+	t.Text = ""
+	t.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+	t.AutoButtonColor = false
+	Instance.new("UICorner", t).CornerRadius = UDim.new(1, 0)
+
+	local c = Instance.new("Frame", t)
+	c.Size = UDim2.new(0, 20, 0, 20)
+	c.Position = UDim2.new(0, 2, 0.5, 0)
+	c.AnchorPoint = Vector2.new(0, 0.5)
+	c.BackgroundColor3 = themes.dark.Text
+	Instance.new("UICorner", c).CornerRadius = UDim.new(1, 0)
+
+	return frame, label, t, c
+end
+
+--/// ADD BUTTONS
+local Float = Button("Float: OFF")
+local Slab = Button("Slab: OFF")
+local ESP = Button("ESP: OFF")
+
+local Speed = Button("Speed Boost")
+local AutoJump = Button("Salto Automático")
+
+local NoclipFrame, NoclipLabel, NoclipToggle = Toggle("Noclip")
+local InfJFrame, InfJLabel, InfJToggle, InfJCircle = Toggle("Infinite Jump")
+
+--/// FEATURES
+
+-- Speed Boost
+local speedOn = false
+Speed.MouseButton1Click:Connect(function()
+	speedOn = not speedOn
+	if speedOn then
+		player.Character.Humanoid.WalkSpeed = 50
+		Speed.Text = "Speed Boost (ON)"
+	else
+		player.Character.Humanoid.WalkSpeed = 16
+		Speed.Text = "Speed Boost"
+	end
+end)
+
+-- Auto Jump
+local autoJump = false
+AutoJump.MouseButton1Click:Connect(function()
+	autoJump = not autoJump
+	AutoJump.Text = autoJump and "Salto Automático (ON)" or "Salto Automático"
+
+	while autoJump do
+		player.Character.Humanoid.Jump = true
+		task.wait(0.1)
+	end
+end)
+
+-- Noclip
+local noclipOn = false
+NoclipToggle.MouseButton1Click:Connect(function()
+	noclipOn = not noclipOn
+	NoclipLabel.Text = "Noclip: " .. (noclipOn and "ON" or "OFF")
+	NoclipToggle.Text = noclipOn and "ON" or "OFF"
+	NoclipToggle.BackgroundColor3 = noclipOn and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+end)
+
+game:GetService("RunService").Stepped:Connect(function()
+	if noclipOn and player.Character then
+		for _, v in pairs(player.Character:GetDescendants()) do
+			if v:IsA("BasePart") then
+				v.CanCollide = false
+			end
+		end
+	end
+end)
+
+-- Infinite Jump
+local infJump = false
+InfJToggle.MouseButton1Click:Connect(function()
+	infJump = not infJump
+	InfJLabel.Text = "Infinite Jump: " .. (infJump and "ON" or "OFF")
+
+	local targetPos = infJump and UDim2.new(1, -24, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)
+	local targetColor = infJump and themes[currentTheme].Accent or themes[currentTheme].ToggleOff
+	TweenService:Create(InfJCircle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetPos}):Play()
+	TweenService:Create(InfJToggle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetColor}):Play()
+end)
+
+mouse.KeyDown:Connect(function(key)
+	if key == " " and infJump then
+		player.Character.Humanoid:ChangeState("Jumping")
+	end
+end)
+
+-- ---------- UTIL ----------
+local function tween(instance, props, time, style, dir)
+    style = style or Enum.EasingStyle.Quart
+    dir = dir or Enum.EasingDirection.Out
+    local info = TweenInfo.new(time or 0.25, style, dir)
+    return TweenService:Create(instance, info, props)
+end
+
+-- ---------- THEME HANDLING ----------
+local function applyTheme(themeName)
+    currentTheme = themeName
+    local t = themes[themeName]
+
+    -- frame background
+    tween(mainFrame, {BackgroundColor3 = t.Frame}, 0.28):Play()
+
+    -- header buttons and title
+    Title.TextColor3 = t.Text
+    tween(minimizeBtn, {BackgroundColor3 = t.Panel, TextColor3 = t.Text}, 0.28):Play()
+    tween(themeBtn, {BackgroundColor3 = t.Panel, TextColor3 = t.Text}, 0.28):Play()
+    tween(closeBtn, {BackgroundColor3 = t.Panel, TextColor3 = t.Text}, 0.28):Play()
+
+    -- each toggle holder -> update colors smoothly
+    for _, child in ipairs(content:GetChildren()) do
+        if child:IsA("Frame") and child ~= topPadding and child ~= bottomPadding then
+            tween(child, {BackgroundColor3 = t.Panel}, 0.28):Play()
+            -- update toggle background and label colors
+            local toggleFrame = child:FindFirstChildOfClass("Frame")
+            local lbl = child:FindFirstChildOfClass("TextLabel")
+            if lbl then lbl.TextColor3 = t.Text end
+            if toggleFrame then
+                -- respect current on/off state
+                local isOn = false
+                local s = child:FindFirstChildWhichIsA("BindableEvent")
+                -- we cannot access internal state directly, so infer from label
+                if lbl and string.find(lbl.Text, "ON") then isOn = true end
+                if isOn then
+                    tween(toggleFrame, {BackgroundColor3 = t.Accent}, 0.22):Play()
+                else
+                    tween(toggleFrame, {BackgroundColor3 = t.ToggleOff}, 0.22):Play()
+                end
+            end
+        end
+    end
+
+    -- theme icon
+    Theme.Text = (themeName == "light") and "🌙" or "☀"
+end
+
+-- initial apply
+applyTheme(currentTheme)
+
+-- theme button behavior (option 2: next to X)
+Theme.MouseButton1Click:Connect(function()
+    local newTheme = (currentTheme == "dark") and "light" or "dark"
+    applyTheme(newTheme)
+end)

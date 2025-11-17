@@ -183,7 +183,7 @@ local Speed = Button("Speed Boost")
 local AutoJump = Button("Salto Automático")
 
 local NoclipFrame, NoclipLabel, NoclipToggle, NoclipCircle = Toggle("Noclip")
-local InfJFrame, InfJLabel, InfJToggle, InfJCircle = Toggle("Infinite Jump")
+local FPFrame, FPLabel, FPToggle, FPCircle = Toggle("Floating Platform")
 
 --/// FEATURES
 
@@ -233,20 +233,92 @@ game:GetService("RunService").Stepped:Connect(function()
 	end
 end)
 
--- Infinite Jump
-local infJump = false
-InfJToggle.MouseButton1Click:Connect(function()
-	infJump = not infJump
-	InfJLabel.Text = "Infinite Jump: " .. (infJump and "ON" or "OFF")
+-- Floating Platform
+local platformEnabled = false
+local platform = nil
+local updateConn = nil
 
-	local targetPos = infJump and UDim2.new(1, -24, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)
-	local targetColor = infJump and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(70, 70, 70)
-	TweenService:Create(InfJCircle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetPos}):Play()
-	TweenService:Create(InfJToggle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetColor}):Play()
-end)
+-- Mantener referencia al HumanoidRootPart y actualizar en respawn
+local humanoidRootPart
+local function onCharacterAdded(character)
+    humanoidRootPart = character:WaitForChild("HumanoidRootPart", 5)
+	-- Si la plataforma está encendida recrearla debajo del nuevo spawn
+    if platformEnabled and humanoidRootPart then
+        -- Si no existe plataforma, crearla
+        if not platform then
+            -- Llamamos a la función de crear más abajo
+            -- (la función createPlatform usa humanoidRootPart)
+        end
+    end
+end
 
-mouse.KeyDown:Connect(function(key)
-	if key == " " and infJump then
-		player.Character.Humanoid:ChangeState("Jumping")
-	end
+if player.Character then
+    onCharacterAdded(player.Character)
+end
+player.CharacterAdded:Connect(onCharacterAdded)
+
+-- Funciones para crear/eliminar y actualizar plataforma
+local function createPlatform()
+    if platform then return end
+    platform = Instance.new("Part")
+    platform.Name = "FloatingPlatform_" .. player.Name
+    platform.Size = Vector3.new(6, 1, 6)
+    platform.Anchored = true
+    platform.Material = Enum.Material.Neon
+    platform.Color = Color3.fromRGB(25, 25, 25)
+    platform.CanCollide = true
+    platform.TopSurface = Enum.SurfaceType.Smooth
+    platform.BottomSurface = Enum.SurfaceType.Smooth
+    platform.Parent = workspace
+
+    -- Conexión para seguir la posición del jugador (RenderStepped para suavidad)
+    if updateConn then updateConn:Disconnect() end
+    updateConn = RunService.RenderStepped:Connect(function()
+        if not platform or not platformEnabled or not humanoidRootPart then return end
+        -- posición 3 studs debajo del HumanoidRootPart
+        local targetPos = humanoidRootPart.Position - Vector3.new(0, 3, 0)
+        -- para suavizar movimiento, interpolamos un poco
+        local current = platform.Position
+        local newPos = current:Lerp(targetPos, 0.35)
+        platform.Position = newPos
+    end)
+end
+
+local function removePlatform()
+    if updateConn then
+        updateConn:Disconnect()
+        updateConn = nil
+    end
+    if platform then
+        platform:Destroy()
+        platform = nil
+    end
+end
+
+FPToggle.MouseButton1Click:Connect(function()
+	platformEnabled = not platformEnabled
+
+    if platformEnabled then
+    	-- Asegurarse de tener humanoidRootPart
+        if not humanoidRootPart and player.Character then
+            humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
+        end
+        createPlatform()
+    else
+        removePlatform()
+    end
+
+	player.AncestryChanged:Connect(function()
+    	-- Si el player sale del juego, limpiar
+    	if not player:IsDescendantOf(game) then
+        	removePlatform()
+    	end
+	end)
+
+	FPLabel.Text = "Floating Platform: " .. (platformEnabled and "ON" or "OFF")
+
+	local targetPos = platformEnabled and UDim2.new(1, -24, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)
+	local targetColor = platformEnabled and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(70, 70, 70)
+	TweenService:Create(FPCircle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetPos}):Play()
+	TweenService:Create(FPToggle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetColor}):Play()
 end)

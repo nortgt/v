@@ -1,11 +1,15 @@
 --// SERVICES
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
 
---// GUI ROOT
+pcall(function() player:WaitForChild("PlayerGui"):FindFirstChild("Hexagon"):Destroy() end)
+
+--// CREATE GUI
 local ScreenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+ScreenGui.Name = "Hexagon"
 ScreenGui.ResetOnSpawn = false
 
 --// MAIN FRAME
@@ -13,6 +17,7 @@ local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.Size = UDim2.new(0, 200, 0, 250)
 MainFrame.Position = UDim2.new(0.35, 0, 0, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.BackgroundTransparency = 0.1
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
 MainFrame.Draggable = true
@@ -72,6 +77,7 @@ local MiniBtn = Instance.new("ImageButton", ScreenGui)
 MiniBtn.Size = UDim2.new(0, 40, 0, 40)
 MiniBtn.Position = UDim2.new(0.15, 0, 0.7, 0)
 MiniBtn.Image = "rbxassetid://108946066610871"
+MiniBtn.ImageTransparency = 0.3
 MiniBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 MiniBtn.Visible = false
 MiniBtn.Active = true
@@ -216,7 +222,7 @@ local noclipOn = false
 NoclipToggle.MouseButton1Click:Connect(function()
 	noclipOn = not noclipOn
 	NoclipLabel.Text = "Noclip: " .. (noclipOn and "ON" or "OFF")
-	local targetPos = noclipOn and UDim2.new(1, -24, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)
+	local targetPos = noclipOn and UDim2.new(1, -24, 0.5, 0) or UDim2.new(0, 3, 0.5, 0)
 	local targetColor = noclipOn and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(70, 70, 70)
 	TweenService:Create(NoclipCircle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetPos}):Play()
 	TweenService:Create(NoclipToggle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetColor}):Play()
@@ -233,8 +239,6 @@ game:GetService("RunService").Stepped:Connect(function()
 end)
 
 -- Floating Platform
-local RunService = game:GetService("RunService")
-
 local platformEnabled = false
 local platform = nil
 local updateConn = nil
@@ -266,6 +270,7 @@ local function createPlatform()
     platform.Size = Vector3.new(6, 1, 6)
     platform.Anchored = true
     platform.Material = Enum.Material.Neon
+    platform.Transparency = 0.3
     platform.Color = Color3.fromRGB(25, 25, 25)
     platform.CanCollide = true
     platform.TopSurface = Enum.SurfaceType.Smooth
@@ -318,7 +323,7 @@ FPToggle.MouseButton1Click:Connect(function()
 
 	FPLabel.Text = "Floating Platform: " .. (platformEnabled and "ON" or "OFF")
 
-	local targetPos = platformEnabled and UDim2.new(1, -24, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)
+	local targetPos = platformEnabled and UDim2.new(1, -24, 0.5, 0) or UDim2.new(0, 3, 0.5, 0)
 	local targetColor = platformEnabled and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(70, 70, 70)
 	TweenService:Create(FPCircle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetPos}):Play()
 	TweenService:Create(FPToggle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetColor}):Play()

@@ -283,10 +283,10 @@ local function createPlatform()
     updateConn = RunService.RenderStepped:Connect(function()
         if not platform or not platformEnabled or not humanoidRootPart then return end
         -- posición 3 studs debajo del HumanoidRootPart
-        local targetPos = humanoidRootPart.Position - Vector3.new(0, 2, 0)
+        local targetPos = humanoidRootPart.Position - Vector3.new(0, 3, 0)
         -- para suavizar movimiento, interpolamos un poco
         local current = platform.Position
-        local newPos = current:Lerp(targetPos, 0.25)
+        local newPos = current:Lerp(targetPos, 0.1)
         platform.Position = newPos
     end)
 end
@@ -343,8 +343,8 @@ game:GetService("UserInputService").JumpRequest:Connect(function()
 	end
 end)
 
-InfJToggle.MouseButton1Click:Connect(function(value)
-	infJump = value
+InfJToggle.MouseButton1Click:Connect(function()
+	infJump = not infJump
 	InfJLabel.Text = "Infinite Jump: " .. (infJump and "ON" or "OFF")
 
 	local targetPos = infJump and UDim2.new(1, -24, 0.5, 0) or UDim2.new(0, 3, 0.5, 0)

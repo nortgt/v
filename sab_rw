@@ -286,7 +286,7 @@ local function createPlatform()
         local targetPos = humanoidRootPart.Position - Vector3.new(0, 3, 0)
         -- para suavizar movimiento, interpolamos un poco
         local current = platform.Position
-        local newPos = current:Lerp(targetPos, 0.1)
+        local newPos = current:Lerp(targetPos, 0.35)
         platform.Position = newPos
     end)
 end
@@ -334,15 +334,6 @@ end)
 -- Infinite Jump
 local infJump = false
 
-game:GetService("UserInputService").JumpRequest:Connect(function()
-	if infJump then
-    	local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
-		if humanoid then
-			humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-		end
-	end
-end)
-
 InfJToggle.MouseButton1Click:Connect(function()
 	infJump = not infJump
 	InfJLabel.Text = "Infinite Jump: " .. (infJump and "ON" or "OFF")
@@ -351,4 +342,13 @@ InfJToggle.MouseButton1Click:Connect(function()
 	local targetColor = infJump and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(70, 70, 70)
 	TweenService:Create(InfJCircle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetPos}):Play()
 	TweenService:Create(InfJToggle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetColor}):Play()
+end)
+
+game:GetService("UserInputService").JumpRequest:Connect(function()
+	if infJump then
+    	local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+		if humanoid then
+			humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+		end
+	end
 end)

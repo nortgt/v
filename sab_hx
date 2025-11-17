@@ -5,11 +5,16 @@ local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 local mouse = player:GetMouse()
 
+-- ---------- CONFIG ----------
+local UI_SIZE = Vector2.new(350, 420)
+local TOGGLE_HEIGHT = 64
+local TOGGLE_SPACING = 14
+
 local themes = {
     dark = {
         Frame = Color3.fromRGB(15,15,15),
         Panel = Color3.fromRGB(30,30,30),
-        ToggleOff = Color3.fromRGB(40,40,40),
+        ToggleOff = Color3.fromRGB(60,60,60),
         Text = Color3.fromRGB(255,255,255),
         Accent = Color3.fromRGB(0,170,0)
     },
@@ -23,6 +28,14 @@ local themes = {
 }
 
 local currentTheme = "dark"
+
+-- ---------- UTIL ----------
+local function tween(instance, props, time, style, dir)
+    style = style or Enum.EasingStyle.Quart
+    dir = dir or Enum.EasingDirection.Out
+    local info = TweenInfo.new(time or 0.25, style, dir)
+    return TweenService:Create(instance, info, props)
+end
 
 --// GUI ROOT
 local ScreenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
@@ -133,20 +146,9 @@ Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 	Scroll.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y + 20)
 end)
 
---// MINIMIZE
-Minimize.MouseButton1Click:Connect(function()
-	MainFrame.Visible = false
-	MiniBtn.Visible = true
-end)
-
 MiniBtn.MouseButton1Click:Connect(function()
 	MainFrame.Visible = true
 	MiniBtn.Visible = false
-end)
-
---// CLOSE WINDOW
-CloseButton.MouseButton1Click:Connect(function()
-	ScreenGui:Destroy()
 end)
 
 local function Button(text)
@@ -279,14 +281,6 @@ mouse.KeyDown:Connect(function(key)
 	end
 end)
 
--- ---------- UTIL ----------
-local function tween(instance, props, time, style, dir)
-    style = style or Enum.EasingStyle.Quart
-    dir = dir or Enum.EasingDirection.Out
-    local info = TweenInfo.new(time or 0.25, style, dir)
-    return TweenService:Create(instance, info, props)
-end
-
 -- ---------- THEME HANDLING ----------
 local function applyTheme(themeName)
     currentTheme = themeName
@@ -335,4 +329,63 @@ applyTheme(currentTheme)
 Theme.MouseButton1Click:Connect(function()
     local newTheme = (currentTheme == "dark") and "light" or "dark"
     applyTheme(newTheme)
+end)
+
+-- ---------- MINIMIZE / CLOSE WITH ANIMATIONS ----------
+local minimized = false
+local contentVisible = true
+
+Minimize.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    if minimized then
+        -- shrink content
+        tween(Scroll, {Position = UDim2.new(0,14,0,64), Size = UDim2.new(1,-28,0,0)}, 0.28):Play()
+        tween(MainFrame, {Size = UDim2.fromOffset(UI_SIZE.X, 80)}, 0.28):Play()
+    else
+        tween(MainFrame, {Size = UDim2.fromOffset(UI_SIZE.X, UI_SIZE.Y)}, 0.28):Play()
+        tween(Scroll, {Size = UDim2.new(1,-28,1,-90), Position = UDim2.new(0,14,0,64)}, 0.28):Play()
+    end
+end)
+
+CloseButton.MouseButton1Click:Connect(function()
+    -- smooth fade out then destroy
+    tween(ScreenGui, {Enabled = false}, 0.18):Play()
+    -- disable after a short delay
+    task.delay(0.18, function() ScreenGui:Destroy() end)
+end)
+
+-- Opening animation
+MainFrame.Position = mainFrame.Position + UDim2.new(0, 0, 0.06, 0)
+MainFrame.BackgroundTransparency = 1
+tween(MainFrame, {BackgroundTransparency = 0}, 0.28):Play()
+tween(MainFrame, {Position = MainFrame.Position - UDim2.new(0, 0, 0.06, 0)}, 0.38):Play()
+
+-- ---------- RGB BORDER ANIMATION ----------
+spawn(function()
+    local hue = 0
+    while MainFrame.Parent do
+        border.Color = Color3.fromHSV(hue % 1, 1, 1)
+        hue = hue + 0.0035
+        task.wait(0.016)
+    end
+end)
+
+-- ---------- Ensure toggles reflect theme on create ----------
+-- (set their initial colors according to current theme)
+for _, child in ipairs(Scroll:GetChildren()) do
+    if child:IsA("Frame") and child ~= topPadding and child ~= bottomPadding then
+        local toggleFrame = child:FindFirstChildWhichIsA("Frame")
+        local lbl = child:FindFirstChildWhichIsA("TextLabel")
+        if toggleFrame then toggleFrame.BackgroundColor3 = themes[currentTheme].ToggleOff end
+        if lbl then lbl.TextColor3 = themes[currentTheme].Text end
+    end
+end
+
+-- ---------- (Optional) Keyboard shortcut to toggle UI (Ctrl+H) ----------
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.H and (UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.RightControl)) then
+        -- simulate minimize toggle
+        minimizeBtn:Activate()
+    end
 end)

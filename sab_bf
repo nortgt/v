@@ -1,0 +1,138 @@
+-- // CONFIG INICIAL
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+local TweenService = game:GetService("TweenService")
+
+-- // GUI CREATION
+local ScreenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+ScreenGui.Name = "BoogieFloatUI"
+
+local Frame = Instance.new("Frame")
+Frame.Parent = ScreenGui
+Frame.AnchorPoint = Vector2.new(0.5, 0.5)
+Frame.Position = UDim2.new(0.5, 0, 0.2, 0)
+Frame.Size = UDim2.new(0, 220, 0, 50)
+Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.ClipsDescendants = true
+
+-- // Rounded corners
+local UICorner = Instance.new("UICorner", Frame)
+UICorner.CornerRadius = UDim.new(0, 20)
+-- // RGB outline
+local Outline = Instance.new("UIStroke", Frame)
+Outline.Thickness = 3
+Outline.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+-- // Label
+local Label = Instance.new("TextLabel")
+Label.Parent = Frame
+Label.BackgroundTransparency = 1
+Label.Text = "Boogie Float"
+Label.Font = Enum.Font.GothamBold
+Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+Label.TextSize = 18
+Label.AnchorPoint = Vector2.new(0, 0.5)
+Label.Position = UDim2.new(0.3, 0, 0.5, 0)
+
+-- // Toggle button
+local Toggle = Instance.new("TextButton")
+Toggle.Parent = Frame
+Toggle.AnchorPoint = Vector2.new(1, 0.5)
+Toggle.Position = UDim2.new(0.9, 0, 0.5, 0)
+Toggle.Size = UDim2.new(0, 45, 0, 25)
+Toggle.Text = ""
+Toggle.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+Toggle.AutoButtonColor = false
+local UICorner2 = Instance.new("UICorner", Toggle)
+UICorner2.CornerRadius = UDim.new(1, 0)
+
+local Knob = Instance.new("Frame")
+Knob.Parent = Toggle
+Knob.Size = UDim2.new(0, 23, 0, 23)
+Knob.Position = UDim2.new(0, 1, 0.5, 0)
+Knob.AnchorPoint = Vector2.new(0, 0.5)
+Knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+
+local KnobCorner = Instance.new("UICorner", Knob)
+KnobCorner.CornerRadius = UDim.new(1, 0)
+
+-- // Variables
+local toggled = false
+local floatForce = nil
+local gyro = nil
+local particleEmitter = nil
+local light = nil
+
+-- // FLOAT + ROTATION + FX
+Toggle.MouseButton1Click:Connect(function()
+    toggled = not toggled
+
+    local targetPos = toggled and UDim2.new(1, -24, 0.5, 0) or UDim2.new(0, 1, 0.5, 0)
+    local targetColor = toggled and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(70, 70, 70)
+
+    TweenService:Create(Knob, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetPos}):Play()
+    TweenService:Create(Toggle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetColor}):Play()
+
+    if toggled then
+        -- Crear fuerza para flotar
+        floatForce = Instance.new("BodyVelocity")
+        floatForce.Velocity = Vector3.new(0, 2, 0)
+        floatForce.MaxForce = Vector3.new(0, 4000, 0)
+        floatForce.Parent = hrp
+
+        -- Crear rotación suave
+        gyro = Instance.new("BodyGyro")
+        gyro.MaxTorque = Vector3.new(4000, 4000, 4000)
+        gyro.P = 3000
+        gyro.Parent = hrp
+-- Efecto de luz RGB
+        light = Instance.new("PointLight")
+        light.Brightness = 2
+        light.Range = 12
+        light.Color = Color3.fromRGB(255, 0, 0)
+        light.Parent = hrp
+
+        -- Partículas mágicas
+        particleEmitter = Instance.new("ParticleEmitter")
+        particleEmitter.Texture = "rbxassetid://241837157" -- partículas suaves blancas
+        particleEmitter.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255))
+        particleEmitter.LightEmission = 0.7
+        particleEmitter.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.5), NumberSequenceKeypoint.new(1, 0)})
+        particleEmitter.Rate = 25
+        particleEmitter.Lifetime = NumberRange.new(1, 2)
+        particleEmitter.Speed = NumberRange.new(0, 1)
+        particleEmitter.SpreadAngle = Vector2.new(360, 360)
+        particleEmitter.Parent = hrp
+
+        -- Movimiento + rotación + efectos
+        task.spawn(function()
+            local angle = 0
+            while toggled and floatForce and gyro do
+                angle += 1
+                floatForce.Velocity = Vector3.new(0, math.sin(angle / 10) * 2, 0)
+                gyro.CFrame = gyro.CFrame * CFrame.Angles(0, math.rad(1), 0)
+                light.Color = Color3.fromHSV((tick() % 5) / 5, 1, 1)
+                task.wait(0.05)
+            end
+        end)
+    else
+        -- Desactivar flotación y efectos
+        if floatForce then floatForce:Destroy() floatForce = nil end
+        if gyro then gyro:Destroy() gyro = nil end
+        if particleEmitter then particleEmitter.Enabled = false particleEmitter:Destroy() particleEmitter = nil end
+        if light then light:Destroy() light = nil end
+    end
+end)
+
+-- // RGB Border animation
+task.spawn(function()
+    while task.wait() do
+        for i = 0, 1, 0.005 do
+            local color = Color3.fromHSV(i, 1, 1)
+            Outline.Color = color
+            task.wait(0.02)
+        end
+    end
+end)

@@ -149,11 +149,6 @@ CloseButton.MouseButton1Click:Connect(function()
 	ScreenGui:Destroy()
 end)
 
-Theme.MouseButton1Click:Connect(function()
-	MainFrame.Visible = false
-	MiniBtn.Visible = true
-end)
-
 local function Button(text)
 	local b = Instance.new("TextButton", Scroll)
 	b.Size = UDim2.new(1, -10, 0, 40)

@@ -190,6 +190,7 @@ local AutoJump = Button("Salto Automático")
 local NoclipFrame, NoclipLabel, NoclipToggle, NoclipCircle = Toggle("Noclip")
 local FPFrame, FPLabel, FPToggle, FPCircle = Toggle("Floating Platform")
 local InfJFrame, InfJLabel, InfJToggle, InfJCircle = Toggle("Infinite Jump")
+local BFFrame, BFLabel, BFToggle, BFCircle = Toggle("Bubble Float")
 
 --/// FEATURES
 
@@ -351,4 +352,87 @@ game:GetService("UserInputService").JumpRequest:Connect(function()
 			humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 		end
 	end
+end)
+
+-- Bubble Float
+local character = player.Character or player.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+local toggled = false
+local floatForce = nil
+local gyro = nil
+local particleEmitter = nil
+local light = nil
+
+-- // FLOAT + ROTATION + FX
+BFToggle.MouseButton1Click:Connect(function()
+    toggled = not toggled
+
+	BFLabel.Text = "Bubble Float: " .. (toggled and "ON" or "OFF")
+
+	local targetPos = toggled and UDim2.new(1, -24, 0.5, 0) or UDim2.new(0, 3, 0.5, 0)
+	local targetColor = toggled and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(70, 70, 70)
+	TweenService:Create(BFCircle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetPos}):Play()
+	TweenService:Create(BFToggle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetColor}):Play()
+
+    if toggled then
+        -- Crear fuerza para flotar
+        floatForce = Instance.new("BodyVelocity")
+        floatForce.Velocity = Vector3.new(0, 2, 0)
+        floatForce.MaxForce = Vector3.new(0, 4000, 0)
+        floatForce.Parent = hrp
+
+        -- Crear rotación suave
+        gyro = Instance.new("BodyGyro")
+        gyro.MaxTorque = Vector3.new(4000, 4000, 4000)
+        gyro.P = 3000
+        gyro.Parent = hrp
+-- Efecto de luz RGB
+        light = Instance.new("PointLight")
+        light.Brightness = 2
+        light.Range = 12
+        light.Color = Color3.fromRGB(255, 0, 0)
+        light.Parent = hrp
+
+        -- Partículas mágicas
+        particleEmitter = Instance.new("ParticleEmitter")
+        particleEmitter.Texture = "rbxassetid://241837157" -- partículas suaves blancas
+        particleEmitter.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255))
+        particleEmitter.LightEmission = 0.7
+        particleEmitter.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.5), NumberSequenceKeypoint.new(1, 0)})
+        particleEmitter.Rate = 25
+        particleEmitter.Lifetime = NumberRange.new(1, 2)
+        particleEmitter.Speed = NumberRange.new(0, 1)
+        particleEmitter.SpreadAngle = Vector2.new(360, 360)
+        particleEmitter.Parent = hrp
+
+        -- Movimiento + rotación + efectos
+        task.spawn(function()
+            local angle = 0
+            while toggled and floatForce and gyro do
+                angle += 1
+                floatForce.Velocity = Vector3.new(0, math.sin(angle / 10) * 2, 0)
+                gyro.CFrame = gyro.CFrame * CFrame.Angles(0, math.rad(1), 0)
+                light.Color = Color3.fromHSV((tick() % 5) / 5, 1, 1)
+                task.wait(0.05)
+            end
+        end)
+    else
+        -- Desactivar flotación y efectos
+        if floatForce then floatForce:Destroy() floatForce = nil end
+        if gyro then gyro:Destroy() gyro = nil end
+        if particleEmitter then particleEmitter.Enabled = false particleEmitter:Destroy() particleEmitter = nil end
+        if light then light:Destroy() light = nil end
+    end
+end)
+
+-- // RGB Border animation
+task.spawn(function()
+    while task.wait() do
+        for i = 0, 1, 0.005 do
+            local color = Color3.fromHSV(i, 1, 1)
+            Outline.Color = color
+            task.wait(0.02)
+        end
+    end
 end)

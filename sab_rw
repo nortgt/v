@@ -155,25 +155,21 @@ local function Toggle(text)
 	label.Font = Enum.Font.GothamBold
 	label.TextSize = 14
 
-  -- // Toggle button
-  local t = Instance.new("TextButton", frame)
-  t.AnchorPoint = Vector2.new(1, 0.5)
-  t.Position = UDim2.new(0.97, 0, 0.5, 0)
-  t.Size = UDim2.new(0, 45, 0, 25)
-  t.Text = ""
-  t.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-  t.AutoButtonColor = false
-  local UICorner2 = Instance.new("UICorner", t)
-  UICorner2.CornerRadius = UDim.new(1, 0)
+	local t = Instance.new("TextButton", frame)
+	t.AnchorPoint = Vector2.new(1, 0.5)
+	t.Position = UDim2.new(0.97, 0, 0.5, 0)
+	t.Size = UDim2.new(0, 45, 0, 25)
+	t.Text = ""
+	t.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+	t.AutoButtonColor = false
+	Instance.new("UICorner", t).CornerRadius = UDim.new(1, 0)
 
-  local Knob = Instance.new("Frame", t)
-  Knob.Size = UDim2.new(0, 20, 0, 20)
-  Knob.Position = UDim2.new(0, 2, 0.5, 0)
-  Knob.AnchorPoint = Vector2.new(0, 0.5)
-  Knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-
-  local KnobCorner = Instance.new("UICorner", Knob)
-  KnobCorner.CornerRadius = UDim.new(1, 0)
+	local c = Instance.new("Frame", t)
+	c.Size = UDim2.new(0, 20, 0, 20)
+	c.Position = UDim2.new(0, 2, 0.5, 0)
+	c.AnchorPoint = Vector2.new(0, 0.5)
+	c.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Instance.new("UICorner", c).CornerRadius = UDim.new(1, 0)
 
 	return frame, t, label
 end
@@ -243,7 +239,7 @@ InfJToggle.MouseButton1Click:Connect(function()
   local targetPos = infJump and UDim2.new(1, -24, 0.5, 0) or UDim2.new(0, 1, 0.5, 0)
   local targetColor = infJump and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(70, 70, 70)
 
-  TweenService:Create(Knob, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetPos}):Play()
+  TweenService:Create(InfJToggle.c, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetPos}):Play()
   TweenService:Create(InfJToggle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetColor}):Play()
   
 	InfJLabel.Text = "Infinite Jump: " .. (infJump and "ON" or "OFF")

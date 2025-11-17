@@ -239,8 +239,8 @@ InfJToggle.MouseButton1Click:Connect(function()
   local targetPos = infJump and UDim2.new(1, -24, 0.5, 0) or UDim2.new(0, 1, 0.5, 0)
   local targetColor = infJump and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(70, 70, 70)
 
-  TweenService:Create(InfJToggle.c, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetPos}):Play()
-  TweenService:Create(InfJToggle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetColor}):Play()
+  TweenService:Create(c, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetPos}):Play()
+  TweenService:Create(t, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetColor}):Play()
   
 	InfJLabel.Text = "Infinite Jump: " .. (infJump and "ON" or "OFF")
 end)

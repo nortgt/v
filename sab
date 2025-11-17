@@ -1,0 +1,248 @@
+--// SERVICES
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
+
+--// GUI ROOT
+local ScreenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+ScreenGui.ResetOnSpawn = false
+
+--// MAIN FRAME
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 200, 0, 250)
+MainFrame.Position = UDim2.new(0.35, 0, 0, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+local frameCorner = Instance.new("UICorner", MainFrame)
+frameCorner.CornerRadius = UDim.new(0, 12)
+
+--// RGB STROKE
+local RGBStroke = Instance.new("UIStroke", MainFrame)
+RGBStroke.Thickness = 2
+RGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+-- RGB Animation
+task.spawn(function()
+	while true do
+		for i = 0, 1, 0.01 do
+			RGBStroke.Color = Color3.fromHSV(i, 1, 1)
+			task.wait(0.05)
+		end
+	end
+end)
+
+--// TITLE TEXT
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Position = UDim2.new(0.3, 0, 0, 20)
+Title.Text = "HEXAGON HUB"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+--// CLOSE BUTTON
+local CloseButton = Instance.new("TextButton", MainFrame)
+CloseButton.Size = UDim2.new(0, 35, 0, 30)
+CloseButton.Position = UDim2.new(1, -40, 0, 5)
+CloseButton.Text = "X"
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.TextSize = 14
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Instance.new("UICorner", CloseButton)
+
+--// MINIMIZE BUTTON
+local Minimize = Instance.new("TextButton", MainFrame)
+Minimize.Text = "-"
+Minimize.Font = Enum.Font.GothamBold
+Minimize.TextSize = 18
+Minimize.Size = UDim2.new(0, 35, 0, 30)
+Minimize.Position = UDim2.new(1, -80, 0, 5)
+Minimize.TextColor3 = Color3.fromRGB(255, 255, 255)
+Minimize.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Instance.new("UICorner", Minimize)
+
+--// SCROLLING FRAME
+local Scroll = Instance.new("ScrollingFrame", MainFrame)
+Scroll.Size = UDim2.new(1, -20, 1, -50)
+Scroll.Position = UDim2.new(0, 10, 0, 45)
+Scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+Scroll.ScrollBarThickness = 2
+Scroll.BackgroundTransparency = 1
+Scroll.ScrollingDirection = Enum.ScrollingDirection.Y
+
+local Layout = Instance.new("UIListLayout", Scroll)
+Layout.Padding = UDim.new(0, 10)
+
+--// MINIMIZED FLOATING BUTTON
+local MiniBtn = Instance.new("ImageButton", ScreenGui)
+MiniBtn.Size = UDim2.new(0, 40, 0, 40)
+MiniBtn.Position = UDim2.new(0.15, 0, 0.7, 0)
+MiniBtn.Image = "rbxassetid://108946066610871"
+MiniBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MiniBtn.Visible = false
+MiniBtn.Active = true
+MiniBtn.Draggable = true
+
+local miniCorner = Instance.new("UICorner", MiniBtn)
+miniCorner.CornerRadius = UDim.new(0, 12)
+
+-- RGB Stroke for minimized button
+local MiniStroke = Instance.new("UIStroke", MiniBtn)
+MiniStroke.Thickness = 2
+
+task.spawn(function()
+	while true do
+		for i = 0, 255, 2 do
+			MiniStroke.Color = Color3.fromRGB(255 - i, i, i / 2)
+			task.wait(0.02)
+		end
+	end
+end)
+
+--/// UI CREATOR FUNCTIONS
+
+local function Button(text)
+	local b = Instance.new("TextButton", Scroll)
+	b.Size = UDim2.new(1, -10, 0, 40)
+	b.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	b.TextColor3 = Color3.fromRGB(255, 255, 255)
+	b.Font = Enum.Font.GothamBold
+	b.TextSize = 14
+	b.Text = text
+	Instance.new("UICorner", b)
+
+	-- Hover effect
+	b.MouseEnter:Connect(function()
+		TweenService:Create(b, TweenInfo.new(0.15), {Size = UDim2.new(1, -5, 0, 45), BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play()
+	end)
+
+	b.MouseLeave:Connect(function()
+		TweenService:Create(b, TweenInfo.new(0.15), {Size = UDim2.new(1, -10, 0, 40), BackgroundColor3 = Color3.fromRGB(40, 40, 40)}):Play()
+	end)
+
+	return b
+end
+
+local function Toggle(text)
+	local frame = Instance.new("Frame", Scroll)
+	frame.Size = UDim2.new(1, -10, 0, 40)
+	frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	Instance.new("UICorner", frame)
+
+	local label = Instance.new("TextLabel", frame)
+	label.Size = UDim2.new(0.7, 0, 1, 0)
+	label.BackgroundTransparency = 1
+	label.Text = text .. ": OFF"
+	label.TextColor3 = Color3.fromRGB(255, 255, 255)
+	label.Font = Enum.Font.GothamBold
+	label.TextSize = 14
+
+	local t = Instance.new("TextButton", frame)
+	t.Size = UDim2.new(0.25, 0, 0.6, 0)
+	t.Position = UDim2.new(0.72, 0, 0.2, 0)
+	t.Text = "OFF"
+	t.Font = Enum.Font.GothamBold
+	t.TextColor3 = Color3.fromRGB(255, 255, 255)
+	t.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+	Instance.new("UICorner", t)
+
+	return frame, t, label
+end
+
+--/// ADD BUTTONS
+local Float = Button("Float: OFF")
+local Slab = Button("Slab: OFF")
+local ESP = Button("ESP: OFF")
+
+local Speed = Button("Speed Boost")
+local AutoJump = Button("Salto Automático")
+
+local NoclipFrame, NoclipToggle, NoclipLabel = Toggle("Noclip")
+local InfJFrame, InfJToggle, InfJLabel = Toggle("Salto Infinito")
+
+-- Update scroll size
+Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+	Scroll.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y + 20)
+end)
+
+--// MINIMIZE
+Minimize.MouseButton1Click:Connect(function()
+	MainFrame.Visible = false
+	MiniBtn.Visible = true
+end)
+
+MiniBtn.MouseButton1Click:Connect(function()
+	MainFrame.Visible = true
+	MiniBtn.Visible = false
+end)
+
+--// CLOSE WINDOW
+CloseButton.MouseButton1Click:Connect(function()
+	ScreenGui:Destroy()
+end)
+
+--/// FEATURES
+
+-- Speed Boost
+local speedOn = false
+Speed.MouseButton1Click:Connect(function()
+	speedOn = not speedOn
+	if speedOn then
+		player.Character.Humanoid.WalkSpeed = 50
+		Speed.Text = "Speed Boost (ON)"
+	else
+		player.Character.Humanoid.WalkSpeed = 16
+		Speed.Text = "Speed Boost"
+	end
+end)
+
+-- Auto Jump
+local autoJump = false
+AutoJump.MouseButton1Click:Connect(function()
+	autoJump = not autoJump
+	AutoJump.Text = autoJump and "Salto Automático (ON)" or "Salto Automático"
+
+	while autoJump do
+		player.Character.Humanoid.Jump = true
+		task.wait(0.1)
+	end
+end)
+
+-- Noclip
+local noclipOn = false
+NoclipToggle.MouseButton1Click:Connect(function()
+	noclipOn = not noclipOn
+	NoclipToggle.Text = noclipOn and "ON" or "OFF"
+	NoclipToggle.BackgroundColor3 = noclipOn and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+	NoclipLabel.Text = "Noclip: " .. (noclipOn and "ON" or "OFF")
+end)
+
+game:GetService("RunService").Stepped:Connect(function()
+	if noclipOn and player.Character then
+		for _, v in pairs(player.Character:GetDescendants()) do
+			if v:IsA("BasePart") then
+				v.CanCollide = false
+			end
+		end
+	end
+end)
+
+-- Infinite Jump
+local infJump = false
+InfJToggle.MouseButton1Click:Connect(function()
+	infJump = not infJump
+	InfJToggle.Text = infJump and "ON" or "OFF"
+	InfJToggle.BackgroundColor3 = infJump and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+	InfJLabel.Text = "Salto Infinito: " .. (infJump and "ON" or "OFF")
+end)
+
+mouse.KeyDown:Connect(function(key)
+	if key == " " and infJump then
+		player.Character.Humanoid:ChangeState("Jumping")
+	end
+end)

@@ -15,7 +15,7 @@ ScreenGui.ResetOnSpawn = false
 --// MAIN FRAME
 local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.Size = UDim2.new(0, 200, 0, 250)
-MainFrame.Position = UDim2.new(0.35, 0, 0, 0)
+MainFrame.Position = UDim2.new(0.1, 0, 0, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 MainFrame.BackgroundTransparency = 0.1
 MainFrame.BorderSizePixel = 0
@@ -75,7 +75,7 @@ Layout.Padding = UDim.new(0, 10)
 --// MINIMIZED FLOATING BUTTON
 local MiniBtn = Instance.new("ImageButton", ScreenGui)
 MiniBtn.Size = UDim2.new(0, 40, 0, 40)
-MiniBtn.Position = UDim2.new(0.15, 0, 0.7, 0)
+MiniBtn.Position = UDim2.new(0.1, 0, 0.6, 0)
 MiniBtn.Image = "rbxassetid://108946066610871"
 MiniBtn.ImageTransparency = 0.3
 MiniBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
@@ -171,7 +171,7 @@ local function Toggle(text)
 
 	local c = Instance.new("Frame", t)
 	c.Size = UDim2.new(0, 20, 0, 20)
-	c.Position = UDim2.new(0, 2, 0.5, 0)
+	c.Position = UDim2.new(0, 3, 0.5, 0)
 	c.AnchorPoint = Vector2.new(0, 0.5)
 	c.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 	Instance.new("UICorner", c).CornerRadius = UDim.new(1, 0)

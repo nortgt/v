@@ -322,6 +322,7 @@ FPToggle.MouseButton1Click:Connect(function()
 	end)
 
 	FPLabel.Text = "Floating Platform: " .. (platformEnabled and "ON" or "OFF")
+	FPLabel.TextSize = 12
 
 	local targetPos = platformEnabled and UDim2.new(1, -24, 0.5, 0) or UDim2.new(0, 3, 0.5, 0)
 	local targetColor = platformEnabled and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(70, 70, 70)

@@ -189,6 +189,7 @@ local AutoJump = Button("Salto Automático")
 
 local NoclipFrame, NoclipLabel, NoclipToggle, NoclipCircle = Toggle("Noclip")
 local FPFrame, FPLabel, FPToggle, FPCircle = Toggle("Floating Platform")
+local InfJFrame, InfJLabel, InfJToggle, InfJCircle = Toggle("Infinite Jump")
 
 --/// FEATURES
 
@@ -282,10 +283,10 @@ local function createPlatform()
     updateConn = RunService.RenderStepped:Connect(function()
         if not platform or not platformEnabled or not humanoidRootPart then return end
         -- posición 3 studs debajo del HumanoidRootPart
-        local targetPos = humanoidRootPart.Position - Vector3.new(0, 3, 0)
+        local targetPos = humanoidRootPart.Position - Vector3.new(0, 2, 0)
         -- para suavizar movimiento, interpolamos un poco
         local current = platform.Position
-        local newPos = current:Lerp(targetPos, 0.35)
+        local newPos = current:Lerp(targetPos, 0.25)
         platform.Position = newPos
     end)
 end
@@ -328,4 +329,26 @@ FPToggle.MouseButton1Click:Connect(function()
 	local targetColor = platformEnabled and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(70, 70, 70)
 	TweenService:Create(FPCircle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetPos}):Play()
 	TweenService:Create(FPToggle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetColor}):Play()
+end)
+
+-- Infinite Jump
+local infJump = false
+
+game:GetService("UserInputService").JumpRequest:Connect(function()
+	if infJump then
+    	local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+		if humanoid then
+			humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+		end
+	end
+end)
+
+InfJToggle.MouseButton1Click:Connect(function(value)
+	infJump = value
+	InfJLabel.Text = "Infinite Jump: " .. (infJump and "ON" or "OFF")
+
+	local targetPos = infJump and UDim2.new(1, -24, 0.5, 0) or UDim2.new(0, 3, 0.5, 0)
+	local targetColor = infJump and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(70, 70, 70)
+	TweenService:Create(InfJCircle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = targetPos}):Play()
+	TweenService:Create(InfJToggle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = targetColor}):Play()
 end)

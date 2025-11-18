@@ -2,6 +2,7 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
+setclipboard("https://discord.gg/Q9R5FDapth")
 
 local player = Players.LocalPlayer
 

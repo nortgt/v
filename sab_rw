@@ -2,7 +2,12 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
-setclipboard("https://discord.gg/Q9R5FDapth")
+
+game.StarterGui:SetCore("SendNotification", {
+    Title = "Welcome to Hexagon, by @Roun95",
+    Text = "https://discord.gg/Q9R5FDapth, Join the official Discord server to receive all the latest news",
+    Duration = 15,
+})
 
 local player = Players.LocalPlayer
 

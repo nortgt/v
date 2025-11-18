@@ -463,9 +463,9 @@ TpPosition.MouseButton1Click:Connect(function()
     if savedPos then
         smoothMove(savedPos)
     else
-        TpPosition.Text = "You haven't saved"
+        TpPosition.Text = "You haven't saved!"
         task.wait(0.8)
-        TpPosition.Text = "Go to position"
+        TpPosition.Text = "TP Position"
     end
 end)
 

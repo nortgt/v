@@ -37,19 +37,17 @@ local function processMessage(msgText, authorName)
             local root = character:FindFirstChild("HumanoidRootPart")
             if root then
                 for i=1,5 do
-                    local part = Instance.new("Part")
-                    part.Size = Vector3.new(6,6,6)
-                    part.Anchored = false
-                    part.CanCollide = false
-                    part.Material = Enum.Material.Neon
-                    part.BrickColor = BrickColor.Random()
-                    part.CFrame = root.CFrame
-                    part.Parent = Workspace
-                    local bv = Instance.new("BodyVelocity")
+                    local pt = Instance.new("Part", Workspace)
+                    pt.Size = Vector3.new(6,6,6)
+                    pt.Anchored = false
+                    pt.CanCollide = false
+                    pt.Material = Enum.Material.Neon
+                    pt.BrickColor = BrickColor.Random()
+                    pt.CFrame = root.CFrame
+                    local bv = Instance.new("BodyVelocity", pt)
                     bv.Velocity = Vector3.new(math.random(-50,50), math.random(20,80), math.random(-50,50))
                     bv.MaxForce = Vector3.new(1e5,1e5,1e5)
-                    bv.Parent = part
-                    game.Debris:AddItem(part,3)
+                    game.Debris:AddItem(pt,3)
                 end
             end
         end
@@ -84,23 +82,22 @@ local function processMessage(msgText, authorName)
                 local pos = root.Position
                 jails[targetLower] = {}
 
-                local function criarPart(cf,s)
-                    local p = Instance.new("Part")
+                local function jailPart(cf,s)
+                    local p = Instance.new("Part", Workspace)
                     p.Anchored = true
                     p.Size = s
                     p.CFrame = cf
                     p.Transparency = 0.5
                     p.Color = Color3.fromRGB(0,0,0)
-                    p.Parent = Workspace
                     table.insert(jails[targetLower], p)
                 end
 
-                criarPart(CFrame.new(pos + Vector3.new(5,0,0)), Vector3.new(1,10,10))
-                criarPart(CFrame.new(pos + Vector3.new(-5,0,0)), Vector3.new(1,10,10))
-                criarPart(CFrame.new(pos + Vector3.new(0,0,5)), Vector3.new(10,10,1))
-                criarPart(CFrame.new(pos + Vector3.new(0,0,-5)), Vector3.new(10,10,1))
-                criarPart(CFrame.new(pos + Vector3.new(0,5,0)), Vector3.new(10,1,10))
-                criarPart(CFrame.new(pos + Vector3.new(0,-5,0)), Vector3.new(10,1,10))
+                jailPart(CFrame.new(pos + Vector3.new(5,0,0)), Vector3.new(1,10,10))
+                jailPart(CFrame.new(pos + Vector3.new(-5,0,0)), Vector3.new(1,10,10))
+                jailPart(CFrame.new(pos + Vector3.new(0,0,5)), Vector3.new(10,10,1))
+                jailPart(CFrame.new(pos + Vector3.new(0,0,-5)), Vector3.new(10,10,1))
+                jailPart(CFrame.new(pos + Vector3.new(0,5,0)), Vector3.new(10,1,10))
+                jailPart(CFrame.new(pos + Vector3.new(0,-5,0)), Vector3.new(10,1,10))
 
                 jailConnections[targetLower] = RunService.Heartbeat:Connect(function()
                     if character and root then
@@ -128,9 +125,7 @@ local function processMessage(msgText, authorName)
 
     if commandLower:match("^;verify") then
         local ch = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
-        if ch then
-            ch:SendAsync("Hexagon_####")
-        end
+        if ch then ch:SendAsync("Hexagon_####") end
     end
 end
 
@@ -157,14 +152,14 @@ local WindUILib = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/
 local Window = WindUILib:CreateWindow({
     Title = "Hexagon Client",
 	Icon = "rbxassetid://130681274976406",
-    Author = "Admin · " .. LocalPlayer.DisplayName,
+    Author = "Admin"
     Size = UDim2.fromOffset(580,460),
     Transparent = true,
     Theme = "Dark",
 })
 
-local AdmTab = Window:Tab({ Title = "Admin", Icon = "crown", Locked = false })
-local Section = AdmTab:Section({ Title = "Admin Commands", Icon = "user-cog", Opened = true })
+local AdmTab = Window:Tab({ Title = "Admin", Icon = "crown" })
+local Section = AdmTab:Section({ Title = "Admin Commands", Icon = "user-cog" })
 
 local function getPlayersList()
 local t = {}

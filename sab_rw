@@ -7,7 +7,6 @@ game.StarterGui:SetCore("SendNotification", {
     Title = "Welcome to Hexagon",
     Text = "https://discord.gg/Q9R5FDapth, Join the official Discord server to receive all the latest news",
     Duration = 15,
-	Icon = Players:GetUserThumbnailAsync(Players:GetUserIdFromNameAsync("Roun95"), Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100),
 })
 
 local player = Players.LocalPlayer
@@ -129,6 +128,7 @@ end)
 --// CLOSE WINDOW
 CloseButton.MouseButton1Click:Connect(function()
 	ScreenGui:Destroy()
+	Workspace.FloatingPlatform_player.Name:Destroy()
 end)
 
 local function Button(text)

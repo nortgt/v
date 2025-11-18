@@ -5,13 +5,10 @@ local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
 
-setclipboard("https://discord.gg/Q9R5FDapth")
-
 game.StarterGui:SetCore("SendNotification", {
     Title = "Welcome to Hexagon, by @Roun95",
     Text = "Join the official Discord server to receive all the latest news",
     Duration = math.huge,
-	Icon = Players:GetUserThumbnailAsync(Players:GetUserIdFromNameAsync("Roun95"), Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
     Button1 = "Okay"
 })
 

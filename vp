@@ -1,0 +1,1714 @@
+-- OblivionX Painel Admin
+-- Desenvolvido por: Voidzindev
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local TextChatService = game:GetService("TextChatService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
+local Workspace = game:GetService("Workspace")
+local UserInputService = game:GetService("UserInputService")
+
+--// Executa o load para TODOS (independente se é dono ou não)
+pcall(function()
+
+end)
+
+-- ===== SISTEMA DE WHITELIST =====
+local function getCurrentTimestamp()
+    return os.time()
+end
+
+local function parseDateTime(dateString)
+    local day, month, year, hour, minute = dateString:match("(%d+)/(%d+)/(%d+) (%d+):(%d+)")
+    if day and month and year and hour and minute then
+        return os.time({
+            day = tonumber(day),
+            month = tonumber(month),
+            year = tonumber(year),
+            hour = tonumber(hour),
+            min = tonumber(minute),
+            sec = 0
+        })
+    end
+    return nil
+end
+
+-- Sistema de Whitelist com Expiração (ATUALIZADO)
+local WhitelistData = {
+    -- Donos (sem expiração)
+    ["crmmff2"] = {type = "Dono", expires = nil},
+    ["drakeee777"] = {type = "Staff", expires = nil},
+    ["pedriinn222"] = {type = "Dono", expires = nil},
+    ["rmss_2012"] = {type = "Staff", expires = nil},
+    ["gamer_dirvedidap"] = {type = "Staff", expires = nil},
+    ["slingshotmate8h"] = {type = "Staff", expires = nil},
+    ["torajuiorsudud7"] = {type = "Staff", expires = nil},
+    ["thebest09520"] = {type = "Dono", expires = nil},
+    ["miuuq_333"] = {type = "Usuario Adm", expires = nil},
+
+    -- Usuários ADM com expiração
+    ["ryehd52835"] = {type = "Usuário adm", expires = parseDateTime("15/01/2026 23:59")},
+    ["pelotocino_x80"] = {type = "Usuário adm", expires = parseDateTime("14/11/2025 23:59")},
+    ["camirurge"] = {type = "Usuário adm", expires = parseDateTime("06/12/2025 14:00")},
+    ["shinidert10"] = {type = "Usuário adm", expires = parseDateTime("15/12/2030 23:59")},
+    ["caiozn7_669"] = {type = "Usuário adm", expires = parseDateTime("15/12/2030 23:59")},
+    ["donarzissus"] = {type = "Usuário adm", expires = parseDateTime("15/12/2030 23:59")},
+    ["vampzinkkj_1"] = {type = "Usuário adm", expires = parseDateTime("15/12/2030 23:59")},
+    ["ppyszt"] = {type = "Usuário adm", expires = parseDateTime("7/01/2026 18:30")},
+    ["pedro_roneido"] = {type = "Usuário adm", expires = parseDateTime("10/01/2030 12:00")},
+    ["pedro_roneido20"] = {type = "Usuário adm", expires = parseDateTime("10/01/2030 12:00")},
+    ["ixi362"] = {type = "Usuário adm", expires = parseDateTime("05/01/2030 15:45")},
+    ["jifhgiu"] = {type = "Usuário adm", expires = parseDateTime("25/12/2030 20:00")},
+    ["piloto158d"] = {type = "Usuário adm", expires = parseDateTime("30/12/2030 14:20")},
+    ["rafaelgms7810396"] = {type = "Usuário adm", expires = parseDateTime("25/12/2030 20:00")},
+    ["ilu1_22"] = {type = "Usuário adm", expires = parseDateTime("08/01/2030 10:30")},
+    ["xmarcelo_27262"] = {type = "Usuário adm", expires = parseDateTime("12/01/2030 16:15")},
+    ["ryansididd"] = {type = "Usuário adm", expires = parseDateTime("03/01/2030 09:00")},
+    ["redz_hub99975"] = {type = "Usuário adm", expires = parseDateTime("28/12/2030 22:45")},
+    ["teteu0902201mc"] = {type = "Usuário adm", expires = parseDateTime("15/01/2030 11:30")},
+    ["amongus23445844sad"] = {type = "Usuário adm", expires = parseDateTime("18/12/2030 19:20")},
+    ["ttyyryjuh"] = {type = "Usuário adm", expires = parseDateTime("22/12/2030 13:10")},
+    ["kevin_oliverra10"] = {type = "Usuário adm", expires = parseDateTime("07/01/2030 17:40")},
+    ["eduard0k0"] = {type = "Usuário adm", expires = parseDateTime("14/01/2030 08:50")},
+    ["gh707080s"] = {type = "Usuário adm", expires = parseDateTime("31/12/2030 23:59")},
+    ["luroblox1262"] = {type = "Usuário adm", expires = parseDateTime("06/01/2030 14:25")},
+    ["bonasamigo"] = {type = "Usuário adm", expires = parseDateTime("19/10/2030 14:30")},
+    ["manopp72"] = {type = "Usuário adm", expires = parseDateTime("25/10/2025 18:40")},
+    ["zack_89901"] = {type = "Usuário adm", expires = parseDateTime("25/10/2025 18:40")},
+    ["rackffr9"] = {type = "Usuário add", expires = parseDateTime("20/11/2025 18:40")},
+    ["oibuto7"] = {type = "Usuário add", expires = parseDateTime("31/10/2025 14:40")},
+    ["ensisbsjbrhe"] = {type = "Usuário add", expires = parseDateTime("09/10/2030 19:40")},
+    ["gui_neh1023"] = {type = "Usuário add", expires = parseDateTime("09/10/2030 19:40")},
+    ["killert_494"] = {type = "Usuário add", expires = parseDateTime("09/10/2030 19:40")},
+}
+
+local function isUserWhitelisted(username)
+    local userData = WhitelistData[username:lower()]
+    if not userData then
+        return false, "Não está na whitelist"
+    end
+    
+    if userData.expires then
+        local currentTime = getCurrentTimestamp()
+        if currentTime > userData.expires then
+            return false, "Whitelist expirada em " .. os.date("%d/%m/%Y %H:%M", userData.expires)
+        end
+    end
+    
+    return true, userData.type
+end
+
+local function verifyWhitelistOnStart()
+    local username = LocalPlayer.Name:lower()
+    local isWhitelisted, reason = isUserWhitelisted(username)
+    
+    if not isWhitelisted then
+        task.wait(2)
+        if reason:find("expirada") then
+            LocalPlayer:Kick("❌ SUA WHITELIST EXPIROU!\n\nData de expiração: " .. reason:match("expirada em (.+)"))
+        else
+            LocalPlayer:Kick("❌ VOCÊ NÃO ESTÁ NA WHITELIST!\n\nEntre em contato com o desenvolvedor.")
+        end
+        return false
+    end
+    
+    return true
+end
+
+if not verifyWhitelistOnStart() then
+    return
+end
+
+-- ===== VARIÁVEIS GLOBAIS =====
+local FROZEN_PLAYERS = {}
+local playerOriginalSpeed = {}
+local jaulas = {}
+local jailConnections = {}
+local SHADOW_USERS = {}
+local TEMP_MODS = {}
+
+-- ===== SISTEMA DO MONSTRO DAS BACKROOMS =====
+local backroomsMonster = nil
+local monsterActive = false
+
+-- Configuração de Jumpscares
+local JUMPSCARES = {
+    { Name = ";jumps1", ImageId = "rbxassetid://126754882337711", AudioId = "rbxassetid://138873214826309" },
+    { Name = ";jumps2", ImageId = "rbxassetid://86379969987314", AudioId = "rbxassetid://143942090" },
+    { Name = ";jumps3", ImageId = "rbxassetid://127382022168206", AudioId = "rbxassetid://143942090" },
+    { Name = ";jumps4", ImageId = "rbxassetid://95973611964555", AudioId = "rbxassetid://138873214826309" },
+}
+
+-- ===== FUNÇÕES DE AÇÃO =====
+local function FreezePlayer(player)
+    if not player or not player.Character then return false end
+    local h = player.Character:FindFirstChildOfClass("Humanoid")
+    if not h or FROZEN_PLAYERS[player.Name] then return false end
+    FROZEN_PLAYERS[player.Name] = { WalkSpeed = h.WalkSpeed, JumpPower = h.JumpPower }
+    h.WalkSpeed = 0
+    h.JumpPower = 0
+    return true
+end
+
+local function UnfreezePlayer(player)
+    if not player or not FROZEN_PLAYERS[player.Name] then return false end
+    local s = FROZEN_PLAYERS[player.Name]
+    if player.Character then
+        local h = player.Character:FindFirstChildOfClass("Humanoid")
+        if h then
+            h.WalkSpeed = s.WalkSpeed
+            h.JumpPower = s.JumpPower
+        end
+    end
+    FROZEN_PLAYERS[player.Name] = nil
+    return true
+end
+
+-- ===== FUNÇÃO KILL PLUS =====
+local function KillPlus(player)
+    if not player or not player.Character then return false end
+    
+    local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+    local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
+    
+    if not humanoid or not humanoidRootPart then return false end
+    
+    local targetPos = humanoidRootPart.Position
+
+    -- Criar múltiplas partes para o efeito
+    local parts = {}
+    local numParts = 8
+    for i = 1, numParts do
+        local part = Instance.new("Part")
+        part.Name = "KillPlusPart_" .. player.Name .. "_" .. i
+        part.Size = Vector3.new(3, 3, 3)
+        part.Position = targetPos + Vector3.new(math.random(-15, 15), -10, math.random(-15, 15))
+        part.Anchored = false
+        part.CanCollide = true
+        part.Material = Enum.Material.Neon
+        part.BrickColor = BrickColor.new("Really red")
+        part.Parent = Workspace
+        
+        local bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.Velocity = Vector3.new(0, 100, 0)
+        bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
+        bodyVelocity.Parent = part
+        
+        table.insert(parts, part)
+    end
+
+    wait(1.5)
+    
+    if player.Character then
+        player.Character:BreakJoints()
+        
+        local explosion = Instance.new("Part")
+        explosion.Size = Vector3.new(10, 10, 10)
+        explosion.Position = targetPos
+        explosion.Anchored = true
+        explosion.CanCollide = false
+        explosion.Material = Enum.Material.Neon
+        explosion.BrickColor = BrickColor.new("Bright yellow")
+        explosion.Transparency = 0.3
+        explosion.Parent = Workspace
+        
+        local light = Instance.new("PointLight")
+        light.Brightness = 10
+        light.Range = 20
+        light.Color = Color3.new(1, 1, 0)
+        light.Parent = explosion
+        
+        game:GetService("Debris"):AddItem(explosion, 3)
+        for _, part in ipairs(parts) do
+            game:GetService("Debris"):AddItem(part, 4)
+        end
+    end
+    
+    return true
+end
+
+-- ===== FUNÇÃO JUMPSCARE =====
+local function TriggerJumpscare(player, jumpscare)
+    if not player or player ~= LocalPlayer then return false end
+    local screenGui = Instance.new("ScreenGui", CoreGui)
+    screenGui.Name = "JumpscareGui"
+    screenGui.IgnoreGuiInset = true
+    local imageLabel = Instance.new("ImageLabel", screenGui)
+    imageLabel.Size = UDim2.new(1, 0, 1, 0)
+    imageLabel.Position = UDim2.new(0, 0, 0, 0)
+    imageLabel.BackgroundTransparency = 1
+    imageLabel.Image = jumpscare.ImageId
+    local sound = Instance.new("Sound", screenGui)
+    sound.SoundId = jumpscare.AudioId
+    sound.Volume = 1
+    sound.Looped = false
+    sound:Play()
+    local flashCount = 10
+    local flashInterval = 0.2
+    for i = 1, flashCount do
+        if not screenGui.Parent then break end
+        imageLabel.ImageTransparency = (i % 2 == 0) and 0.3 or 0
+        task.wait(flashInterval)
+    end
+    sound:Stop()
+    screenGui:Destroy()
+    return true
+end
+
+-- ===== SISTEMA DE TAGS =====
+local function createSpecialTag(player, tagText)
+    local char = player.Character  
+    if not char then return end  
+    local head = char:FindFirstChild("Head")  
+    if not head then return end  
+    local old = head:FindFirstChild("SpecialTag")  
+    if old then old:Destroy() end  
+    
+    local billboardGui = Instance.new("BillboardGui")  
+    billboardGui.Name = "SpecialTag"  
+    billboardGui.Size = UDim2.new(0, 200, 0, 50)  
+    billboardGui.StudsOffset = Vector3.new(0, 3, 0)  
+    billboardGui.Adornee = head  
+    billboardGui.AlwaysOnTop = true  
+    billboardGui.Parent = head  
+    
+    local frame = Instance.new("Frame")  
+    frame.Size = UDim2.new(1, 0, 1, 0)  
+    frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)  
+    frame.BackgroundTransparency = 0.5  
+    frame.BorderSizePixel = 0  
+    frame.Parent = billboardGui  
+    
+    local corner = Instance.new("UICorner")  
+    corner.CornerRadius = UDim.new(0, 12)  
+    corner.Parent = frame  
+    
+    local textLabel = Instance.new("TextLabel")  
+    textLabel.Size = UDim2.new(1, 0, 1, 0)  
+    textLabel.BackgroundTransparency = 1  
+    textLabel.Text = tagText  
+    textLabel.TextColor3 = Color3.fromRGB(170, 0, 255) -- Roxo
+    textLabel.TextScaled = true  
+    textLabel.Font = Enum.Font.GothamBold  
+    textLabel.TextStrokeTransparency = 0.5  
+    textLabel.Parent = frame
+end
+
+local function applyTag(player)
+    local isWhitelisted, tagType = isUserWhitelisted(player.Name:lower())
+    if isWhitelisted then  
+        player.CharacterAdded:Connect(function()  
+            task.wait(1)  
+            createSpecialTag(player, tagType)  
+        end)  
+        if player.Character then  
+            task.wait(1)  
+            createSpecialTag(player, tagType)  
+        end  
+    end
+end
+
+-- Aplicar tags nos jogadores
+for _, p in ipairs(Players:GetPlayers()) do
+    applyTag(p)
+end
+
+Players.PlayerAdded:Connect(function(p)
+    applyTag(p)
+end)
+
+-- ===== SISTEMA DO MONSTRO DAS BACKROOMS =====
+local function CreateBackroomsMonster(position)
+    local monsterFolder = Instance.new("Folder")
+    monsterFolder.Name = "BackroomsMonster"
+    
+    -- Criar parte principal do monstro
+    local monsterPart = Instance.new("Part")
+    monsterPart.Name = "MonsterBody"
+    monsterPart.Size = Vector3.new(8, 12, 8)
+    monsterPart.Position = position
+    monsterPart.Anchored = true
+    monsterPart.CanCollide = true
+    monsterPart.Material = Enum.Material.SmoothPlastic
+    monsterPart.BrickColor = BrickColor.new("Really black")
+    monsterPart.Parent = monsterFolder
+    
+    -- Criar decal/textura com a imagem do monstro
+    local monsterDecal = Instance.new("Decal")
+    monsterDecal.Name = "MonsterFace"
+    monsterDecal.Texture = "rbxassetid://126754882337711"
+    monsterDecal.Face = Enum.NormalId.Front
+    monsterDecal.Parent = monsterPart
+    
+    -- Adicionar decal nas outras faces também
+    local decalBack = Instance.new("Decal")
+    decalBack.Texture = "rbxassetid://126754882337711"
+    decalBack.Face = Enum.NormalId.Back
+    decalBack.Parent = monsterPart
+    
+    local decalLeft = Instance.new("Decal")
+    decalLeft.Texture = "rbxassetid://126754882337711"
+    decalLeft.Face = Enum.NormalId.Left
+    decalLeft.Parent = monsterPart
+    
+    local decalRight = Instance.new("Decal")
+    decalRight.Texture = "rbxassetid://126754882337711"
+    decalRight.Face = Enum.NormalId.Right
+    decalRight.Parent = monsterPart
+    
+    -- Luz vermelha assustadora
+    local monsterLight = Instance.new("PointLight")
+    monsterLight.Brightness = 5
+    monsterLight.Range = 20
+    monsterLight.Color = Color3.fromRGB(255, 0, 0)
+    monsterLight.Parent = monsterPart
+    
+    -- Partículas de fumaça vermelha
+    local smokeParticles = Instance.new("ParticleEmitter")
+    smokeParticles.Texture = "rbxassetid://243664672"
+    smokeParticles.Lifetime = NumberRange.new(1, 3)
+    smokeParticles.Rate = 25
+    smokeParticles.SpreadAngle = Vector2.new(45, 45)
+    smokeParticles.Speed = NumberRange.new(2, 4)
+    smokeParticles.Color = ColorSequence.new(Color3.fromRGB(255, 0, 0))
+    smokeParticles.Transparency = NumberSequence.new(0.3, 0.8)
+    smokeParticles.Size = NumberSequence.new(1, 3)
+    smokeParticles.Parent = monsterPart
+    
+    -- Som do monstro
+    local monsterSound = Instance.new("Sound")
+    monsterSound.SoundId = "rbxassetid://138873214826309"
+    monsterSound.Volume = 1.5
+    monsterSound.Looped = true
+    monsterSound.Parent = monsterPart
+    monsterSound:Play()
+    
+    -- Efeito de pulsação na luz
+    coroutine.wrap(function()
+        while monsterPart.Parent do
+            monsterLight.Brightness = 8
+            wait(0.5)
+            monsterLight.Brightness = 3
+            wait(0.5)
+        end
+    end)()
+    
+    return monsterFolder
+end
+
+-- ===== FUNÇÃO PARA ATIVAR O MONSTRO =====
+local function ActivateMonster(player)
+    if not player or not player.Character then return end
+    
+    local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then return end
+    
+    -- Criar monstro se não existir
+    if not backroomsMonster then
+        local monsterPosition = humanoidRootPart.Position + Vector3.new(25, 0, 0)
+        backroomsMonster = CreateBackroomsMonster(monsterPosition)
+        backroomsMonster.Parent = workspace
+    end
+    
+    monsterActive = true
+    
+    -- Sistema de perseguição do monstro
+    local monsterBody = backroomsMonster:FindFirstChild("MonsterBody")
+    if not monsterBody then return end
+    
+    -- Jumpscare inicial após 2 segundos
+    task.wait(2)
+    
+    -- Criar jumpscare assustador
+    local screenGui = Instance.new("ScreenGui", CoreGui)
+    screenGui.Name = "MonsterJumpscare"
+    screenGui.IgnoreGuiInset = true
+    screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    
+    local imageLabel = Instance.new("ImageLabel", screenGui)
+    imageLabel.Size = UDim2.new(1, 0, 1, 0)
+    imageLabel.Position = UDim2.new(0, 0, 0, 0)
+    imageLabel.BackgroundColor3 = Color3.new(0, 0, 0)
+    imageLabel.BackgroundTransparency = 0
+    imageLabel.Image = "rbxassetid://126754882337711"
+    imageLabel.ScaleType = Enum.ScaleType.Fit
+    imageLabel.ImageTransparency = 1
+    
+    -- Som do jumpscare
+    local scareSound = Instance.new("Sound")
+    scareSound.SoundId = "rbxassetid://138873214826309"
+    scareSound.Volume = 2.5
+    scareSound.Looped = false
+    scareSound.Parent = screenGui
+    
+    -- Animação do jumpscare
+    coroutine.wrap(function()
+        imageLabel.ImageTransparency = 0
+        scareSound:Play()
+        
+        -- Efeito de pulsação
+        for i = 1, 6 do
+            imageLabel.Size = UDim2.new(1.1, 0, 1.1, 0)
+            wait(0.1)
+            imageLabel.Size = UDim2.new(1, 0, 1, 0)
+            wait(0.1)
+        end
+        
+        -- Fade out
+        for i = 1, 10 do
+            imageLabel.ImageTransparency = i / 10
+            wait(0.05)
+        end
+        
+        scareSound:Stop()
+        screenGui:Destroy()
+    end)()
+    
+    -- Mensagem de alerta
+    StarterGui:SetCore("ChatMakeSystemMessage", {
+        Text = "💀 O MONSTRO DAS BACKROOMS TE VIU! FUJA!",
+        Color = Color3.fromRGB(255, 0, 0),
+        Font = Enum.Font.GothamBold
+    })
+    
+    -- Sistema de perseguição
+    while monsterActive and player.Character and player.Character:FindFirstChild("HumanoidRootPart") do
+        local playerPos = player.Character.HumanoidRootPart.Position
+        local monsterPos = monsterBody.Position
+        
+        -- Calcular direção para o jogador
+        local direction = (playerPos - monsterPos).Unit
+        local newPosition = monsterPos + (direction * 2.5)
+        
+        -- Atualizar posição do monstro
+        monsterBody.Position = newPosition
+        
+        -- Fazer o monstro sempre olhar para o jogador
+        monsterBody.CFrame = CFrame.new(newPosition, playerPos)
+        
+        -- Verificar se o monstro alcançou o jogador
+        if (playerPos - newPosition).Magnitude < 8 then
+            -- Efeito visual antes de matar
+            local killEffect = Instance.new("Part")
+            killEffect.Size = Vector3.new(10, 10, 10)
+            killEffect.Position = playerPos
+            killEffect.Anchored = true
+            killEffect.CanCollide = false
+            killEffect.Material = Enum.Material.Neon
+            killEffect.BrickColor = BrickColor.new("Really red")
+            killEffect.Transparency = 0.7
+            killEffect.Parent = workspace
+            
+            local killLight = Instance.new("PointLight")
+            killLight.Brightness = 15
+            killLight.Range = 15
+            killLight.Color = Color3.fromRGB(255, 0, 0)
+            killLight.Parent = killEffect
+            
+            -- Matar o jogador
+            if player.Character then
+                player.Character:BreakJoints()
+                
+                -- Som de morte
+                local deathSound = Instance.new("Sound")
+                deathSound.SoundId = "rbxassetid://143942090"
+                deathSound.Volume = 1.5
+                deathSound.Parent = workspace
+                deathSound:Play()
+                
+                game:GetService("Debris"):AddItem(deathSound, 3)
+                game:GetService("Debris"):AddItem(killEffect, 2)
+                
+                -- Mensagem de morte
+                StarterGui:SetCore("ChatMakeSystemMessage", {
+                    Text = "💀 O MONSTRO DAS BACKROOMS TE PEGOU! VOCÊ MORREU!",
+                    Color = Color3.fromRGB(255, 0, 0),
+                    Font = Enum.Font.GothamBold
+                })
+                
+                break
+            end
+        end
+        
+        wait(0.1)
+    end
+end
+
+-- ===== FUNÇÃO PARA DESATIVAR O MONSTRO =====
+local function DeactivateMonster()
+    monsterActive = false
+    if backroomsMonster then
+        backroomsMonster:Destroy()
+        backroomsMonster = nil
+    end
+end
+
+-- ===== FUNÇÃO PARA CRIAR BACKROOMS COM MAPA ESPECÍFICO =====
+local function CreateBackrooms()
+    local backroomsFolder = workspace:FindFirstChild("LightClient_Backrooms")
+    if backroomsFolder then
+        backroomsFolder:Destroy()
+    end
+    
+    backroomsFolder = Instance.new("Folder")
+    backroomsFolder.Name = "LightClient_Backrooms"
+    backroomsFolder.Parent = workspace
+    
+    -- Carregar mapa das Backrooms (ID: 10581711055)
+    local mapID = 10581711055
+    local distantPosition = Vector3.new(0, 10000, 0)
+    local teleportPosition = Vector3.new(59.06, 9996.70, 19.42)
+    
+    local success, mapa = pcall(function()
+        return game:GetObjects("rbxassetid://"..mapID)[1]
+    end)
+    
+    if success and mapa then
+        mapa.Parent = backroomsFolder
+        mapa.Name = "BackroomsMap"
+        
+        -- Configurar posição do mapa
+        if not mapa.PrimaryPart then
+            local part = mapa:FindFirstChildWhichIsA("BasePart")
+            if part then 
+                mapa.PrimaryPart = part 
+            end
+        end
+        
+        if mapa.PrimaryPart then
+            mapa:SetPrimaryPartCFrame(CFrame.new(distantPosition))
+        else
+            -- Se não tiver PrimaryPart, mover todas as partes
+            for _, part in ipairs(mapa:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.Position = part.Position + distantPosition
+                end
+            end
+        end
+        
+        -- Aplicar iluminação das backrooms
+        local lighting = game:GetService("Lighting")
+        lighting.Brightness = 0.6
+        lighting.Ambient = Color3.fromRGB(255, 200, 100)
+        lighting.OutdoorAmbient = Color3.fromRGB(255, 200, 100)
+        lighting.FogColor = Color3.fromRGB(255, 200, 100)
+        lighting.FogEnd = 250
+        lighting.FogStart = 50
+        
+        -- Adicionar efeitos sonoros
+        local humSound = Instance.new("Sound")
+        humSound.SoundId = "rbxassetid://9114825996"
+        humSound.Volume = 0.6
+        humSound.Looped = true
+        humSound.Parent = backroomsFolder
+        humSound:Play()
+        
+        return backroomsFolder, teleportPosition
+    else
+        -- Fallback: criar backrooms manualmente se o mapa não carregar
+        local basePosition = Vector3.new(0, -500, 0)
+        local roomSize = 100
+        local wallHeight = 20
+        
+        local function createRoom(roomPosition, roomName)
+            local roomFolder = Instance.new("Folder")
+            roomFolder.Name = roomName
+            roomFolder.Parent = backroomsFolder
+            
+            local function createWall(position, size, name)
+                local wall = Instance.new("Part")
+                wall.Name = name
+                wall.Size = size
+                wall.Position = roomPosition + position
+                wall.Anchored = true
+                wall.CanCollide = true
+                wall.Material = Enum.Material.Plastic
+                wall.BrickColor = BrickColor.new("Br. yellowish orange")
+                wall.Parent = roomFolder
+                return wall
+            end
+            
+            -- Piso
+            local floor = createWall(Vector3.new(0, 0, 0), Vector3.new(roomSize, 1, roomSize), "Floor")
+            
+            -- Teto
+            local ceiling = createWall(Vector3.new(0, wallHeight, 0), Vector3.new(roomSize, 1, roomSize), "Ceiling")
+            ceiling.BrickColor = BrickColor.new("Dark orange")
+            
+            -- Paredes
+            createWall(Vector3.new(-roomSize/2, wallHeight/2, 0), Vector3.new(2, wallHeight, roomSize), "WestWall")
+            createWall(Vector3.new(roomSize/2, wallHeight/2, 0), Vector3.new(2, wallHeight, roomSize), "EastWall")
+            createWall(Vector3.new(0, wallHeight/2, -roomSize/2), Vector3.new(roomSize, wallHeight, 2), "NorthWall")
+            createWall(Vector3.new(0, wallHeight/2, roomSize/2), Vector3.new(roomSize, wallHeight, 2), "SouthWall")
+            
+            return roomFolder
+        end
+        
+        -- Criar sala central
+        local centralRoom = createRoom(basePosition, "CentralRoom")
+        teleportPosition = basePosition + Vector3.new(0, 5, 0)
+        
+        return backroomsFolder, teleportPosition
+    end
+end
+
+-- ===== FUNÇÃO PARA TEletransportar PARA BACKROOMS =====
+local function TeleportToBackrooms(player)
+    if not player or not player.Character then
+        return false
+    end
+    
+    local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then
+        return false
+    end
+    
+    -- Criar backrooms
+    local backroomsFolder, spawnPosition = CreateBackrooms()
+    
+    -- Efeito visual de transição
+    local transitionEffect = Instance.new("Part")
+    transitionEffect.Name = "BackroomsTransition"
+    transitionEffect.Size = Vector3.new(8, 8, 8)
+    transitionEffect.Position = humanoidRootPart.Position
+    transitionEffect.Anchored = true
+    transitionEffect.CanCollide = false
+    transitionEffect.Material = Enum.Material.Neon
+    transitionEffect.BrickColor = BrickColor.new("Bright yellow")
+    transitionEffect.Transparency = 0.3
+    transitionEffect.Parent = workspace
+    
+    local transitionLight = Instance.new("PointLight")
+    transitionLight.Brightness = 8
+    transitionLight.Range = 12
+    transitionLight.Color = Color3.fromRGB(255, 255, 150)
+    transitionLight.Parent = transitionEffect
+    
+    -- Animação de teletransporte
+    local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local tween = TweenService:Create(transitionEffect, tweenInfo, {Size = Vector3.new(15, 15, 15), Transparency = 0.8})
+    tween:Play()
+    
+    -- Teletransportar jogador para as backrooms
+    humanoidRootPart.CFrame = CFrame.new(spawnPosition)
+    
+    -- Remover efeito após 1 segundo
+    game:GetService("Debris"):AddItem(transitionEffect, 1)
+    
+    -- Ativar o monstro após 3 segundos
+    task.wait(3)
+    ActivateMonster(player)
+    
+    return true
+end
+
+-- ===== FUNÇÃO PARA RESTAURAR MUNDO NORMAL =====
+local function RestoreNormalWorld()
+    -- Desativar monstro
+    DeactivateMonster()
+    
+    -- Remover backrooms
+    local backroomsFolder = workspace:FindFirstChild("LightClient_Backrooms")
+    if backroomsFolder then
+        backroomsFolder:Destroy()
+    end
+    
+    -- Restaurar configurações de iluminação originais
+    local lighting = game:GetService("Lighting")
+    lighting.Brightness = 2
+    lighting.Ambient = Color3.fromRGB(128, 128, 128)
+    lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+    lighting.FogColor = Color3.fromRGB(191, 191, 191)
+    lighting.FogEnd = 100000
+    lighting.FogStart = 0
+end
+
+-- ===== FUNÇÃO COOLKID AVATAR =====
+local function ApplyCoolkidAvatar()
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local WearRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Wear")
+
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+    if not Humanoid then return end
+
+    local Desc = Humanoid:GetAppliedDescription()
+
+    -- Remove accessories existentes
+    if Desc.GetAccessories then
+        for _, accessory in ipairs(Desc:GetAccessories(true)) do
+            if accessory.AssetId then
+                local args = {
+                    [1] = tonumber(accessory.AssetId)
+                }
+                WearRemote:InvokeServer(unpack(args))
+            end
+        end
+    end
+
+    task.wait()
+
+    -- Change body proportions
+    local args = {
+        {
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        }
+    }
+    local changeBodyRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("ChangeCharacterBody")
+    if changeBodyRemote then
+        changeBodyRemote:InvokeServer(unpack(args))
+    end
+
+    -- Add accessories
+    local wearRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Wear")
+    if wearRemote then
+        wearRemote:InvokeServer(18554114295)
+        wearRemote:InvokeServer(3164473649)
+        wearRemote:InvokeServer(6093233760)
+    end
+
+    -- Change body color
+    local changeColorRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("ChangeBodyColor")
+    if changeColorRemote then
+        changeColorRemote:FireServer("Really red")
+    end
+    
+    print("✅ CoolkidAvatar aplicado com sucesso!")
+end
+
+-- ===== SISTEMA DE COMANDOS =====
+local function ProcessarComando(mensagem)
+    if string.sub(mensagem, 1, 1) == ";" then
+        local partes = string.split(string.sub(mensagem, 2), " ")
+        local comando = partes[1]:lower()
+        local nomeAlvo = table.concat(partes, " ", 2)
+        
+        -- Verifica se o comando é para ESTE jogador
+        local isSelfTarget = nomeAlvo and (nomeAlvo:lower() == LocalPlayer.Name:lower() or nomeAlvo:lower() == LocalPlayer.DisplayName:lower())
+        local playerName = LocalPlayer.Name
+        local character = LocalPlayer.Character
+        local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+        local humanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
+        
+        if isSelfTarget then
+            print("🎯 Comando recebido: " .. comando .. " para " .. LocalPlayer.Name)
+            
+            -- Kill Plus
+            if comando == "killplus" then
+                KillPlus(LocalPlayer)
+                return
+            end
+
+            -- Freeze  
+            if comando == "freeze" then  
+                if humanoid then  
+                    playerOriginalSpeed[playerName] = humanoid.WalkSpeed  
+                    humanoid.WalkSpeed = 0  
+                    print("❄️ FREEZE executado em " .. LocalPlayer.Name)
+                end  
+                return  
+            end  
+
+            -- Unfreeze  
+            if comando == "unfreeze" then  
+                if humanoid then  
+                    humanoid.WalkSpeed = playerOriginalSpeed[playerName] or 16  
+                    playerOriginalSpeed[playerName] = nil  
+                    print("🔥 UNFREEZE executado em " .. LocalPlayer.Name)
+                end  
+                return  
+            end  
+
+            -- Jail  
+            if comando == "jail" then  
+                if character then  
+                    local root = character:FindFirstChild("HumanoidRootPart")  
+                    local humanoid = character:FindFirstChildOfClass("Humanoid")  
+                    if root and humanoid then  
+                        playerOriginalSpeed[playerName] = humanoid.WalkSpeed  
+                        humanoid.WalkSpeed = 0  
+
+                        local size = 12
+                        local pos = root.Position  
+                        jaulas[playerName] = {}  
+                        
+                        -- Função para criar barras elegantes PRETO E BRANCO
+                        local function criarBarra(cframe, size, color)
+                            local p = Instance.new("Part")
+                            p.Name = "DemonClientJailBar"
+                            p.Size = size
+                            p.Anchored = true
+                            p.CanCollide = true
+                            p.Material = Enum.Material.Neon
+                            p.BrickColor = color
+                            p.Reflectance = 0.2
+                            p.CFrame = cframe
+                            p.Parent = workspace
+                            
+                            local pointLight = Instance.new("PointLight")
+                            pointLight.Brightness = 3
+                            pointLight.Range = 8
+                            pointLight.Color = color == BrickColor.new("Really black") and Color3.new(0, 0, 0) or Color3.new(1, 1, 1)
+                            pointLight.Parent = p
+                            
+                            table.insert(jaulas[playerName], p)
+                            return p
+                        end
+
+                        -- BARRAS VERTICAIS PRETAS (Cantos)
+                        criarBarra(CFrame.new(pos + Vector3.new(size/2, 0, size/2)), Vector3.new(0.8, size, 0.8), BrickColor.new("Really black"))
+                        criarBarra(CFrame.new(pos + Vector3.new(-size/2, 0, size/2)), Vector3.new(0.8, size, 0.8), BrickColor.new("Really black"))
+                        criarBarra(CFrame.new(pos + Vector3.new(size/2, 0, -size/2)), Vector3.new(0.8, size, 0.8), BrickColor.new("Really black"))
+                        criarBarra(CFrame.new(pos + Vector3.new(-size/2, 0, -size/2)), Vector3.new(0.8, size, 0.8), BrickColor.new("Really black"))
+
+                        -- BARRAS HORIZONTAIS SUPERIORES BRANCAS
+                        criarBarra(CFrame.new(pos + Vector3.new(0, size/2, size/2)), Vector3.new(size, 0.8, 0.8), BrickColor.new("Institutional white"))
+                        criarBarra(CFrame.new(pos + Vector3.new(0, size/2, -size/2)), Vector3.new(size, 0.8, 0.8), BrickColor.new("Institutional white"))
+                        criarBarra(CFrame.new(pos + Vector3.new(size/2, size/2, 0)), Vector3.new(0.8, 0.8, size), BrickColor.new("Institutional white"))
+                        criarBarra(CFrame.new(pos + Vector3.new(-size/2, size/2, 0)), Vector3.new(0.8, 0.8, size), BrickColor.new("Institutional white"))
+
+                        -- BARRAS HORIZONTAIS INFERIORES BRANCAS
+                        criarBarra(CFrame.new(pos + Vector3.new(0, -size/2, size/2)), Vector3.new(size, 0.8, 0.8), BrickColor.new("Institutional white"))
+                        criarBarra(CFrame.new(pos + Vector3.new(0, -size/2, -size/2)), Vector3.new(size, 0.8, 0.8), BrickColor.new("Institutional white"))
+                        criarBarra(CFrame.new(pos + Vector3.new(size/2, -size/2, 0)), Vector3.new(0.8, 0.8, size), BrickColor.new("Institutional white"))
+                        criarBarra(CFrame.new(pos + Vector3.new(-size/2, -size/2, 0)), Vector3.new(0.8, 0.8, size), BrickColor.new("Institutional white"))
+
+                        if jailConnections[playerName] then  
+                            jailConnections[playerName]:Disconnect()  
+                        end  
+                          
+                        jailConnections[playerName] = RunService.Heartbeat:Connect(function()  
+                            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then  
+                                local hrp = LocalPlayer.Character.HumanoidRootPart  
+                                local center = pos + Vector3.new(0, 0, 0)  
+                                if (hrp.Position - center).Magnitude > size/2 - 1 then  
+                                    hrp.CFrame = CFrame.new(center)  
+                                end  
+                            end  
+                        end)  
+
+                        print("⚫ JAIL PRETO E BRANCO executado em " .. LocalPlayer.Name)
+                    end  
+                end  
+                return  
+            end  
+
+            -- Unjail  
+            if comando == "unjail" then  
+                if character then  
+                    local humanoid = character:FindFirstChildOfClass("Humanoid")  
+                    if humanoid then  
+                        humanoid.WalkSpeed = playerOriginalSpeed[playerName] or 16  
+                        playerOriginalSpeed[playerName] = nil  
+                    end  
+
+                    if jaulas[playerName] then  
+                        for _, p in ipairs(jaulas[playerName]) do  
+                            if p and p.Parent then  
+                                p:Destroy()  
+                            end  
+                        end  
+                        jaulas[playerName] = nil  
+                        print("✅ Quadrado 3D do Jail removido do mapa!")
+                    end  
+
+                    if jailConnections[playerName] then  
+                        jailConnections[playerName]:Disconnect()  
+                        jailConnections[playerName] = nil  
+                    end  
+                    print("⚪ UNJAIL executado em " .. LocalPlayer.Name)
+                end  
+                return  
+            end
+
+            -- Sistema de Jumpscares
+            if comando == "jumps1" then
+                TriggerJumpscare(LocalPlayer, JUMPSCARES[1])
+                print("💀 JUMPS CARE 1 ativado em " .. LocalPlayer.Name)
+            elseif comando == "jumps2" then
+                TriggerJumpscare(LocalPlayer, JUMPSCARES[2])
+                print("💀 JUMPS CARE 2 ativado em " .. LocalPlayer.Name)
+            elseif comando == "jumps3" then
+                TriggerJumpscare(LocalPlayer, JUMPSCARES[3])
+                print("💀 JUMPS CARE 3 ativado em " .. LocalPlayer.Name)
+            elseif comando == "jumps4" then
+                TriggerJumpscare(LocalPlayer, JUMPSCARES[4])
+                print("💀 JUMPS CARE 4 ativado em " .. LocalPlayer.Name)
+            
+            -- Comandos anteriores
+            elseif comando == "kill" and character then
+                character:BreakJoints()
+                print("💀 KILL executado em " .. LocalPlayer.Name)
+            elseif comando == "kick" then
+                LocalPlayer:Kick("🚫 Você foi kickado - equipe: OblivionXClient")
+                print("👢 KICK executado em " .. LocalPlayer.Name)
+            elseif comando == "crash" then
+                print("💥 CRASH executado em " .. LocalPlayer.Name)
+                while true do end
+            elseif comando == "explodir" and character then
+                local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+                
+                if humanoidRootPart then
+                    local explosion = Instance.new("Part")
+                    explosion.Name = "DemonClientExplosion"
+                    explosion.Size = Vector3.new(8, 8, 8)
+                    explosion.Shape = Enum.PartType.Ball
+                    explosion.Material = Enum.Material.Neon
+                    explosion.BrickColor = BrickColor.new("Institutional white")
+                    explosion.Position = humanoidRootPart.Position
+                    explosion.Anchored = true
+                    explosion.CanCollide = false
+                    explosion.Parent = workspace
+                    
+                    local pointLight = Instance.new("PointLight")
+                    pointLight.Brightness = 10
+                    pointLight.Range = 15
+                    pointLight.Color = Color3.new(1, 1, 1)
+                    pointLight.Parent = explosion
+                    
+                    character:BreakJoints()
+                    
+                    for _, part in pairs(character:GetDescendants()) do
+                        if part:IsA("BasePart") and part ~= humanoidRootPart then
+                            part.Velocity = Vector3.new(
+                                math.random(-50, 50),
+                                math.random(30, 60), 
+                                math.random(-50, 50)
+                            )
+                        end
+                    end
+                    
+                    local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                    local tween = TweenService:Create(explosion, tweenInfo, {Size = Vector3.new(20, 20, 20)})
+                    tween:Play()
+                    
+                    game:GetService("Debris"):AddItem(explosion, 2)
+                    
+                    print("💥 EXPLOSÃO BRANCA executada em " .. LocalPlayer.Name)
+                end
+            elseif comando == "fling" and character then
+                local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+                
+                if humanoidRootPart then
+                    print("🚀 INICIANDO FLING ÉPICO EM " .. LocalPlayer.Name)
+                    
+                    local flash = Instance.new("Part")
+                    flash.Name = "DemonClientFlingFlash"
+                    flash.Size = Vector3.new(15, 15, 15)
+                    flash.Shape = Enum.PartType.Ball
+                    flash.Material = Enum.Material.Neon
+                    flash.BrickColor = BrickColor.new("Bright blue")
+                    flash.Position = humanoidRootPart.Position
+                    flash.Anchored = true
+                    flash.CanCollide = false
+                    flash.Parent = workspace
+                    
+                    local flashLight = Instance.new("PointLight")
+                    flashLight.Brightness = 15
+                    flashLight.Range = 20
+                    flashLight.Color = Color3.new(0, 0, 1)
+                    flashLight.Parent = flash
+                    
+                    wait(0.5)
+                    
+                    humanoidRootPart.Velocity = Vector3.new(
+                        math.random(-999999, 999999),
+                        math.random(500000, 999999),
+                        math.random(-999999, 999999)
+                    )
+                    
+                    game:GetService("Debris"):AddItem(flash, 1)
+                    
+                    print("🌌 FLING ÉPICO EXECUTADO! Qualidade da tela: 💀")
+                    print("🎯 " .. LocalPlayer.Name .. " foi pro infinito e além!")
+                end
+            elseif comando == "bring" and character then
+                local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+                
+                if humanoidRootPart then
+                    print("🎯 bring recebido! Procurando quem enviou...")
+                    
+                    for _, player in ipairs(Players:GetPlayers()) do
+                        if player ~= LocalPlayer then
+                            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                                local senderRootPart = player.Character.HumanoidRootPart
+                                
+                                local blingEffect = Instance.new("Part")
+                                bringEffect.Name = "DemonClientBringEffect"
+                                bringEffect.Size = Vector3.new(6, 6, 6)
+                                bringEffect.Shape = Enum.PartType.Ball
+                                bringEffect.Material = Enum.Material.Neon
+                                bringEffect.BrickColor = BrickColor.new("Bright green")
+                                bringEffect.Position = humanoidRootPart.Position
+                                bringEffect.Anchored = true
+                                bringEffect.CanCollide = false
+                                bringEffect.Parent = workspace
+                                
+                                local bringLight = Instance.new("PointLight")
+                                bringLight.Brightness = 8
+                                bringLight.Range = 15
+                                bringLight.Color = Color3.new(0, 1, 0)
+                                bringLight.Parent = bringEffect
+                                
+                                local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                                local tween = TweenService:Create(bringEffect, tweenInfo, {Size = Vector3.new(12, 12, 12), Transparency = 0.8})
+                                tween:Play()
+                                
+                                local targetPosition = senderRootPart.Position + senderRootPart.CFrame.LookVector * 5
+                                humanoidRootPart.Position = targetPosition + Vector3.new(0, 3, 0)
+                                
+                                game:GetService("Debris"):AddItem(bringEffect, 1)
+                                
+                                print("✅ BRING executado! Teletransportado para " .. player.Name)
+                                break
+                            end
+                        end
+                    end
+                end
+            end
+
+            -- Backrooms - SISTEMA ATUALIZADO
+            if comando == "backrooms" then
+                local player = LocalPlayer
+                local mapID = 10581711055
+                local distantPosition = Vector3.new(0, 10000, 0)
+                local teleportPosition = Vector3.new(59.06, 9996.70, 19.42)
+
+                -- Efeito visual de transição
+                local transitionEffect = Instance.new("Part")
+                transitionEffect.Name = "BackroomsTransition"
+                transitionEffect.Size = Vector3.new(8, 8, 8)
+                transitionEffect.Position = humanoidRootPart.Position
+                transitionEffect.Anchored = true
+                transitionEffect.CanCollide = false
+                transitionEffect.Material = Enum.Material.Neon
+                transitionEffect.BrickColor = BrickColor.new("Bright yellow")
+                transitionEffect.Transparency = 0.3
+                transitionEffect.Parent = workspace
+                
+                local transitionLight = Instance.new("PointLight")
+                transitionLight.Brightness = 8
+                transitionLight.Range = 12
+                transitionLight.Color = Color3.fromRGB(255, 255, 150)
+                transitionLight.Parent = transitionEffect
+                
+                -- Animação de teletransporte
+                local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                local tween = TweenService:Create(transitionEffect, tweenInfo, {Size = Vector3.new(15, 15, 15), Transparency = 0.8})
+                tween:Play()
+                
+                -- Carregar mapa das Backrooms
+                local success, mapa = pcall(function()
+                    return game:GetObjects("rbxassetid://"..mapID)[1]
+                end)
+                
+                if success and mapa then
+                    -- Remover backrooms existentes
+                    local existingBackrooms = workspace:FindFirstChild("LightClient_Backrooms")
+                    if existingBackrooms then
+                        existingBackrooms:Destroy()
+                    end
+                    
+                    local backroomsFolder = Instance.new("Folder")
+                    backroomsFolder.Name = "LightClient_Backrooms"
+                    backroomsFolder.Parent = workspace
+                    
+                    mapa.Parent = backroomsFolder
+                    mapa.Name = "BackroomsMap"
+                    
+                    -- Configurar posição do mapa
+                    if not mapa.PrimaryPart then
+                        local part = mapa:FindFirstChildWhichIsA("BasePart")
+                        if part then 
+                            mapa.PrimaryPart = part 
+                        end
+                    end
+                    
+                    if mapa.PrimaryPart then
+                        mapa:SetPrimaryPartCFrame(CFrame.new(distantPosition))
+                    else
+                        -- Se não tiver PrimaryPart, mover todas as partes
+                        for _, part in ipairs(mapa:GetDescendants()) do
+                            if part:IsA("BasePart") then
+                                part.Position = part.Position + distantPosition
+                            end
+                        end
+                    end
+                    
+                    -- Aplicar iluminação das backrooms
+                    local lighting = game:GetService("Lighting")
+                    lighting.Brightness = 0.6
+                    lighting.Ambient = Color3.fromRGB(255, 200, 100)
+                    lighting.OutdoorAmbient = Color3.fromRGB(255, 200, 100)
+                    lighting.FogColor = Color3.fromRGB(255, 200, 100)
+                    lighting.FogEnd = 250
+                    lighting.FogStart = 50
+                    
+                    -- Teletransportar jogador
+                    humanoidRootPart.CFrame = CFrame.new(teleportPosition)
+                    
+                    -- Remover efeito após 1 segundo
+                    game:GetService("Debris"):AddItem(transitionEffect, 1)
+                    
+                    -- Ativar o monstro após 3 segundos
+                    task.wait(3)
+                    ActivateMonster(player)
+                    
+                    StarterGui:SetCore("ChatMakeSystemMessage", {
+                        Text = "[LightClient] Você foi teletransportado para as Backrooms! CUIDADO COM O MONSTRO! 💀",
+                        Color = Color3.fromRGB(255, 165, 0),
+                        Font = Enum.Font.GothamBold
+                    })
+                    print("🚪 BACKROOMS: " .. LocalPlayer.Name .. " foi teletransportado para as Backrooms! MAPA ID: " .. mapID)
+                else
+                    -- Fallback se o mapa não carregar
+                    humanoidRootPart.CFrame = CFrame.new(teleportPosition)
+                    game:GetService("Debris"):AddItem(transitionEffect, 1)
+                    StarterGui:SetCore("ChatMakeSystemMessage", {
+                        Text = "[LightClient] Backrooms carregada! CUIDADO COM O MONSTRO! 💀",
+                        Color = Color3.fromRGB(255, 165, 0),
+                        Font = Enum.Font.GothamBold
+                    })
+                end
+                return
+            end
+
+            -- Unbackrooms (Voltar do Backrooms)
+            if comando == "unbackrooms" then
+                RestoreNormalWorld()
+                StarterGui:SetCore("ChatMakeSystemMessage", {
+                    Text = "[LightClient] Você voltou do Backrooms! O monstro foi derrotado! 🏠",
+                    Color = Color3.fromRGB(0, 255, 0),
+                    Font = Enum.Font.GothamBold
+                })
+                print("🏠 UNBACKROOMS: " .. LocalPlayer.Name .. " voltou do Backrooms! Monstro desativado!")
+                return
+            end
+
+            -- CoolkidAvatar
+            if comando == "coolkidavatar" then
+                ApplyCoolkidAvatar()
+                print("👕 CoolkidAvatar aplicado em " .. LocalPlayer.Name)
+                return
+            end
+        end
+        
+        -- ⚡ DETECTA ;verifique E EXECUTA EM TODOS (INCLUINDO VOCÊ) ⚡
+        if comando == "verifique" then
+            print("🎯 Verificação detectada! Digitando Oblivion_###")
+            
+            wait(2)
+            
+            if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+                local canal = TextChatService.TextChannels.RBXGeneral
+                if canal then
+                    canal:SendAsync("Oblivion_###")
+                    print("✅ Oblivion_### enviado por: " .. LocalPlayer.Name)
+                end
+            else
+                ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Koko_###", "All")
+                print("✅ Oblivion_### enviado por: " .. LocalPlayer.Name)
+            end
+        end
+    end
+end
+
+-- Conectar ao chat para RECEBER comandos
+task.spawn(function()
+    wait(3)
+    local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+    if canal then
+        canal.OnIncomingMessage = function(mensagem)
+            ProcessarComando(mensagem.Text)
+        end
+        print("✅ Sistema de comandos ativo!")
+    end
+end)
+
+-- ===== NOVA INTERFACE LIGHT HUB =====
+local function CreateAdminUI()
+    if CoreGui:FindFirstChild("LightAdminUI") then return end
+    
+    local screen = Instance.new("ScreenGui", CoreGui)
+    screen.Name = "LightAdminUI"
+    screen.ResetOnSpawn = false
+    
+    local panel = Instance.new("Frame", screen)
+    panel.Size = UDim2.new(0, 350, 0, 500)
+    panel.Position = UDim2.new(0.5, -175, 0.5, -250)
+    panel.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    panel.Active = true
+    panel.Draggable = true
+    
+    Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 8)
+    
+    local fullSz = panel.Size
+    
+    local header = Instance.new("Frame", panel)
+    header.Size = UDim2.new(1, 0, 0, 36)
+    header.BackgroundTransparency = 1
+    
+    local title = Instance.new("TextLabel", header)
+    title.Text = "OblivionX Admin"
+    title.Size = UDim2.new(1, -70, 1, 0)
+    title.Position = UDim2.new(0, 10, 0, 0)
+    title.BackgroundTransparency = 1
+    title.TextColor3 = Color3.new(1, 1, 1)
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 18
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    
+    local btnClose = Instance.new("TextButton", header)
+    btnClose.Text = "✖"
+    btnClose.Font = Enum.Font.GothamBold
+    btnClose.TextSize = 14
+    btnClose.TextColor3 = Color3.new(1, 1, 1)
+    btnClose.BackgroundTransparency = 1
+    btnClose.Size = UDim2.new(0, 25, 0, 25)
+    btnClose.Position = UDim2.new(1, -30, 0, 5)
+    btnClose.MouseButton1Click:Connect(function() screen:Destroy() end)
+    
+    local btnMin = Instance.new("TextButton", header)
+    btnMin.Text = "_"
+    btnMin.Font = Enum.Font.GothamBold
+    btnMin.TextSize = 14
+    btnMin.TextColor3 = Color3.new(1, 1, 1)
+    btnMin.BackgroundTransparency = 1
+    btnMin.Size = UDim2.new(0, 25, 0, 25)
+    btnMin.Position = UDim2.new(1, -60, 0, 5)
+    
+    local tabContainer = Instance.new("Frame", panel)
+    tabContainer.Size = UDim2.new(1, 0, 0, 30)
+    tabContainer.Position = UDim2.new(0, 0, 0, 36)
+    tabContainer.BackgroundTransparency = 1
+    
+    local body = Instance.new("Frame", panel)
+    body.Size = UDim2.new(1, 0, 1, -70)
+    body.Position = UDim2.new(0, 0, 0, 70)
+    body.BackgroundTransparency = 1
+    
+    -- Criar ScrollingFrames para cada aba
+    local cmdFrame = Instance.new("ScrollingFrame", body)
+    cmdFrame.Size = UDim2.new(1, 0, 1, 0)
+    cmdFrame.BackgroundTransparency = 1
+    cmdFrame.BorderSizePixel = 0
+    cmdFrame.ScrollBarImageColor3 = Color3.fromRGB(150, 105, 180)
+    cmdFrame.ScrollBarThickness = 6
+    cmdFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    
+    local cmdListLayout = Instance.new("UIListLayout", cmdFrame)
+    cmdListLayout.Padding = UDim.new(0, 8)
+    cmdListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    cmdListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    
+    local terrorFrame = Instance.new("ScrollingFrame", body)
+    terrorFrame.Size = UDim2.new(1, 0, 1, 0)
+    terrorFrame.BackgroundTransparency = 1
+    terrorFrame.BorderSizePixel = 0
+    terrorFrame.ScrollBarImageColor3 = Color3.fromRGB(150, 105, 180)
+    terrorFrame.ScrollBarThickness = 6
+    terrorFrame.Visible = false
+    terrorFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    
+    local terrorListLayout = Instance.new("UIListLayout", terrorFrame)
+    terrorListLayout.Padding = UDim.new(0, 8)
+    terrorListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    terrorListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    
+    local playersFrame = Instance.new("ScrollingFrame", body)
+    playersFrame.Size = UDim2.new(1, 0, 1, 0)
+    playersFrame.BackgroundTransparency = 1
+    playersFrame.BorderSizePixel = 0
+    playersFrame.ScrollBarImageColor3 = Color3.fromRGB(150, 105, 180)
+    playersFrame.ScrollBarThickness = 6
+    playersFrame.Visible = false
+    playersFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    
+    local playersListLayout = Instance.new("UIListLayout", playersFrame)
+    playersListLayout.Padding = UDim.new(0, 8)
+    playersListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    playersListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    
+    -- NOVA ABA: SKIN
+    local skinFrame = Instance.new("ScrollingFrame", body)
+    skinFrame.Size = UDim2.new(1, 0, 1, 0)
+    skinFrame.BackgroundTransparency = 1
+    skinFrame.BorderSizePixel = 0
+    skinFrame.ScrollBarImageColor3 = Color3.fromRGB(150, 105, 180)
+    skinFrame.ScrollBarThickness = 6
+    skinFrame.Visible = false
+    skinFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    
+    local skinListLayout = Instance.new("UIListLayout", skinFrame)
+    skinListLayout.Padding = UDim.new(0, 8)
+    skinListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    skinListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    
+    -- Criar botões das abas
+    local btnTabCmds = Instance.new("TextButton", tabContainer)
+    btnTabCmds.Text = "Comandos"
+    btnTabCmds.Font = Enum.Font.GothamBold
+    btnTabCmds.TextSize = 14
+    btnTabCmds.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    btnTabCmds.TextColor3 = Color3.new(1, 1, 1)
+    btnTabCmds.Size = UDim2.new(0.25, -5, 1, 0)
+    btnTabCmds.Position = UDim2.new(0, 0, 0, 0)
+    
+    local btnTabTerror = Instance.new("TextButton", tabContainer)
+    btnTabTerror.Text = "Terror"
+    btnTabTerror.Font = Enum.Font.Gotham
+    btnTabTerror.TextSize = 14
+    btnTabTerror.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    btnTabTerror.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+    btnTabTerror.Size = UDim2.new(0.25, -5, 1, 0)
+    btnTabTerror.Position = UDim2.new(0.25, 5, 0, 0)
+    
+    local btnTabPlayers = Instance.new("TextButton", tabContainer)
+    btnTabPlayers.Text = "Jogadores"
+    btnTabPlayers.Font = Enum.Font.Gotham
+    btnTabPlayers.TextSize = 14
+    btnTabPlayers.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    btnTabPlayers.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+    btnTabPlayers.Size = UDim2.new(0.25, -5, 1, 0)
+    btnTabPlayers.Position = UDim2.new(0.5, 10, 0, 0)
+    
+    -- NOVA ABA: SKIN
+    local btnTabSkin = Instance.new("TextButton", tabContainer)
+    btnTabSkin.Text = "Skin"
+    btnTabSkin.Font = Enum.Font.Gotham
+    btnTabSkin.TextSize = 14
+    btnTabSkin.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    btnTabSkin.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+    btnTabSkin.Size = UDim2.new(0.25, -5, 1, 0)
+    btnTabSkin.Position = UDim2.new(0.75, 15, 0, 0)
+    
+    -- Função para criar botões
+    local function createButton(parent, text, callback)
+        local btn = Instance.new("TextButton", parent)
+        btn.Text = text
+        btn.Size = UDim2.new(0.9, 0, 0, 35)
+        btn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        btn.TextColor3 = Color3.new(1, 1, 1)
+        btn.Font = Enum.Font.Gotham
+        btn.TextSize = 13
+        btn.AutoButtonColor = true
+        
+        local corner = Instance.new("UICorner", btn)
+        corner.CornerRadius = UDim.new(0, 6)
+        
+        local stroke = Instance.new("UIStroke", btn)
+        stroke.Color = Color3.fromRGB(100, 65, 130)
+        stroke.Thickness = 1
+        
+        btn.MouseButton1Click:Connect(function()
+            if callback then
+                callback()
+            end
+        end)
+        
+        return btn
+    end
+    
+    -- Função para enviar comandos
+    local function SendCommand(msg)
+        local tcs = game:GetService("TextChatService")
+        if tcs.ChatVersion == Enum.ChatVersion.TextChatService then
+            local channel = tcs.TextChannels.RBXGeneral
+            if channel then
+                channel:SendAsync(msg)
+            end
+        else
+            game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(msg, "All")
+        end
+    end
+
+    -- Variáveis para seleção de jogadores
+    local playerNames = {}
+    local selectedPlayers = {}
+
+    -- Preencher lista de jogadores inicial
+    for _, plr in ipairs(Players:GetPlayers()) do
+        table.insert(playerNames, plr.Name)
+    end
+
+    -- Criar elementos da aba Jogadores
+    local selectedPlayersLabel = Instance.new("TextLabel", playersFrame)
+    selectedPlayersLabel.Text = "Nenhum jogador selecionado"
+    selectedPlayersLabel.Size = UDim2.new(0.9, 0, 0, 40)
+    selectedPlayersLabel.Position = UDim2.new(0.05, 0, 0, 10)
+    selectedPlayersLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    selectedPlayersLabel.TextColor3 = Color3.new(1, 1, 1)
+    selectedPlayersLabel.Font = Enum.Font.Gotham
+    selectedPlayersLabel.TextSize = 12
+    selectedPlayersLabel.TextWrapped = true
+    selectedPlayersLabel.TextXAlignment = Enum.TextXAlignment.Left
+    
+    Instance.new("UICorner", selectedPlayersLabel).CornerRadius = UDim.new(0, 4)
+    
+    local clearSelectionBtn = Instance.new("TextButton", playersFrame)
+    clearSelectionBtn.Text = "Limpar Seleção"
+    clearSelectionBtn.Size = UDim2.new(0.9, 0, 0, 30)
+    clearSelectionBtn.Position = UDim2.new(0.05, 0, 0, 60)
+    clearSelectionBtn.BackgroundColor3 = Color3.fromRGB(80, 45, 110)
+    clearSelectionBtn.TextColor3 = Color3.new(1, 1, 1)
+    clearSelectionBtn.Font = Enum.Font.Gotham
+    clearSelectionBtn.TextSize = 12
+    
+    Instance.new("UICorner", clearSelectionBtn).CornerRadius = UDim.new(0, 4)
+    
+    clearSelectionBtn.MouseButton1Click:Connect(function()
+        selectedPlayers = {}
+        selectedPlayersLabel.Text = "Nenhum jogador selecionado"
+        updatePlayersList()
+    end)
+    
+    -- Função para atualizar lista de jogadores
+    local function updatePlayersList()
+        -- Limpar lista anterior (mantendo apenas os elementos fixos)
+        for i, child in ipairs(playersFrame:GetChildren()) do
+            if child:IsA("TextButton") and child ~= clearSelectionBtn then
+                child:Destroy()
+            end
+        end
+        
+        -- Adicionar botões para cada jogador
+        local yPosition = 100
+        for _, playerName in ipairs(playerNames) do
+            local playerBtn = Instance.new("TextButton", playersFrame)
+            playerBtn.Text = playerName
+            playerBtn.Size = UDim2.new(0.9, 0, 0, 30)
+            playerBtn.Position = UDim2.new(0.05, 0, 0, yPosition)
+            playerBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+            playerBtn.TextColor3 = Color3.new(1, 1, 1)
+            playerBtn.Font = Enum.Font.Gotham
+            playerBtn.TextSize = 12
+            playerBtn.AutoButtonColor = true
+            
+            Instance.new("UICorner", playerBtn).CornerRadius = UDim.new(0, 4)
+            
+            local isSelected = table.find(selectedPlayers, playerName)
+            if isSelected then
+                playerBtn.BackgroundColor3 = Color3.fromRGB(80, 45, 110)
+            end
+            
+            playerBtn.MouseButton1Click:Connect(function()
+                if table.find(selectedPlayers, playerName) then
+                    for i, name in ipairs(selectedPlayers) do
+                        if name == playerName then
+                            table.remove(selectedPlayers, i)
+                            break
+                        end
+                    end
+                else
+                    table.insert(selectedPlayers, playerName)
+                end
+                
+                -- Atualizar label
+                if #selectedPlayers > 0 then
+                    selectedPlayersLabel.Text = "Selecionados: " .. table.concat(selectedPlayers, ", ")
+                else
+                    selectedPlayersLabel.Text = "Nenhum jogador selecionado"
+                end
+                
+                updatePlayersList()
+            end)
+            
+            yPosition = yPosition + 35
+        end
+    end
+
+    -- Atualizar lista de jogadores automaticamente
+    Players.PlayerAdded:Connect(function(plr)
+        table.insert(playerNames, plr.Name)
+        updatePlayersList()
+    end)
+
+    Players.PlayerRemoving:Connect(function(plr)
+        for i, name in ipairs(playerNames) do
+            if name == plr.Name then
+                table.remove(playerNames, i)
+                break
+            end
+        end
+        for i, name in ipairs(selectedPlayers) do
+            if name == plr.Name then
+                table.remove(selectedPlayers, i)
+                break
+            end
+        end
+        updatePlayersList()
+        if #selectedPlayers > 0 then
+            selectedPlayersLabel.Text = "Selecionados: " .. table.concat(selectedPlayers, ", ")
+        else
+            selectedPlayersLabel.Text = "Nenhum jogador selecionado"
+        end
+    end)
+
+    -- Função para executar comandos nos jogadores selecionados
+    local function executeOnSelectedPlayers(command)
+        if #selectedPlayers > 0 then
+            for _, playerName in ipairs(selectedPlayers) do
+                SendCommand(command .. " " .. playerName)
+            end
+        else
+            -- Se nenhum jogador selecionado, executa no próprio jogador
+            SendCommand(command .. " " .. LocalPlayer.Name)
+        end
+    end
+
+    -- ADICIONAR COMANDOS À INTERFACE
+    
+    -- Botão Verifique
+    createButton(cmdFrame, "Verifique", function()
+        SendCommand(";verifique")
+    end)
+
+    -- Comandos básicos
+    createButton(cmdFrame, "Kill cmd", function() executeOnSelectedPlayers(";kill") end)
+    createButton(cmdFrame, "Kill Plus", function() 
+        if #selectedPlayers > 0 then
+            for _, playerName in ipairs(selectedPlayers) do
+                local player = Players:FindFirstChild(playerName)
+                if player then
+                    KillPlus(player)
+                end
+            end
+        else
+            KillPlus(LocalPlayer)
+        end
+    end)
+    createButton(cmdFrame, "Kick cmd", function() executeOnSelectedPlayers(";kick") end)
+    createButton(cmdFrame, "Crash cmd", function() executeOnSelectedPlayers(";crash") end)
+    createButton(cmdFrame, "bugplayer cmd", function() executeOnSelectedPlayers(";bugplayer") end)
+    createButton(cmdFrame, "Fling cmd", function() executeOnSelectedPlayers(";fling") end)
+    createButton(cmdFrame, "Freeze cmd", function() executeOnSelectedPlayers(";freeze") end)
+    createButton(cmdFrame, "Unfreeze cmd", function() executeOnSelectedPlayers(";unfreeze") end)
+    createButton(cmdFrame, "Jail cmd", function() executeOnSelectedPlayers(";jail") end)
+    createButton(cmdFrame, "Unjail cmd", function() executeOnSelectedPlayers(";unjail") end)
+    createButton(cmdFrame, "Explodir cmd", function() executeOnSelectedPlayers(";explodir") end)
+
+    -- Comandos de Backrooms
+    createButton(terrorFrame, "🚪 BACKROOMS", function() 
+        if #selectedPlayers > 0 then
+            for _, playerName in ipairs(selectedPlayers) do
+                SendCommand(";backrooms " .. playerName)
+            end
+        else
+            SendCommand(";backrooms " .. LocalPlayer.Name)
+        end
+    end)
+
+    createButton(terrorFrame, "🏠 VOLTAR DO BACKROOMS", function() 
+        if #selectedPlayers > 0 then
+            for _, playerName in ipairs(selectedPlayers) do
+                SendCommand(";unbackrooms " .. playerName)
+            end
+        else
+            SendCommand(";unbackrooms " .. LocalPlayer.Name)
+        end
+    end)
+
+    -- Comandos de terror
+    createButton(terrorFrame, "Jumpscare 1", function() executeOnSelectedPlayers(";jumps1") end)
+    createButton(terrorFrame, "Jumpscare 2", function() executeOnSelectedPlayers(";jumps2") end)
+    createButton(terrorFrame, "Jumpscare 3", function() executeOnSelectedPlayers(";jumps3") end)
+    createButton(terrorFrame, "Jumpscare 4", function() executeOnSelectedPlayers(";jumps4") end)
+    
+    -- NOVA ABA: SKIN - BOTÃO COOLKIDAVATAR
+    createButton(skinFrame, "CoolkidAvatar", function()
+        ApplyCoolkidAvatar()
+    end)
+    
+    -- Função para trocar de aba
+    local function switchTab(tab)
+        cmdFrame.Visible = (tab == "cmds")
+        terrorFrame.Visible = (tab == "terror")
+        playersFrame.Visible = (tab == "players")
+        skinFrame.Visible = (tab == "skin")
+        
+        -- Resetar todas as abas
+        btnTabCmds.Font = Enum.Font.Gotham
+        btnTabCmds.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        btnTabCmds.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+        
+        btnTabTerror.Font = Enum.Font.Gotham
+        btnTabTerror.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        btnTabTerror.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+        
+        btnTabPlayers.Font = Enum.Font.Gotham
+        btnTabPlayers.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        btnTabPlayers.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+        
+        btnTabSkin.Font = Enum.Font.Gotham
+        btnTabSkin.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        btnTabSkin.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+        
+        -- Destacar aba ativa
+        if tab == "cmds" then
+            btnTabCmds.Font = Enum.Font.GothamBold
+            btnTabCmds.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            btnTabCmds.TextColor3 = Color3.new(1, 1, 1)
+        elseif tab == "terror" then
+            btnTabTerror.Font = Enum.Font.GothamBold
+            btnTabTerror.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            btnTabTerror.TextColor3 = Color3.new(1, 1, 1)
+        elseif tab == "players" then
+            btnTabPlayers.Font = Enum.Font.GothamBold
+            btnTabPlayers.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            btnTabPlayers.TextColor3 = Color3.new(1, 1, 1)
+        elseif tab == "skin" then
+            btnTabSkin.Font = Enum.Font.GothamBold
+            btnTabSkin.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            btnTabSkin.TextColor3 = Color3.new(1, 1, 1)
+        end
+    end
+    
+    -- Sistema de minimizar
+    local minimized = false
+    btnMin.MouseButton1Click:Connect(function()
+        minimized = not minimized
+        body.Visible = not minimized
+        tabContainer.Visible = not minimized
+        if minimized then
+            panel.Size = UDim2.new(0, 180, 0, 36)
+            btnMin.Text = "❐"
+        else
+            panel.Size = fullSz
+            btnMin.Text = "_"
+        end
+    end)
+    
+    -- Conectar eventos dos botões de tab
+    btnTabCmds.MouseButton1Click:Connect(function() switchTab("cmds") end)
+    btnTabTerror.MouseButton1Click:Connect(function() switchTab("terror") end)
+    btnTabPlayers.MouseButton1Click:Connect(function() switchTab("players") end)
+    btnTabSkin.MouseButton1Click:Connect(function() switchTab("skin") end)
+    
+    -- Iniciar na aba de comandos
+    switchTab("cmds")
+    
+    -- Atualizar lista de jogadores inicial
+    updatePlayersList()
+    
+    return screen
+end
+
+-- ===== INICIALIZAR INTERFACE =====
+CreateAdminUI()
+
+print("🎮 LIGHT HUB - INTERFACE CARREGADA COM SUCESSO!")
+print("👑 Desenvolvido por: Hiro")
+print("🎨 TEMA ESCURO COM DESTAQUES ROXOS")
+print("🛡️  SISTEMA DE WHITELIST ATIVADO - USUÁRIO AUTORIZADO!")
+print("⚡ COMANDOS FUNCIONANDO IGUAL AO DEMON CLIENT!")
+print("🚪 SISTEMA DE BACKROOMS COM MONSTRO ADICIONADO!")
+print("👕 ABA SKIN ADICIONADA COM COOLKIDAVATAR!")

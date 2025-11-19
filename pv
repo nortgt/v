@@ -42,9 +42,6 @@ local Window = WindUI:CreateWindow({
     }
 })
 
-WindUI.TransparencyValue = 0.6
-WindUI:SetTheme("Dark")
-
 local function newNotify(title, message, duration, icon)
 	WindUI:Notify({
     	Title = title,

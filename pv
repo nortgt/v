@@ -6,12 +6,15 @@ local LocalPlayer = Players.LocalPlayer
 
 local Translator = {}
 
-Translator.Text = loadstring(game:HttpGet("https://raw.githubusercontent.com/nxvap/Hexagon/main/main/translations.lua"))()
+Translator.Frases = loadstring(game:HttpGet("https://raw.githubusercontent.com/nxvap/Hexagon/main/main/translations.lua"))()
 
-local lang = (game.Players.LocalPlayer.LocaleId or "en-US"):sub(1, 2):lower()
-if not Translator.Text[lang] then lang = "en" end
+local idioma = (game.Players.LocalPlayer.LocaleId or "en-US"):sub(1, 2):lower()
+if not Translator.Frases[idioma] then idioma = "en" end
+Translator.Idioma = idioma
 
-function Translator:text(msg) return msg end
+function Translator:text(msg)
+return self.Frases[self.Idioma][msg] or msg
+end
 
 local playerOldSpeed = {}
 local jails = {}

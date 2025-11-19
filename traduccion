@@ -1,0 +1,11 @@
+return {
+    en = {
+        ["Info"] = "Nepe",
+        ["Admin Commands"] = "ADMIN",
+    },
+
+    es = {
+        ["Info"] = "Traka",
+        ["Admin Commands"] = "Trakakka",
+    }
+}

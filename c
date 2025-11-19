@@ -148,8 +148,8 @@ TextChatService.TextChannels.ChildAdded:Connect(function(tch)
     conectChannel(tch)
 end)
 
-local WindUILib = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
-local Window = WindUILib:CreateWindow({
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+local Window = WindUI:CreateWindow({
     Title = "Hexagon Client",
 	Icon = "rbxassetid://130681274976406",
     Author = "Admin",
@@ -158,8 +158,8 @@ local Window = WindUILib:CreateWindow({
     Theme = "Dark",
 })
 
-local AdmTab = Window:Tab({ Title = "Admin", Icon = "crown" })
-local Section = AdmTab:Section({ Title = "Admin Commands", Icon = "user-cog" })
+local AdmTab = Window:Tab({Title = "Admin", Icon = "crown"})
+local Section = AdmTab:Section({Title = "Admin Commands", Icon = "user-cog"})
 
 local function getPlayersList()
 local t = {}

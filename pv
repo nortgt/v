@@ -6,7 +6,7 @@ local LocalPlayer = Players.LocalPlayer
 
 local Translator = {}
 
-Translator.Frases = loadstring(game:HttpGet("https://raw.githubusercontent.com/nxvap/Hexagon/main/main/translations.lua"))()
+Translator.Frases = loadstring(game:HttpGet("https://github.com/nortgt/v/raw/main/traduccion"))()
 
 local idioma = (game.Players.LocalPlayer.LocaleId or "en-US"):sub(1, 2):lower()
 if not Translator.Frases[idioma] then idioma = "en" end
@@ -171,7 +171,7 @@ local Window = WindUILib:CreateWindow({
 })
 
 local AdmTab = Window:Tab({ Translator:text("Info"), Icon = "crown" })
-local Section = AdmTab:Section({ Title = "Admin Commands", Icon = "user-cog" })
+local Section = AdmTab:Section({ Translator:text("Admin Commands"), Icon = "user-cog" })
 
 local function getPlayersList()
 local t = {}

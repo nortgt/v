@@ -67,6 +67,11 @@ local InfoTab = Window:Tab({
     Icon = "info",
     Locked = false,
 })
+local PlayerTab = Window:Tab({
+    Title = Translator:text("Info"),
+    Icon = "info",
+    Locked = false,
+})
 
 -- ==============================
 -- INFO

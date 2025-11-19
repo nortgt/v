@@ -1,0 +1,293 @@
+local Players, RunService, ReplicatedStorage, StarterGui, UIS = game:GetService("Players"), game:GetService("RunService"), game:GetService("ReplicatedStorage"), game:GetService("StarterGui"), game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid, RootPart = Character:WaitForChild("Humanoid"), Character:WaitForChild("HumanoidRootPart")
+local RE = ReplicatedStorage:WaitForChild("RE")
+
+local Translator = {}
+
+Translator.Frases = loadstring(game:HttpGet("https://raw.githubusercontent.com/nxvap/Hexagon/main/main/translations.lua"))()
+
+local idioma = (game.Players.LocalPlayer.LocaleId or "en-US"):sub(1, 2):lower()
+if not Translator.Frases[idioma] then idioma = "en" end
+Translator.Idioma = idioma
+
+function Translator:text(msg)
+return self.Frases[self.Idioma][msg] or msg
+end
+
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+local Window = WindUI:CreateWindow({
+    Title = "Hexagon Admin",
+    Icon = "rbxassetid://108946066610871",
+    Author = "Administrator · " .. LocalPlayer.DisplayName,
+    Size = UDim2.fromOffset(600, 480),
+    Transparent = true,
+    Theme = "Midnight",
+    Background = "rbxassetid://102266309145667",
+
+    OpenButton = {
+        Title = "Hexagon",
+    	Icon = "rbxassetid://130681274976406",
+        CornerRadius = UDim.new(0,15),
+        StrokeThickness = 2,
+        Enabled = true,
+        Draggable = true,
+        OnlyMobile = false,
+        
+        Color = ColorSequence.new(
+        	Color3.fromHex("000000"), 
+        	Color3.fromHex("FFFFFF")
+        )
+    }
+})
+
+WindUI.TransparencyValue = 0.6
+WindUI:SetTheme("Dark")
+
+local function newNotify(title, message, duration, icon)
+	WindUI:Notify({
+    	Title = title,
+    	Content = message,
+    	Duration = duration or 3,
+    	Icon = icon or "rbxassetid://130681274976406",
+	})
+end
+
+local function newNotification(title, message, icon, duration)
+    StarterGui:SetCore("SendNotification",{
+        Title = title,
+        Text = message,
+		Icon = icon or "",
+        Duration = duration or 5
+    })
+end
+
+newNotify(Translator:text("Welcome to Hexagon Client"), "Created by @Roun95", 10, Players:GetUserThumbnailAsync(Players:GetUserIdFromNameAsync("Roun95"), Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100))
+
+local InfoTab = Window:Tab({
+    Title = Translator:text("Info"),
+    Icon = "info",
+    Locked = false,
+})
+
+-- ==============================
+-- INFO
+-- ==============================
+
+InfoTab:Section({Title = Translator:text("Info"), Icon = "info", Opened = true})
+
+InfoTab:Image({
+    Image = "https://raw.githubusercontent.com/nxvap/Hexagon/main/img/banner.png",
+    AspectRatio = "16:9",
+    Radius = 9,
+})
+    
+InfoTab:Space()
+    
+InfoTab:Section({
+    Title = "Hexagon Client for Brookhaven 🏡RP",
+    TextSize = 24,
+    FontWeight = Enum.FontWeight.SemiBold,
+})
+
+InfoTab:Space()
+
+InfoTab:Paragraph({
+    Title = "Hexagon Community",
+    Desc = Translator:text("Join the Discord official"),
+    Image = "https://raw.githubusercontent.com/nxvap/Hexagon/main/img/icon.png",
+    Thumbnail = "",
+    ImageSize = 48,
+    Buttons = {
+        {
+            Title = Translator:text("Copy Discord link"),
+            Icon = "link",
+            Callback = function()
+                setclipboard("https://discord.gg/Q9R5FDapth")
+            end
+        }
+    }
+})
+
+InfoTab:Space()
+
+InfoTab:Section({
+    Title =  [[Hexagon Client aims to be a reliable and secure option for you, compared to other alternatives.
+Developed by Nova (Owner of @Roun95, Co-owner of @Deluxe_Studios).
+Offering you an innovative, user-friendly, and simple design, along with a variety of innovative, useful, and reliable options.]],
+    TextSize = 18,
+    TextTransparency = .35,
+    FontWeight = Enum.FontWeight.Medium,
+})
+
+InfoTab:Section({
+    Title = [[New Features 1.3.0 (Expansion Update):
+Added: THE BACKROOMS, VIP Particles Unlocker, Limited Items Unlocker, Advanced Animation Customizer, TP Player, View Player, Glue/Unglue Player, Ghost Mode, Ultimate Noclip, Troll Child, Custom Fov Player, New ESP Improved, Obito Kamui, New Loading Screen, New Icon, New Tags Name, New Design and more...
+Credits: Nova]],
+    TextSize = 14,
+    TextTransparency = .45,
+    FontWeight = Enum.FontWeight.Medium,
+})
+-- ==============================
+-- PLAYER
+-- ==============================
+
+PlayerTab:Section({Title = Translator:text("Player"), Icon = "user"})
+
+PlayerTab:Slider({
+    Title = Translator:text("Speed"),
+	Step = 1,
+    Value = {
+        Min = 1,
+        Max = 500,
+        Default = 16,
+    },
+    Callback = function(Value)
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+        if humanoid then
+            humanoid.WalkSpeed = Value
+		end
+	end
+})
+
+PlayerTab:Slider({
+    Title = Translator:text("JumpPower"),
+	Step = 1,
+    Value = {
+        Min = 1,
+        Max = 500,
+        Default = 50,
+    },
+    Callback = function(Value)
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+        if humanoid then
+            humanoid.JumpPower = Value
+		end
+	end
+})
+
+PlayerTab:Slider({
+    Title = Translator:text("Gravity"),
+	Step = 1,
+    Value = {
+        Min = 1,
+        Max = 500,
+        Default = 196,
+    },
+    Callback = function(Value)
+        Workspace.Gravity = Value
+    end
+})
+
+local infJumpEnabled = false
+UIS.JumpRequest:Connect(function()
+	if infJumpEnabled then
+    	local character = game.Players.LocalPlayer.Character
+		if character and character:FindFirstChild("Humanoid") then
+			character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+		end
+	end
+end)
+
+PlayerTab:Toggle({
+	Title = Translator:text("Infinite Jump"),
+    Default = false,
+    Callback = function(Value)
+       infJumpEnabled = Value
+    end
+})
+
+local ResetValuesTab
+ResetValuesTab = PlayerTab:Button({
+	Title = Translator:text("Reset Values"),
+    Icon = "chevron-right",
+    Default = false,
+    Callback = function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        humanoid.WalkSpeed = 16
+    	humanoid.JumpPower = 50
+    end
+    Workspace.Gravity = 196.2
+    infJumpEnabled = false
+    ResetValuesTab:Highlight()
+    end
+})
+
+local UltimateNoclip = {
+	Enabled = false,
+	Connections = {}
+}
+
+local function managePlayerCollisions(character)
+    if not character then return end
+    for _, part in ipairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = not UltimateNoclip.Enabled
+            part.Anchored = false
+        end
+    end
+end
+
+local function voidProtection(rootPart)
+    if rootPart.Position.Y < -400 then
+        rootPart.CFrame = CFrame.new(0, 100, 0)
+    end
+end
+
+PlayerTab:Toggle({
+	Title = Translator:text("Noclip + Void Protection"),
+    Default = false,
+    Callback = function(state)
+    UltimateNoclip.Enabled = state
+    if state then
+        UltimateNoclip.Connections.Heartbeat = RunService.Heartbeat:Connect(function()
+            local char = LocalPlayer.Character
+            if char then
+                managePlayerCollisions(char)
+                local rootPart = char:FindFirstChild("HumanoidRootPart")
+                if rootPart then voidProtection(rootPart) end
+            end
+        end)
+        newNotify("Ultimate Noclip", "Enabled")
+    else
+        for _, c in pairs(UltimateNoclip.Connections) do pcall(function() c:Disconnect() end) end
+        UltimateNoclip.Connections = {}
+        if LocalPlayer.Character then managePlayerCollisions(LocalPlayer.Character) end
+        newNotify("Ultimate Noclip", "Disabled")
+    end
+end
+})
+
+PlayerTab:Section({Title = Translator:text("Change Fov"), Icon = "user"})
+
+local fovValue = 70
+
+PlayerTab:Input({
+    Title = Translator:text("Fov player"),
+    Desc = "Enter part of the player name",
+    Callback = function(Value)
+		fovValue = tonumber(Value) or 70
+	end
+})
+
+PlayerTab:Button({
+	Title = Translator:text("Adjust fov"),
+    Icon = "chevron-right",
+    Default = false,
+    Callback = function()
+    local camera = Workspace.CurrentCamera
+		if camera and typeof(fovValue) == "number" then
+			camera.FieldOfView = fovValue
+		end
+	end
+})

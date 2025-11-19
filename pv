@@ -6,14 +6,14 @@ local RE = ReplicatedStorage:WaitForChild("RE")
 
 local Translator = {}
 
-Translator.Frases = loadstring(game:HttpGet("https://raw.githubusercontent.com/nxvap/Hexagon/main/main/translations.lua"))()
+Translator.Text = loadstring(game:HttpGet("https://raw.githubusercontent.com/nxvap/Hexagon/main/main/translations.lua"))()
 
-local idioma = (game.Players.LocalPlayer.LocaleId or "en-US"):sub(1, 2):lower()
-if not Translator.Frases[idioma] then idioma = "en" end
-Translator.Idioma = idioma
+local lang = (game.Players.LocalPlayer.LocaleId or "en-US"):sub(1, 2):lower()
+if not Translator.Text[lang] then lang = "en" end
+Translator.Lang = lang
 
 function Translator:text(msg)
-return self.Frases[self.Idioma][msg] or msg
+return self.Lang[self.Lang][msg] or msg
 end
 
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()

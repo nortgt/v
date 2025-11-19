@@ -4,18 +4,6 @@ local TextChatService = game:GetService("TextChatService")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
-local Translator = {}
-
-Translator.Frases = loadstring(game:HttpGet("https://github.com/nortgt/v/raw/main/traduccion"))()
-
-local idioma = (game.Players.LocalPlayer.LocaleId or "en-US"):sub(1, 2):lower()
-if not Translator.Frases[idioma] then idioma = "en" end
-Translator.Idioma = idioma
-
-function Translator:text(msg)
-return self.Frases[self.Idioma][msg] or msg
-end
-
 local playerOldSpeed = {}
 local jails = {}
 local jailConnections = {}
@@ -170,8 +158,8 @@ local Window = WindUILib:CreateWindow({
     Theme = "Dark",
 })
 
-local AdmTab = Window:Tab({ Translator:text("Info"), Icon = "crown" })
-local Section = AdmTab:Section({ Translator:text("Admin Commands"), Icon = "user-cog" })
+local AdmTab = Window:Tab({ Title =  "Admin", Icon = "crown" })
+local Section = AdmTab:Section({ Title =  "Admin Commands", Icon = "user-cog" })
 
 local function getPlayersList()
 local t = {}

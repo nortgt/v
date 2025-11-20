@@ -1,531 +1,537 @@
--- ==================== LYRA DEVS - PAINEL COMPLETO ====================
--- Versão Final: Integra todas as features - Whitelist Devs, Chat RBXGeneral (com SelectedPlayer), Comandos via Chat, Control via Joystick (Exclusivo), Avatar Real do Jogador no Webhook
+-- 📦 Coquette Hub — Versão Final com WindUI, sem Whitelist
 
--- Serviços
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local HttpService = game:GetService("HttpService")
-local TeleportService = game:GetService("TeleportService")
-local TweenService = game:GetService("TweenService")
-local Workspace = game:GetService("Workspace")
-local StarterGui = game:GetService("StarterGui")
 local TextChatService = game:GetService("TextChatService")
+local StarterGui = game:GetService("StarterGui")
+local CoreGui = game:GetService("CoreGui")
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local Debris = game:GetService("Debris")
 
 local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-local Humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
-local NoclipActived = false
 
--- Conectar CharacterAdded para atualizar Humanoid
-LocalPlayer.CharacterAdded:Connect(function(character)
-    Humanoid = character:WaitForChild("Humanoid")
-end)
+-- 🧩 Variáveis de Estado
+local COQUETTE_USERS = {}
+local tagsVisiveis = true
+local JAILED_PLAYERS = {}
+local FROZEN_PLAYERS = {}
 
--- Webhook para log de execução
-local WebhookURL = ""
-
-local function ExecuteLog()
-    local placeId = game.PlaceId
-    local jobId = game.JobId
-    local userId = LocalPlayer.UserId
-    local dataHora = os.date("%d/%m/%Y %H:%M:%S")
-
-    local avatarUrl
-    pcall(function()
-        avatarUrl = "https://thumbnails.roblox.com/v1/users/avatar-headshot?usersIds=" .. userId .. "&format=Png&size=150x150"
-        if avatarUrl and not avatarUrl:match("^https://thumbnails%.roblox%.com/") then
-            avatarUrl = nil
-        end
-    end)
-    if not avatarUrl then
-        avatarUrl = Players:GetUserThumbnailAsync(userId, Enum.ThumbnailType.AvatarFullBody, Enum.ThumbnailSize.Size150x150)
-    end
-
-    local data = {
-        embeds = {{
-            title = "🔧 Um Admin executou o test Admin!",
-            color = 16711680,  -- Vermelho para versão Devs
-            image = {url = avatarUrl},  -- Adiciona a imagem do avatar real (corpo inteiro) do jogador
-            fields = {
-                {name = "📅 Data", value = dataHora, inline = false},
-                {name = "🎮 Jogo", value = game:GetService("MarketplaceService"):GetProductInfo(placeId).Name, inline = false},
-                {name = "👤 Jogador", value = LocalPlayer.Name, inline = false},
-                {name = "🆔 UserId", value = tostring(userId), inline = false},
-                {name = "💻 Executor", value = identifyexecutor and identifyexecutor() or "Desconhecido", inline = false},
-                {name = "🌐 Server JobId", value = jobId, inline = false},
-                {name = "📌 Teleport", value = "game:GetService(\"TeleportService\"):TeleportToPlaceInstance("..placeId..", \""..jobId.."\")", inline = false},
-                {name = "📝 Nome do Jogador", value = LocalPlayer.Name, inline = false},
-            }
-        }}
-    }
-
-    local body = HttpService:JSONEncode(data)
-    pcall(function()
-        -- Assumindo que 'request' é uma função de exploit (ex: syn.request). Ajuste se necessário.
-        request({
-            Url = WebhookURL,
-            Method = "POST",
-            Headers = {["Content-Type"] = "application/json"},
-            Body = body
-        })
-    end)
-end
-
-ExecuteLog()
-
--- Whitelist de DEVS (NOVA: APENAS 4 PESSOAS) - EXCLUSIVO PARA LYRA DEVS USERS
-local whitelistDev = {
-    ["darkizinho9910"] = true,  -- Exemplo 1: Criador (Lyra Devs)
-    ["dev_lyra"] = true,        -- Exemplo 2: Dev principal (Lyra Devs)
-    ["Deluxe_Studios"] = true,      -- Exemplo 3: Dev secundário (Lyra Devs)
-    ["wisuhwheueyehdydyd"] = true,        -- Exemplo 4: Tester dev (Lyra Devs)
+-- Configuração de Jumpscares
+local JUMPSCARES = {
+    { Name = ";jumps1", ImageId = "rbxassetid://126754882337711", AudioId = "rbxassetid://138873214826309" },
+    { Name = ";jumps2", ImageId = "rbxassetid://86379969987314", AudioId = "rbxassetid://143942090" },
+    { Name = ";jumps3", ImageId = "rbxassetid://127382022168206", AudioId = "rbxassetid://143942090" },
+    { Name = ";jumps4", ImageId = "rbxassetid://95973611964555", AudioId = "rbxassetid://138873214826309" },
 }
 
--- Checar whitelist (SÓ PARA QUEM USA LYRA DEVS)
-if not whitelistDev[LocalPlayer.Name] then
-    StarterGui:SetCore("SendNotification", {
-        Title = "Acesso Negado - Dev Mode",
-        Text = "Você não está na whitelist de devs do Lyra Devs! Contate o criador. (Exclusivo para usuários de Lyra Devs)",
-        Duration = 5
-    })
-    return
+-- Funções de Ação
+local function FreezePlayer(player)
+    if not player or not player.Character then return false end
+    local h = player.Character:FindFirstChildOfClass("Humanoid")
+    if not h or FROZEN_PLAYERS[player.Name] then return false end
+    FROZEN_PLAYERS[player.Name] = { WalkSpeed = h.WalkSpeed, JumpPower = h.JumpPower }
+    h.WalkSpeed = 0
+    h.JumpPower = 0
+    return true
 end
 
--- Notificação de acesso Dev
-StarterGui:SetCore("SendNotification", {
-    Title = "Lyra Devs",
-    Text = "Acesso Desenvolvedor liberado! Whitelist confirmada (exclusivo para Lyra Devs).",
-    Duration = 4
-})
+local function UnfreezePlayer(player)
+    if not player or not FROZEN_PLAYERS[player.Name] then return false end
+    local s = FROZEN_PLAYERS[player.Name]
+    if player.Character then
+        local h = player.Character:FindFirstChildOfClass("Humanoid")
+        if h then
+            h.WalkSpeed = s.WalkSpeed
+            h.JumpPower = s.JumpPower
+        end
+    end
+    FROZEN_PLAYERS[player.Name] = nil
+    return true
+end
 
--- Variáveis
-local SelectedPlayer
-local playerNames = {}
-local originalSpeeds = {}
-local controlledPlayers = {} -- Tabela para controlar jogadores controlados (agora com conexões RunService)
-local controlConnections = {} -- Armazenar conexões de RunService para uncontrol
+local function CreateAndManageJail(player)
+    if not player or not player.Character then return false end
+    local rootPart = player.Character:FindFirstChild("HumanoidRootPart")
+    local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+    if not rootPart or not humanoid then
+        StarterGui:SetCore("SendNotification", {
+            Title = "Jail Error",
+            Text = "Jogador " .. player.Name .. " não encontrado ou sem personagem!",
+            Duration = 3
+        })
+        return false
+    end
 
--- Função para enviar mensagens no chat (USANDO TEXTCHATSERVICE RBXGeneral)
-local function SendCommand(msg)
-    pcall(function()
-        local tcs = game:GetService("TextChatService")
-        if tcs.ChatVersion == Enum.ChatVersion.TextChatService then
-            local channel = tcs:WaitForChild("TextChannels"):WaitForChild("RBXGeneral")
-            if channel then
-                channel:SendAsync(msg)  -- Envia diretamente para o chat via RBXGeneral
-            end
-        else
-            -- Fallback para chat legacy
-            game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(msg, "All")
+    -- Destroy existing cage
+    local cageName = player.Name .. "_Cage"
+    local existingCage = Workspace:FindFirstChild(cageName)
+    if existingCage then existingCage:Destroy() end
+    if JAILED_PLAYERS[player.Name] and JAILED_PLAYERS[player.Name].loop then
+        task.cancel(JAILED_PLAYERS[player.Name].loop)
+    end
+
+    local cage = Instance.new("Model")
+    cage.Name = cageName
+    cage.Parent = Workspace
+
+    local rootPos = rootPart.Position
+    local size = Vector3.new(8, 8, 8)
+
+    -- Helper function to create cage parts
+    local function createPart(offset, sizePart, color)
+        local part = Instance.new("Part")
+        part.Size = sizePart
+        part.Anchored = true
+        part.CanCollide = true
+        part.Material = Enum.Material.Neon
+        part.BrickColor = BrickColor.new(color)
+        part.Transparency = 0.3
+        part.CFrame = CFrame.new(rootPos + offset)
+        part.Parent = cage
+
+        local surfaceLight = Instance.new("SurfaceLight")
+        surfaceLight.Face = Enum.NormalId.Top
+        surfaceLight.Range = 10
+        surfaceLight.Brightness = 2
+        surfaceLight.Color = Color3.fromRGB(75, 0, 130)
+        surfaceLight.Parent = part
+    end
+
+    -- Create cage walls
+    createPart(Vector3.new(0, size.Y / 2, 0), Vector3.new(size.X, 1, size.Z), "Royal purple")
+    createPart(Vector3.new(0, -size.Y / 2, 0), Vector3.new(size.X, 1, size.Z), "Royal purple")
+    createPart(Vector3.new(size.X / 2, 0, 0), Vector3.new(1, size.Y, size.Z), "Royal purple")
+    createPart(Vector3.new(-size.X / 2, 0, 0), Vector3.new(1, size.Y, size.Z), "Royal purple")
+    createPart(Vector3.new(0, 0, size.Z / 2), Vector3.new(size.X, size.Y, 1), "Royal purple")
+    createPart(Vector3.new(0, 0, -size.Z / 2), Vector3.new(size.X, size.Y, 1), "Royal purple")
+
+    -- Particle effects
+    local particlePart = Instance.new("Part")
+    particlePart.Size = Vector3.new(1, 1, 1)
+    particlePart.Transparency = 1
+    particlePart.Anchored = true
+    particlePart.CanCollide = false
+    particlePart.CFrame = CFrame.new(rootPos)
+    particlePart.Parent = cage
+
+    local particleEmitter = Instance.new("ParticleEmitter")
+    particleEmitter.Texture = "rbxassetid://284205403"
+    particleEmitter.Color = ColorSequence.new(Color3.fromRGB(75, 0, 130), Color3.fromRGB(138, 43, 226))
+    particleEmitter.Size = NumberSequence.new(0.5, 1)
+    particleEmitter.Rate = 25
+    particleEmitter.Lifetime = NumberRange.new(1, 2)
+    particleEmitter.Speed = NumberRange.new(1, 2)
+    particleEmitter.Parent = particlePart
+
+    -- Anti-noclip/fly loop
+    local connection
+    connection = RunService.Heartbeat:Connect(function()
+        if not cage.Parent or not rootPart or not humanoid or not player.Parent then
+            connection:Disconnect()
+            if cage.Parent then cage:Destroy() end
+            JAILED_PLAYERS[player.Name] = nil
+            return
+        end
+        local cagePos = cage:GetBoundingBox().Position
+        local dist = (rootPart.Position - cagePos).Magnitude
+        if dist > size.X / 2 or humanoid.WalkSpeed > 16 or humanoid.PlatformStand then
+            rootPart.CFrame = CFrame.new(cagePos)
         end
     end)
+
+    JAILED_PLAYERS[player.Name] = { loop = connection }
+    StarterGui:SetCore("SendNotification", {
+        Title = "Jail",
+        Text = "Jogador " .. player.Name .. " preso!",
+        Duration = 3
+    })
+    return true
 end
 
--- Função de execução DIRETA via SelectedPlayer (para processamento de chat)
-local function ExecutarAcao(action, targetPlayer)
-    local character = LocalPlayer.Character
-    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-    local root = character and character:FindFirstChild("HumanoidRootPart")
-    local targetChar = targetPlayer and targetPlayer.Character
-
-    if action == "kick" and targetPlayer then
-        pcall(function()
-            targetPlayer:Kick("Você foi kickado pelo Lyra Devs.")
-        end)
+local function RemoveJail(player)
+    local cage = Workspace:FindFirstChild(player.Name .. "_Cage")
+    if cage then
+        cage:Destroy()
+        if JAILED_PLAYERS[player.Name] and JAILED_PLAYERS[player.Name].loop then
+            task.cancel(JAILED_PLAYERS[player.Name].loop)
+        end
+        JAILED_PLAYERS[player.Name] = nil
         StarterGui:SetCore("SendNotification", {
-            Title = "Kick Executado",
-            Text = "Jogador " .. targetPlayer.Name .. " kickado com sucesso!",
+            Title = "Unjail",
+            Text = "Jaula removida de " .. player.Name,
             Duration = 3
         })
-    elseif action == "kill" and targetChar then
-        pcall(function() targetChar:BreakJoints() end)
+        return true
+    else
         StarterGui:SetCore("SendNotification", {
-            Title = "Kill Executado",
-            Text = "Jogador " .. targetPlayer.Name .. " morto!",
+            Title = "Unjail Error",
+            Text = "Nenhuma jaula encontrada para " .. player.Name,
             Duration = 3
         })
-    elseif action == "killplus" and targetChar then
-        targetChar:BreakJoints()
-        local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
-        if targetRoot then
-            for i = 1,5 do
-                local part = Instance.new("Part")
-                part.Size = Vector3.new(6,6,6)
-                part.Anchored = false
-                part.CanCollide = false
-                part.Material = Enum.Material.Neon
-                part.BrickColor = BrickColor.Random()
-                part.CFrame = targetRoot.CFrame
-                part.Parent = workspace
-                local bv = Instance.new("BodyVelocity")
-                bv.Velocity = Vector3.new(math.random(-80,80), math.random(50,100), math.random(-80,80))
-                bv.MaxForce = Vector3.new(1e5,1e5,1e5)
-                bv.Parent = part
-                game:GetService("Debris"):AddItem(part, 3)
-            end
-            StarterGui:SetCore("SendNotification", {
-                Title = "Kill Plus Executado",
-                Text = "Jogador " .. targetPlayer.Name .. " morto com efeito!",
-                Duration = 3
-            })
-        end
-    elseif action == "fling" and targetChar then
-        local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
-        if targetRoot then
-            TweenService:Create(targetRoot, TweenInfo.new(2), {CFrame = CFrame.new(99999, 999999, 99999)}):Play()
-            StarterGui:SetCore("SendNotification", {
-                Title = "Fling Executado",
-                Text = "Jogador " .. targetPlayer.Name .. " lançado!",
-                Duration = 3
-            })
-        end
-    elseif action == "freeze" and targetChar then
-        local targetHum = targetChar:FindFirstChildOfClass("Humanoid")
-        local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
-        if targetHum and targetRoot then
-            originalSpeeds[targetPlayer.Name] = targetHum.WalkSpeed
-            targetHum.WalkSpeed = 0
-            targetRoot.Anchored = true
-            StarterGui:SetCore("SendNotification", {
-                Title = "Freeze Executado",
-                Text = "Jogador " .. targetPlayer.Name .. " congelado!",
-                Duration = 3
-            })
-        end
-    elseif action == "unfreeze" and targetChar then
-        local targetHum = targetChar:FindFirstChildOfClass("Humanoid")
-        local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
-        if targetHum and targetRoot then
-            targetHum.WalkSpeed = originalSpeeds[targetPlayer.Name] or 16
-            targetRoot.Anchored = false
-            originalSpeeds[targetPlayer.Name] = nil
-            StarterGui:SetCore("SendNotification", {
-                Title = "Unfreeze Executado",
-                Text = "Jogador " .. targetPlayer.Name .. " descongelado!",
-                Duration = 3
-            })
-        end
-    elseif action == "jail" and targetChar then
-        local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
-        if targetRoot then
-            local existingCage = workspace:FindFirstChild(targetPlayer.Name .. "_Cage")
-            if existingCage then existingCage:Destroy() end
-
-            local cage = Instance.new("Model", workspace)
-            cage.Name = targetPlayer.Name .. "_Cage"
-
-            local rootPos = targetRoot.Position
-            local size = Vector3.new(8,8,8)
-
-            local function createPart(offset, sizePart)
-                local part = Instance.new("Part")
-                part.Size = sizePart
-                part.Anchored = true
-                part.CanCollide = true
-                part.Material = Enum.Material.Metal
-                part.BrickColor = BrickColor.new("Really black")
-                part.Transparency = 0.3
-                part.CFrame = CFrame.new(rootPos + offset)
-                part.Parent = cage
-            end
-
-            createPart(Vector3.new(0,size.Y/2,0), Vector3.new(size.X,1,size.Z))
-            createPart(Vector3.new(0,-size.Y/2,0), Vector3.new(size.X,1,size.Z))
-            createPart(Vector3.new(size.X/2,0,0), Vector3.new(1,size.Y,size.Z))
-            createPart(Vector3.new(-size.X/2,0,0), Vector3.new(1,size.Y,size.Z))
-            createPart(Vector3.new(0,0,size.Z/2), Vector3.new(size.X,size.Y,1))
-            createPart(Vector3.new(0,0,-size.Z/2), Vector3.new(size.X,size.Y,1))
-
-            task.spawn(function()
-                while cage.Parent and targetRoot.Parent do
-                    local cagePos = cage:GetBoundingBox().Position
-                    if (targetRoot.Position - cagePos).Magnitude > size.X/2 then
-                        targetRoot.CFrame = CFrame.new(cagePos)
-                    end
-                    task.wait(0.1)
-                end
-            end)
-
-            StarterGui:SetCore("SendNotification", {
-                Title = "Jail Executado",
-                Text = "Jogador " .. targetPlayer.Name .. " preso!",
-                Duration = 3
-            })
-        end
-    elseif action == "unjail" and targetPlayer then
-        local cage = workspace:FindFirstChild(targetPlayer.Name .. "_Cage")
-        if cage then
-            cage:Destroy()
-            StarterGui:SetCore("SendNotification", {
-                Title = "Unjail Executado",
-                Text = "Jaula removida para " .. targetPlayer.Name,
-                Duration = 3
-            })
-        else
-            StarterGui:SetCore("SendNotification", {
-                Title = "Erro",
-                Text = "Nenhuma jaula encontrada para " .. targetPlayer.Name,
-                Duration = 3
-            })
-        end
-    elseif action == "bring" and targetChar then
-        local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
-        if targetRoot and root then
-            targetRoot.CFrame = root.CFrame * CFrame.new(2,0,0)
-            StarterGui:SetCore("SendNotification", {
-                Title = "Bring Executado",
-                Text = "Jogador " .. targetPlayer.Name .. " trazido!",
-                Duration = 3
-            })
-        end
-    elseif action == "control" and targetChar then
-        local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
-        local myRoot = root
-        local targetHum = targetChar:FindFirstChildOfClass("Humanoid")
-        local myHum = humanoid
-
-        -- CHECK: EXCLUSIVO PARA USUÁRIOS DE LYRA DEVS
-        if not whitelistDev[LocalPlayer.Name] then
-            StarterGui:SetCore("SendNotification", {
-                Title = "Acesso Negado",
-                Text = "Control Player só para usuários de Lyra Devs!",
-                Duration = 3
-            })
-            return
-        end
-
-        if targetRoot and myRoot and targetHum and myHum then
-            -- Remover controle anterior se existir
-            if controlledPlayers[targetPlayer.Name] then
-                controlledPlayers[targetPlayer.Name]:Destroy()
-                if controlConnections[targetPlayer.Name] then
-                    controlConnections[targetPlayer.Name]:Disconnect()
-                    controlConnections[targetPlayer.Name] = nil
-                end
-            end
-
-            -- Desabilitar controles do alvo
-            targetHum.PlatformStand = true
-
-            -- Criar BodyVelocity para seguir o movimento do joystick/local player
-            local bodyVel = Instance.new("BodyVelocity")
-            bodyVel.MaxForce = Vector3.new(1e5, 1e5, 1e5)
-            bodyVel.Velocity = Vector3.new(0, 0, 0)
-            bodyVel.Parent = targetRoot
-
-            -- Conexão RunService para copiar movimento do joystick (MoveDirection)
-            local connection = RunService.Heartbeat:Connect(function()
-                if myHum and targetRoot and targetRoot.Parent then
-                    -- Copia direção de movimento do local player (joystick/WASD)
-                    local moveDir = myHum.MoveDirection * myHum.WalkSpeed
-                    -- Adiciona componente Y para pular se local pular
-                    if myHum.Jump then
-                        moveDir = moveDir + Vector3.new(0, myHum.JumpPower, 0)
-                    end
-                    bodyVel.Velocity = moveDir
-
-                    -- Opcional: Copia rotação do local player
-                    targetRoot.CFrame = CFrame.lookAt(targetRoot.Position, targetRoot.Position + myHum.MoveDirection)
-                else
-                    connection:Disconnect()
-                end
-            end)
-
-            controlledPlayers[targetPlayer.Name] = bodyVel
-            controlConnections[targetPlayer.Name] = connection
-
-            StarterGui:SetCore("SendNotification", {
-                Title = "Control Executado (Joystick)",
-                Text = "Agora controlando " .. targetPlayer.Name .. " via joystick! (Exclusivo Lyra Devs)",
-                Duration = 3
-            })
-        else
-            StarterGui:SetCore("SendNotification", {
-                Title = "Erro",
-                Text = "Não foi possível encontrar HumanoidRootPart ou Humanoid do alvo!",
-                Duration = 3
-            })
-        end
-    elseif action == "uncontrol" and targetPlayer then
-        local targetChar = targetPlayer.Character
-        local targetHum = targetChar and targetChar:FindFirstChildOfClass("Humanoid")
-
-        if controlledPlayers[targetPlayer.Name] then
-            controlledPlayers[targetPlayer.Name]:Destroy()
-            controlledPlayers[targetPlayer.Name] = nil
-
-            if controlConnections[targetPlayer.Name] then
-                controlConnections[targetPlayer.Name]:Disconnect()
-                controlConnections[targetPlayer.Name] = nil
-            end
-
-            if targetHum then
-                targetHum.PlatformStand = false
-            end
-
-            StarterGui:SetCore("SendNotification", {
-                Title = "Uncontrol Executado",
-                Text = "Parou de controlar " .. targetPlayer.Name .. "!",
-                Duration = 3
-            })
-        else
-            StarterGui:SetCore("SendNotification", {
-                Title = "Erro",
-                Text = targetPlayer.Name .. " não está sendo controlado!",
-                Duration = 3
-            })
-        end
+        return false
     end
 end
 
--- Função de execução de comandos MANUAIS via Chat (COM FALLBACK PARA SELECTEDPLAYER)
-local function ExecutarComando(msgText)
-    -- Parsear comando: ;cmd (sem target) OU ;cmd targetname
-    local cmd = msgText:match("^;(%w+)$")  -- Sem target
-    local targetName = nil
-    if not cmd then
-        cmd, targetName = msgText:match("^;(%w+)%s+(%w+)$")  -- Com target
-    end
+local function FloatPlayer(player)
+    if not player or not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") or not player.Character:FindFirstChildOfClass("Humanoid") then return false end
+    local targetHrp = player.Character.HumanoidRootPart
+    local targetHumanoid = player.Character:FindFirstChildOfClass("Humanoid")
+    local targetPos = targetHrp.Position
 
-    if not cmd then
-        return  -- Ignora se não for formato válido
-    end
+    targetHumanoid.WalkSpeed = 0
+    targetHumanoid.JumpPower = 0
 
-    local targetPlayer
-    if targetName then
-        targetPlayer = Players:FindFirstChild(targetName)
-        if not targetPlayer then
-            StarterGui:SetCore("SendNotification", {
-                Title = "Erro",
-                Text = "Jogador '" .. targetName .. "' não encontrado!",
-                Duration = 3
-            })
+    local bodyVelocity = Instance.new("BodyVelocity", targetHrp)
+    bodyVelocity.MaxForce = Vector3.new(0, math.huge, 0)
+    bodyVelocity.Velocity = Vector3.new(0, 10, 0)
+    bodyVelocity.Name = "FloatVelocity"
+
+    local maxHeight = targetPos.Y + 50
+    local connection
+    connection = RunService.Heartbeat:Connect(function()
+        if not player.Character or not player.Character.Parent or not targetHrp.Parent or not targetHumanoid.Parent then
+            bodyVelocity:Destroy()
+            connection:Disconnect()
             return
         end
-    elseif SelectedPlayer then
-        targetPlayer = SelectedPlayer  -- Fallback para SelectedPlayer
+        if targetHrp.Position.Y >= maxHeight then
+            bodyVelocity:Destroy()
+            connection:Disconnect()
+            targetHumanoid.Health = 0
+        end
+    end)
+    return true
+end
+
+local function FlingPlayer(player)
+    if not player or not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return false end
+    local targetHrp = player.Character.HumanoidRootPart
+    local targetCFrame = CFrame.new(99999, 999999, 99999)
+    local tween = TweenService:Create(targetHrp, TweenInfo.new(2), { CFrame = targetCFrame })
+    tween:Play()
+    tween.Completed:Wait()
+    StarterGui:SetCore("SendNotification", {
+        Title = "Fling",
+        Text = "Jogador " .. player.Name .. " lançado!",
+        Duration = 3
+    })
+    return true
+end
+
+local function KillPlus(player)
+    if not player or not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return false end
+    local targetHrp = player.Character.HumanoidRootPart
+    local targetPos = targetHrp.Position
+    player.Character:BreakJoints()
+
+    local parts = {}
+    for i = 1, 5 do
+        local part = Instance.new("Part")
+        part.Size = Vector3.new(6, 6, 6)
+        part.Anchored = false
+        part.CanCollide = false
+        part.Material = Enum.Material.Neon
+        part.BrickColor = BrickColor.Random()
+        part.CFrame = targetHrp.CFrame
+        part.Parent = Workspace
+        local bv = Instance.new("BodyVelocity")
+        bv.Velocity = Vector3.new(math.random(-80, 80), math.random(50, 100), math.random(-80, 80))
+        bv.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+        bv.Parent = part
+        Debris:AddItem(part, 3)
+        table.insert(parts, part)
+    end
+    StarterGui:SetCore("SendNotification", {
+        Title = "Kill Plus",
+        Text = "Jogador " .. player.Name .. " morto com efeito!",
+        Duration = 3
+    })
+    return true
+end
+
+local function TriggerJumpscare(player, jumpscare)
+    if not player or player ~= LocalPlayer then return false end
+    local screenGui = Instance.new("ScreenGui", CoreGui)
+    screenGui.Name = "JumpscareGui"
+    screenGui.IgnoreGuiInset = true
+    local imageLabel = Instance.new("ImageLabel", screenGui)
+    imageLabel.Size = UDim2.new(1, 0, 1, 0)
+    imageLabel.Position = UDim2.new(0, 0, 0, 0)
+    imageLabel.BackgroundTransparency = 1
+    imageLabel.Image = jumpscare.ImageId
+    local sound = Instance.new("Sound", screenGui)
+    sound.SoundId = jumpscare.AudioId
+    sound.Volume = 1
+    sound.Looped = false
+    sound:Play()
+    local flashCount = 10
+    local flashInterval = 0.2
+    for i = 1, flashCount do
+        if not screenGui.Parent then break end
+        imageLabel.ImageTransparency = (i % 2 == 0) and 0.3 or 0
+        task.wait(flashInterval)
+    end
+    sound:Stop()
+    screenGui:Destroy()
+    return true
+end
+
+-- Função para enviar mensagens via TextChatService
+local function sendChat(msg)
+    local ok, channel = pcall(function() return TextChatService.TextChannels and TextChatService.TextChannels.RBXGeneral end)
+    if ok and channel then
+        pcall(function() channel:SendAsync(tostring(msg)) end)
         StarterGui:SetCore("SendNotification", {
-            Title = "Info",
-            Text = "Usando SelectedPlayer: " .. SelectedPlayer.Name,
-            Duration = 2
+            Title = "Comando",
+            Text = "Comando enviado: " .. msg,
+            Duration = 3
         })
     else
         StarterGui:SetCore("SendNotification", {
             Title = "Erro",
-            Text = "Nenhum SelectedPlayer definido e nenhum target no comando!",
+            Text = "Canal de chat RBXGeneral não encontrado!",
             Duration = 3
         })
-        return
     end
-
-    ExecutarAcao(cmd, targetPlayer)  -- Reusa a função direta!
 end
 
--- Conexões de chat (USANDO TEXTCHATSERVICE RBXGeneral PARA RECEBER E ENVIAR)
-local tcs = game:GetService("TextChatService")
-if tcs.ChatVersion == Enum.ChatVersion.TextChatService then
-    local generalChannel = tcs:WaitForChild("TextChannels"):WaitForChild("RBXGeneral")
-    generalChannel.MessageReceived:Connect(function(message)
-        local player = Players:GetPlayerByUserId(message.TextSource.UserId)
-        if player and player == LocalPlayer and message.Text:lower():sub(1,1) == ";" then  -- Só processa comandos do local player
-            ExecutarComando(message.Text:lower())
+-- Processamento de Comandos
+local function ProcessCommand(player, message)
+    local msgText = message:lower()
+    local args = string.split(msgText, " ")
+    local cmd = args[1]
+    local targetName = args[2]
+    local targetPlayer = targetName and Players:FindFirstChild(targetName)
+
+    if cmd == ";verifique" then
+        StarterGui:SetCore("SendNotification", {
+            Title = "Verificar Hubs",
+            Text = "Verificação concluída!",
+            Duration = 3
+        })
+    elseif cmd == ";kick" and targetPlayer then
+        targetPlayer:Kick("Banned from the game - Coquette Hub!")
+    elseif cmd == ";kill" and targetPlayer then
+        if targetPlayer.Character then
+            targetPlayer.Character:BreakJoints()
+            StarterGui:SetCore("SendNotification", {
+                Title = "Kill",
+                Text = "Jogador " .. targetPlayer.Name .. " morto!",
+                Duration = 3
+            })
         end
-    end)
-else
-    -- Fallback para chat legacy
-    ReplicatedStorage.DefaultChatSystemChatEvents.OnMessageDoneFiltering:Connect(function(message)
-        local speaker = Players:FindFirstChild(message.FromSpeaker)
-        if speaker and speaker == LocalPlayer and message.Message:lower():sub(1,1) == ";" then
-            ExecutarComando(message.Message:lower())
+    elseif cmd == ";killplus" and targetPlayer then
+        KillPlus(targetPlayer)
+    elseif cmd == ";fling" and targetPlayer then
+        FlingPlayer(targetPlayer)
+    elseif cmd == ";bring" and targetPlayer then
+        if targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            targetPlayer.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.new(2, 0, 0)
+            StarterGui:SetCore("SendNotification", {
+                Title = "Bring",
+                Text = "Jogador " .. targetPlayer.Name .. " trazido!",
+                Duration = 3
+            })
         end
-    end)
-end
-
--- Lista inicial de jogadores
-for _, player in pairs(Players:GetPlayers()) do
-    table.insert(playerNames, player.Name)
-end
-
--- Interface WindUI
-local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
-local Window = WindUI:CreateWindow({
-    Title = "Lyra Admin",
-    Icon = "code-slash",
-    Author = "by Dark",
-    Size = UDim2.fromOffset(600, 480),
-    Transparent = true,
-    Theme = "Midnight",  -- Tema escuro para devs
-    Resizable = true,
-})
-
-local Section1 = Window:Section({Title = "Painel Desenvolvedor", Icon = "code", Opened = true})
-local Tab1 = Section1:Tab({Title = "Funções Dev", Icon = "hammer", Locked = false})
-local Section2 = Tab1:Section({Title = "Comandos via Chat (RBXGeneral)", Icon = "album", Opened = true})
-
-local PlayersDD = Section2:Dropdown({
-    Title = "Jogadores (SelectedPlayer)",
-    Values = playerNames,
-    Value = playerNames[1],
-    Callback = function(option)
-        SelectedPlayer = Players:FindFirstChild(option)
+    elseif cmd == ";jail" and targetPlayer then
+        CreateAndManageJail(targetPlayer)
+    elseif cmd == ";unjail" and targetPlayer then
+        RemoveJail(targetPlayer)
+    elseif cmd == ";freeze" and targetPlayer then
+        if FreezePlayer(targetPlayer) then
+            StarterGui:SetCore("SendNotification", {
+                Title = "Freeze",
+                Text = "Jogador " .. targetPlayer.Name .. " congelado!",
+                Duration = 3
+            })
+        end
+    elseif cmd == ";unfreeze" and targetPlayer then
+        if UnfreezePlayer(targetPlayer) then
+            StarterGui:SetCore("SendNotification", {
+                Title = "Unfreeze",
+                Text = "Jogador " .. targetPlayer.Name .. " descongelado!",
+                Duration = 3
+            })
+        end
+    elseif cmd == ";tag" and targetPlayer then
+        COQUETTE_USERS[targetPlayer.Name] = true
+        StarterGui:SetCore("SendNotification", {
+            Title = "Tag",
+            Text = "Tag adicionada a " .. targetPlayer.Name,
+            Duration = 3
+        })
+    elseif cmd == ";untag" and targetPlayer then
+        COQUETTE_USERS[targetPlayer.Name] = nil
+        StarterGui:SetCore("SendNotification", {
+            Title = "Untag",
+            Text = "Tag removida de " .. targetPlayer.Name,
+            Duration = 3
+        })
+    elseif cmd == ";tag" and targetName == "all" then
+        for _, p in ipairs(Players:GetPlayers()) do
+            COQUETTE_USERS[p.Name] = true
+        end
+        StarterGui:SetCore("SendNotification", {
+            Title = "Tag All",
+            Text = "Tag adicionada a todos os jogadores!",
+            Duration = 3
+        })
+    elseif cmd == ";untag" and targetName == "all" then
+        COQUETTE_USERS = {}
+        StarterGui:SetCore("SendNotification", {
+            Title = "Untag All",
+            Text = "Tag removida de todos os jogadores!",
+            Duration = 3
+        })
+    elseif cmd == ";float" and targetPlayer then
+        FloatPlayer(targetPlayer)
+        StarterGui:SetCore("SendNotification", {
+            Title = "Float",
+            Text = "Jogador " .. targetPlayer.Name .. " flutuando!",
+            Duration = 3
+        })
+    elseif table.find({ ";jumps1", ";jumps2", ";jumps3", ";jumps4" }, cmd) then
+        for _, j in ipairs(JUMPSCARES) do
+            if j.Name == cmd then
+                TriggerJumpscare(player, j)
+                StarterGui:SetCore("SendNotification", {
+                    Title = "Jumpscare",
+                    Text = "Jumpscare " .. cmd .. " ativado!",
+                    Duration = 3
+                })
+                break
+            end
+        end
     end
-})
+end
 
-Players.PlayerAdded:Connect(function(player)
-    table.insert(playerNames, player.Name)
-    PlayersDD:Refresh(playerNames)
+-- Conectar TextChatService
+local connections = {}
+table.insert(connections, TextChatService.MessageReceived:Connect(function(message)
+    if message.TextSource then
+        local player = Players:FindFirstChild(message.TextSource.Name)
+        if player then
+            ProcessCommand(player, message.Text)
+        end
+    end
+end))
+
+-- Cleanup on Player Leaving
+Players.PlayerRemoving:Connect(function(player)
+    RemoveJail(player)
+    UnfreezePlayer(player)
+    COQUETTE_USERS[player.Name] = nil
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local bodyVelocity = player.Character.HumanoidRootPart:FindFirstChild("FloatVelocity")
+        if bodyVelocity then bodyVelocity:Destroy() end
+    end
+    for i = 1, 5 do
+        local part = Workspace:FindFirstChild("KillPlusPart_" .. player.Name .. "_" .. i)
+        if part then part:Destroy() end
+    end
 end)
 
-Players.PlayerRemoving:Connect(function(player)
-    for i, name in pairs(playerNames) do
+-- Configuração da WindUI
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+local Window = WindUI:CreateWindow({
+    Title = "Coquette Hub",
+    Icon = "shield",
+    Author = "by Dark",
+    Size = UDim2.fromOffset(580, 460),
+    Transparent = true,
+    Theme = "Dark",
+    Resizable = true
+})
+
+-- Dynamic Player List
+local playerNames = {}
+for _, player in ipairs(Players:GetPlayers()) do
+    table.insert(playerNames, player.Name)
+end
+local SelectedPlayer = LocalPlayer.Name
+
+-- Command Tab and Dropdown
+local TabComandos = Window:Tab({ Title = "Comandos", Icon = "terminal" })
+local Dropdown = TabComandos:Dropdown({
+    Title = "Selecionar Jogador",
+    Values = playerNames,
+    Callback = function(value)
+        SelectedPlayer = value
+    end
+})
+
+-- Update player list on join/leave
+table.insert(connections, Players.PlayerAdded:Connect(function(player)
+    table.insert(playerNames, player.Name)
+    Dropdown:SetValues(playerNames)
+end))
+
+table.insert(connections, Players.PlayerRemoving:Connect(function(player)
+    for i, name in ipairs(playerNames) do
         if name == player.Name then
             table.remove(playerNames, i)
             break
         end
     end
-    PlayersDD:Refresh(playerNames)
-end)
+    Dropdown:SetValues(playerNames)
+    RemoveJail(player)
+end))
 
--- Botões de comando (ENVIA PARA O CHAT VIA RBXGeneral USANDO SELECTEDPLAYER)
-local commands = {
-    {Title = "Kick", Desc = "Envia ;kick [SelectedPlayer] no chat", Cmd = ";kick"},
-    {Title = "Kill", Desc = "Envia ;kill [SelectedPlayer] no chat", Cmd = ";kill"},
-    {Title = "Kill Plus", Desc = "Envia ;killplus [SelectedPlayer] no chat", Cmd = ";killplus"},
-    {Title = "Fling", Desc = "Envia ;fling [SelectedPlayer] no chat", Cmd = ";fling"},
-    {Title = "Freeze", Desc = "Envia ;freeze [SelectedPlayer] no chat", Cmd = ";freeze"},
-    {Title = "Unfreeze", Desc = "Envia ;unfreeze [SelectedPlayer] no chat", Cmd = ";unfreeze"},
-    {Title = "Jail", Desc = "Envia ;jail [SelectedPlayer] no chat", Cmd = ";jail"},
-    {Title = "Unjail", Desc = "Envia ;unjail [SelectedPlayer] no chat", Cmd = ";unjail"},
-    {Title = "Bring", Desc = "Envia ;bring [SelectedPlayer] no chat", Cmd = ";bring"},
-    {Title = "Control Player (Joystick)", Desc = "Envia ;control [SelectedPlayer] no chat (exclusivo Lyra Devs)", Cmd = ";control"},
-    {Title = "Uncontrol Player", Desc = "Envia ;uncontrol [SelectedPlayer] no chat", Cmd = ";uncontrol"},
+-- Command Buttons
+local buttons = {
+    { "Verificar Hubs", ";verifique" },
+    { "Kick", ";kick" },
+    { "Kill", ";kill" },
+    { "Kill Plus", ";killplus" },
+    { "Fling", ";fling" },
+    { "Bring", ";bring" },
+    { "Jail", ";jail" },
+    { "Unjail", ";unjail" },
+    { "Freeze", ";freeze" },
+    { "Unfreeze", ";unfreeze" },
+    { "Tag", ";tag" },
+    { "Untag", ";untag" },
+    { "Tag All", ";tag all" },
+    { "Untag All", ";untag all" },
+    { "Float", ";float" },
+    { "Jumpscare 1", ";jumps1" },
+    { "Jumpscare 2", ";jumps2" },
+    { "Jumpscare 3", ";jumps3" },
+    { "Jumpscare 4", ";jumps4" }
 }
 
-for _, cmd in pairs(commands) do
-    Section2:Button({
-        Title = cmd.Title,
-        Desc = cmd.Desc,
-        Locked = false,
+for _, button in ipairs(buttons) do
+    local title, cmd = button[1], button[2]
+    TabComandos:Button({
+        Title = title,
         Callback = function()
-            if not SelectedPlayer then
-                StarterGui:SetCore("SendNotification", {
-                    Title = "Erro",
-                    Text = "Selecione um jogador primeiro!",
-                    Duration = 3
-                })
-                return
+            if cmd == ";jail" then
+                CreateAndManageJail(Players:FindFirstChild(SelectedPlayer))
+            elseif cmd == ";unjail" then
+                RemoveJail(Players:FindFirstChild(SelectedPlayer))
+            else
+                sendChat(cmd .. (string.find(cmd, "^;[%w]+%s+all$") or not string.find(cmd, "^;jumps") and " " .. SelectedPlayer or ""))
             end
-            local fullCmd = cmd.Cmd .. " " .. SelectedPlayer.Name  -- Monta ";cmd SelectedPlayer.Name"
-            SendCommand(fullCmd)  -- Envia para o chat (RBXGeneral)
-            -- O listener vai capturar e executar automaticamente
         end
     })
 end
 
--- Notificação final de carregamento
+-- Inicializar UI para todos os jogadores
 StarterGui:SetCore("SendNotification", {
-    Title = "Lyra Devs",
-    Text = "Carregado! Botões enviam comandos para o chat (RBXGeneral). Manual: ;cmd nomejogador OU ;cmd (usa SelectedPlayer). Control via joystick exclusivo para Lyra Devs!",
-    Duration = 5
+    Title = "Coquette Hub",
+    Text = "Painel WindUI Midnight carregado!",
+    Duration = 4
 })
+
+-- Cleanup on script termination
+game:BindToClose(function()
+    for _, connection in ipairs(connections) do
+        connection:Disconnect()
+    end
+    for _, player in ipairs(Players:GetPlayers()) do
+        RemoveJail(player)
+        UnfreezePlayer(player)
+    end
+end)

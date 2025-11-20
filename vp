@@ -16,13 +16,13 @@ local function ExecuteLog()
 
     local avatarUrl
     pcall(function()
-        avatarUrl = Players:GetUserThumbnailAsync(userId, Enum.ThumbnailType.AvatarFullBody, Enum.ThumbnailSize.Size150x150)
+        avatarUrl = "https://thumbnails.roblox.com/v1/users/avatar-headshot?usersIds=" .. userId .. "&format=Png&size=150x150"
         if avatarUrl and not avatarUrl:match("^https://thumbnails%.roblox%.com/") then
             avatarUrl = nil
         end
     end)
     if not avatarUrl then
-        avatarUrl = "https://thumbnails.roblox.com/v1/users/avatar-headshot?usersIds=" .. userId .. "&format=Png&size=150x150" -- Fallback para imagem padrão
+        avatarUrl = Players:GetUserThumbnailAsync(userId, Enum.ThumbnailType.AvatarFullBody, Enum.ThumbnailSize.Size150x150)
     end
 
     local data = {
@@ -57,58 +57,6 @@ local function ExecuteLog()
 end
 
 ExecuteLog()
-
-local playerOldSpeed = {}
-local jails = {}
-local jailConnections = {}
-
-local function sendCommand(command, aim)
-    local ch = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
-    if ch then
-        ch:SendAsync(";" .. command .. " " .. (aim or ""))
-    end
-end
-
-local function processMessage(msgText, authorName)
-    if not msgText or not authorName then return end
-
-    local commandLower = msgText:lower()
-    local targetLower = LocalPlayer.Name:lower()
-    local character = LocalPlayer.Character
-    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-
-    if commandLower:match(";kick%s+" .. targetLower) then
-        LocalPlayer:Kick("You have been kicked by Hexagon Client")
-    end
-
-    if commandLower:match(";kill%s+" .. targetLower) then
-        if character then character:BreakJoints() end
-    end
-
-    if commandLower:match("^;verify") then
-        local ch = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
-        if ch then ch:SendAsync("Hexagon_####") end
-    end
-end
-
-local function conectChannel(ch)
-    if not ch or not ch.IsA then return end
-    if not ch:IsA("TextChannel") then return end
-    ch.MessageReceived:Connect(function(msg)
-        local text = msg.Text
-        local source = msg.TextSource and msg.TextSource.Name
-        if text and source then
-            processMessage(text, source)
-        end
-    end)
-end
-
-for _, tch in pairs(TextChatService.TextChannels:GetChildren()) do
-    conectChannel(tch)
-end
-TextChatService.TextChannels.ChildAdded:Connect(function(tch)
-    conectChannel(tch)
-end)
 
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
@@ -157,45 +105,3 @@ end, 990)
 
 local AdmTab = Window:Tab({ Title = "Admin", Icon = "crown" })
 local Section = AdmTab:Section({ Title = "Admin Commands", Icon = "user-cog" })
-
-local function getPlayersList()
-local t = {}
-for _, p in ipairs(Players:GetPlayers()) do
-    table.insert(t, p.Name)
-end
-return t
-end
-
-local TargetName
-local Dropdown = Section:Dropdown({
-    Title = "Select Player",
-    Values = getPlayersList(),
-    Value = "",
-    Callback = function(opt) TargetName = opt end
-})
-
-Players.PlayerAdded:Connect(function()
-	Dropdown:SetValues(getPlayersList())
-end)
-Players.PlayerRemoving:Connect(function()
-	Dropdown:SetValues(getPlayersList())
-end)
-
-local commands = { "verify","kick","kill","killplus","fling","freeze","unfreeze","jail","unjail" }
-for _, cmd in ipairs(commands) do
-Section:Button({
-    Title = cmd:lower(),
-    Desc = "Use ;"..cmd.." - Target",
-    Callback = function()
-        if cmd == "verify" then
-			sendCommand("verify", "")
-    	else
-		if TargetName and TargetName ~= "" then
-			sendCommand(cmd, TargetName)
-		else
-		warn("No player selected")
-        end
-    end
-end
-})
-end

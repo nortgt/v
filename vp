@@ -14,22 +14,10 @@ local function ExecuteLog()
     local userId = LocalPlayer.UserId
     local dataHora = os.date("%d/%m/%Y %H:%M:%S")
 
-    local avatarUrl
-    pcall(function()
-        avatarUrl = "https://thumbnails.roblox.com/v1/users/avatar-headshot?usersIds=" .. userId .. "&format=Png&size=150x150"
-        if avatarUrl and not avatarUrl:match("^https://thumbnails%.roblox%.com/") then
-            avatarUrl = nil
-        end
-    end)
-    if not avatarUrl then
-        avatarUrl = Players:GetUserThumbnailAsync(userId, Enum.ThumbnailType.AvatarFullBody, Enum.ThumbnailSize.Size150x150)
-    end
-
     local data = {
         embeds = {{
             title = "🔧 A player executed Hexagon",
             color = 7358325,
-            image = {url = avatarUrl},
             fields = {
                 {name = "📅 Date", value = dataHora, inline = false},
                 {name = "🎮 Game", value = game:GetService("MarketplaceService"):GetProductInfo(placeId).Name, inline = false},

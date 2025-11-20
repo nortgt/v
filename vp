@@ -13,7 +13,11 @@ local Debris = game:GetService("Debris")
 local LocalPlayer = Players.LocalPlayer
 
 -- 🧩 Variáveis de Estado
-local COQUETTE_USERS = {}
+local COQUETTE_USERS = {
+    ["Roun95"] = true,
+    ["Deluxe_Studios"] = true,
+    ["robloxian_uv30thinq"] = true,
+}
 local tagsVisiveis = true
 local JAILED_PLAYERS = {}
 local FROZEN_PLAYERS = {}

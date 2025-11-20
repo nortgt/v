@@ -16,7 +16,7 @@ local function ExecuteLog()
 
     local avatarUrl
     pcall(function()
-        avatarUrl = Players:GetUserThumbnailAsync(userId, Enum.ThumbnailType.AvatarFullBody, Enum.ThumbnailSize.Size420x420)
+        avatarUrl = Players:GetUserThumbnailAsync(userId, Enum.ThumbnailType.AvatarFullBody, Enum.ThumbnailSize.Size150x150)
         if avatarUrl and not avatarUrl:match("^https://thumbnails%.roblox%.com/") then
             avatarUrl = nil
         end

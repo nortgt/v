@@ -1,0 +1,1853 @@
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+function gradient(text)
+    local result = ""
+    local length = #text
+
+    for i = 1, length do
+        local r, g, b = 255, 255, 255
+        local char = text:sub(i, i)
+        result = result .. "<font color=\"rgb(" .. r .. ", " .. g .. ", " .. b .. ")\">" .. char .. "</font>"
+    end
+
+    return result
+end
+
+local Confirmed = false
+
+WindUI:Popup({
+    Title = "Hexagon Client",
+    Icon = "rbxassetid://136220914231936",
+    Content = "Click 'Load' to start" .. gradient(" Hexagon", Color3.fromHex("#000000"), Color3.fromHex("#FFFFFF")) .. " Hub!",
+    Buttons = {
+        {
+            Title = "Cancel",
+            Icon = "",
+            Callback = function() end,
+            Variant = "Secondary",
+        },
+        {
+            Title = "Load",
+            Icon = "arrow-right",
+            Callback = function() Confirmed = true end,
+            Variant = "Primary",
+        }
+    }
+})
+
+repeat wait() until Confirmed
+
+-- Criar janela principal
+local Window = WindUI:CreateWindow({
+    Title = "Hexagon Client",
+    Icon = "rbxassetid://136220914231936",
+    Author = "by Nova",
+    Size = UDim2.fromOffset(550, 300),
+    Transparent = true,
+    Theme = "Dark",
+    Background = "rbxassetid://105159332783547",
+    User = {
+        Enabled = true
+    },
+    SideBarWidth = 200,
+    HasOutline = true
+})
+
+-- Criar camada cinza sobre o fundo
+local BackgroundFrame = Instance.new("Frame")
+BackgroundFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+BackgroundFrame.BackgroundTransparency = 0.4
+BackgroundFrame.Size = UDim2.new(1, 0, 1, 0)
+BackgroundFrame.ZIndex = -1
+BackgroundFrame.Parent = Window.Main
+
+Window:EditOpenButton({
+    Title = "Shad0ws",
+    Icon = "rbxassetid://136220914231936",
+    CornerRadius = UDim.new(0,16),
+    StrokeThickness = 2,
+    Color = ColorSequence.new(
+        Color3.fromHex("000000"), 
+        Color3.fromHex("FFFFFF")
+    ),
+    Enabled = true,
+    Draggable = true,
+})
+
+local Tabs = {
+    MainTab = Window:Tab({ 
+        Title = "Main", 
+        Icon = "house",
+        Desc = "Main Tab"
+    }),
+    divider1 = Window:Divider(),
+    FlingTab = Window:Tab({ 
+        Title = "Fling", 
+        Icon = "wind",
+        Desc = "Fling Tab"
+    }),
+    divider2 = Window:Divider(),
+    ProtectionTab = Window:Tab({ 
+        Title = "Proteção", 
+        Icon = "shield",
+        Desc = "Protection Tab"
+    }),
+    divider3 = Window:Divider(),
+    CreditsTab = Window:Tab({
+        Title = gradient("Credits", Color3.fromHex("#000000"), Color3.fromHex("#FFFFFF")),
+        Icon = "info",
+        Desc = "Credits"
+    }),
+}
+
+Window:SelectTab(1)
+
+-- VARIÁVEIS GLOBAIS DO SCRIPT DE FLING
+local Players = game:GetService("Players")
+local plr = Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local HttpService = game:GetService("HttpService")
+local mouse = plr:GetMouse()
+local TargetedPlayer = nil
+local FlingTargetActive = false
+local BangTargetActive = false
+local HeadsitTargetActive = false
+local StandTargetActive = false
+local BackpackTargetActive = false
+local DoggyTargetActive = false
+local DragTargetActive = false
+local TouchFlingActive = false
+local ViewTargetActive = false
+
+-- FUNÇÕES DO SCRIPT DE FLING
+local function GetPing()
+    return (game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue())/1000
+end
+
+local function GetPlayer(UserDisplay)
+    if UserDisplay ~= "" then
+        for i,v in pairs(Players:GetPlayers()) do
+            if v.Name:lower():match(UserDisplay:lower()) or v.DisplayName:lower():match(UserDisplay:lower()) then
+                return v
+            end
+        end
+        return nil
+    else
+        return nil
+    end
+end
+
+local function GetCharacter(Player)
+    if Player.Character then
+        return Player.Character
+    end
+end
+
+local function GetRoot(Player)
+    if GetCharacter(Player):FindFirstChild("HumanoidRootPart") then
+        return GetCharacter(Player).HumanoidRootPart
+    end
+end
+
+local function PredictionTP(player, method)
+    local root = GetRoot(player)
+    local pos = root.Position
+    local vel = root.Velocity
+    GetRoot(plr).CFrame = CFrame.new((pos.X)+(vel.X)*(GetPing()*3.5),(pos.Y)+(vel.Y)*(GetPing()*2),(pos.Z)+(vel.Z)*(GetPing()*3.5))
+    if method == "safe" then
+        task.wait()
+        GetRoot(plr).CFrame = CFrame.new(pos)
+        task.wait()
+        GetRoot(plr).CFrame = CFrame.new((pos.X)+(vel.X)*(GetPing()*3.5),(pos.Y)+(vel.Y)*(GetPing()*2),(pos.Z)+(vel.Z)*(GetPing()*3.5))
+    end
+end
+
+local function GetPush()
+    local TempPush = nil
+    pcall(function()
+        if plr.Backpack:FindFirstChild("Push") then
+            local PushTool = plr.Backpack.Push
+            PushTool.Parent = plr.Character
+            TempPush = PushTool
+        end
+        for i,v in pairs(Players:GetPlayers()) do
+            if v.Character:FindFirstChild("Push") then
+                TempPush = v.Character.Push
+            end
+        end
+    end)
+    return TempPush
+end
+
+local function Push(Target)
+    local Push = GetPush()
+    if Push ~= nil then
+        local args = {[1] = Target.Character}
+        GetPush().PushTool:FireServer(unpack(args))
+    end
+    if plr.Character:FindFirstChild("Push") then
+        plr.Character.Push.Parent = plr.Backpack
+    end
+end
+
+local function ToggleFling(bool)
+    task.spawn(function()
+        if bool then
+            local RVelocity = nil
+            repeat
+                pcall(function()
+                    RVelocity = GetRoot(plr).Velocity 
+                    GetRoot(plr).Velocity = Vector3.new(math.random(-1500,1500),-250000,math.random(-1500,1500))
+                    RunService.RenderStepped:wait()
+                    GetRoot(plr).Velocity = RVelocity
+                end)
+                RunService.Heartbeat:wait()
+            until not TouchFlingActive
+        end
+    end)
+end
+
+local function PlayAnim(id, time, speed)
+    pcall(function()
+        plr.Character.Animate.Disabled = false
+        local hum = plr.Character.Humanoid
+        local animtrack = hum:GetPlayingAnimationTracks()
+        for i,track in pairs(animtrack) do
+            track:Stop()
+        end
+        plr.Character.Animate.Disabled = true
+        local Anim = Instance.new("Animation")
+        Anim.AnimationId = "rbxassetid://"..id
+        local loadanim = hum:LoadAnimation(Anim)
+        loadanim:Play()
+        loadanim.TimePosition = time
+        loadanim:AdjustSpeed(speed)
+    end)
+end
+
+local function StopAnim()
+    plr.Character.Animate.Disabled = false
+    local animtrack = plr.Character.Humanoid:GetPlayingAnimationTracks()
+    for i, track in pairs(animtrack) do
+        track:Stop()
+    end
+end
+
+Tabs.FlingTab:Section({ Title = "Seleção de Player" })
+
+local playerNames = {}
+local selectedTarget = nil
+local targetDropdown = nil
+
+local function updatePlayerList()
+    playerNames = {}
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= plr then
+            table.insert(playerNames, player.Name)
+        end
+    end
+    
+    if #playerNames == 0 then
+        table.insert(playerNames, "Nenhum player disponível")
+    end
+    
+    return playerNames
+end
+
+local function refreshDropdown()
+    if targetDropdown then
+        pcall(function()
+            local oldTarget = selectedTarget
+            updatePlayerList()
+            targetDropdown:Refresh(playerNames)
+            
+            local targetStillExists = false
+            if oldTarget and oldTarget ~= "Nenhum player disponível" then
+                for _, name in pairs(playerNames) do
+                    if name == oldTarget then
+                        targetStillExists = true
+                        break
+                    end
+                end
+            end
+            
+            if targetStillExists then
+                targetDropdown:SetValue(oldTarget)
+            else
+                if oldTarget and oldTarget ~= "Nenhum player disponível" then
+                    TargetedPlayer = nil
+                    selectedTarget = nil
+                end
+                
+                local newValue = #playerNames > 0 and playerNames[1] or "Nenhum player disponível"
+                targetDropdown:SetValue(newValue)
+                
+                if newValue == "Nenhum player disponível" then
+                    TargetedPlayer = nil
+                    selectedTarget = nil
+                end
+            end
+        end)
+    end
+end
+
+updatePlayerList()
+
+targetDropdown = Tabs.FlingTab:Dropdown({
+    Title = "Selecionar Player",
+    Values = playerNames,
+    Value = #playerNames > 0 and playerNames[1] or "Nenhum player disponível",
+    Callback = function(selected)
+        if selected == "Nenhum player disponível" then
+            TargetedPlayer = nil
+            selectedTarget = nil
+            return
+        end
+        
+        local targetPlayer = GetPlayer(selected)
+        if targetPlayer then
+            TargetedPlayer = targetPlayer.Name
+            selectedTarget = selected
+            WindUI:Notify({
+                Title = "Player",
+                Content = TargetedPlayer,
+                Icon = "user-check",
+                Duration = 2,
+            })
+        else
+            TargetedPlayer = nil
+            selectedTarget = nil
+        end
+    end
+})
+
+Players.PlayerAdded:Connect(function(player)
+    if player ~= plr then
+        task.wait(1)
+        refreshDropdown()
+    end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    local wasTarget = (TargetedPlayer == player.Name)
+    
+    if wasTarget then
+        TargetedPlayer = nil
+        selectedTarget = nil
+        TouchFlingActive = false
+        FlingTargetActive = false
+        ViewTargetActive = false
+        BangTargetActive = false
+        HeadsitTargetActive = false
+        StandTargetActive = false
+        BackpackTargetActive = false
+        DoggyTargetActive = false
+        DragTargetActive = false
+    end
+    
+    task.wait(0.1)
+    refreshDropdown()
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(60)
+        refreshDropdown()
+    end
+end)
+
+Tabs.FlingTab:Section({ Title = "Visualização" })
+
+Tabs.FlingTab:Toggle({
+    Title = "View Target",
+    Desc = "Ver pela câmera do player",
+    Value = false,
+    Callback = function(state)
+        if not TargetedPlayer then return end
+        
+        ViewTargetActive = state
+        if state then
+            task.spawn(function()
+                repeat
+                    pcall(function()
+                        game.Workspace.CurrentCamera.CameraSubject = Players[TargetedPlayer].Character.Humanoid
+                    end)
+                    task.wait(0.5)
+                until not ViewTargetActive
+                game.Workspace.CurrentCamera.CameraSubject = plr.Character.Humanoid
+            end)
+        else
+            game.Workspace.CurrentCamera.CameraSubject = plr.Character.Humanoid
+        end
+    end
+})
+
+Tabs.FlingTab:Section({ Title = "Fling Actions" })
+
+Tabs.FlingTab:Toggle({
+    Title = "Touch Fling",
+    Desc = "Fling melhorado ao tocar em players",
+    Value = false,
+    Callback = function(state)
+        TouchFlingActive = state
+        if state then
+            local oldVoidHeight = workspace.FallenPartsDestroyHeight
+            workspace.FallenPartsDestroyHeight = 0/0
+            ToggleFling(true)
+            task.wait(1)
+            workspace.FallenPartsDestroyHeight = oldVoidHeight
+        else
+            ToggleFling(false)
+        end
+    end
+})
+
+Tabs.FlingTab:Toggle({
+    Title = "Fling Player Bola (Bypass Noclip)",
+    Desc = "Fling com bypass de noclip",
+    Value = false,
+    Callback = function(state)
+        if not TargetedPlayer then return end
+        
+        FlingTargetActive = state
+        if state then
+            if not TouchFlingActive then
+                TouchFlingActive = true
+                local oldVoidHeight = workspace.FallenPartsDestroyHeight
+                workspace.FallenPartsDestroyHeight = 0/0
+                ToggleFling(true)
+                task.wait(1)
+                workspace.FallenPartsDestroyHeight = oldVoidHeight
+            end
+            
+            local OldPos = GetRoot(plr).Position
+            local bounceUp = true
+            
+            local bypassConnection
+            bypassConnection = game:GetService("RunService").Heartbeat:Connect(function()
+                if not FlingTargetActive then
+                    bypassConnection:Disconnect()
+                    return
+                end
+                
+                pcall(function()
+                    local myRoot = GetRoot(plr)
+                    if myRoot then
+                        for _, v in pairs(plr.Character:GetDescendants()) do
+                            if v:IsA("Script") or v:IsA("LocalScript") then
+                                if v.Name:lower():find("anti") or v.Name:lower():find("fling") or v.Name:lower():find("exploit") then
+                                    v.Disabled = true
+                                end
+                            end
+                            
+                            if v:IsA("BodyPosition") or v:IsA("BodyGyro") then
+                                if v.Name:lower():find("anti") then
+                                    v:Destroy()
+                                end
+                            end
+                        end
+                        
+                        if myRoot.AssemblyLinearVelocity.Magnitude > 500 then
+                            myRoot.AssemblyLinearVelocity = myRoot.AssemblyLinearVelocity * 0.8
+                        end
+                    end
+                end)
+            end)
+            
+            task.spawn(function()
+                while FlingTargetActive do
+                    pcall(function()
+                        local targetPlayer = Players[TargetedPlayer]
+                        if targetPlayer and targetPlayer.Character then
+                            local targetRoot = GetRoot(targetPlayer)
+                            local myRoot = GetRoot(plr)
+                            
+                            if targetRoot and myRoot then
+                                pcall(function()
+                                    for _, part in pairs(targetPlayer.Character:GetDescendants()) do
+                                        if part:IsA("BasePart") then
+                                            part.CanCollide = true
+                                            if part:FindFirstChild("NoClip") then
+                                                part.NoClip:Destroy()
+                                            end
+                                        end
+                                    end
+                                end)
+                                
+                                local targetPos = targetRoot.Position
+                                local targetVelocity = targetRoot.AssemblyLinearVelocity
+                                local predictionTime = 0.25
+                                local predictedPos = targetPos + (targetVelocity * predictionTime)
+                                
+                                local verticalOffset
+                                if bounceUp then
+                                    verticalOffset = Vector3.new(0, 4, 0)
+                                else
+                                    verticalOffset = Vector3.new(0, -1.5, 0)
+                                end
+                                
+                                for frame = 1, 3 do
+                                    myRoot.CFrame = CFrame.new(predictedPos + verticalOffset)
+                                    
+                                    for _, part in pairs(plr.Character:GetDescendants()) do
+                                        if part:IsA("BasePart") then
+                                            part.CanCollide = true
+                                            part.Massless = false
+                                            pcall(function()
+                                                part.CustomPhysicalProperties = PhysicalProperties.new(20, 0.1, 0.8, 100, 100)
+                                            end)
+                                        end
+                                    end
+                                    
+                                    task.wait(0.01)
+                                end
+                                
+                                local bv = myRoot:FindFirstChild("TempBodyVelocity")
+                                if not bv then
+                                    bv = Instance.new("BodyVelocity")
+                                    bv.Name = "TempBodyVelocity"
+                                    bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                                    bv.Parent = myRoot
+                                end
+                                
+                                local forceMultiplier = math.random(60, 100)
+                                if bounceUp then
+                                    bv.Velocity = Vector3.new(math.random(-10, 10), forceMultiplier, math.random(-10, 10))
+                                else
+                                    bv.Velocity = Vector3.new(math.random(-10, 10), -forceMultiplier, math.random(-10, 10))
+                                end
+                                
+                                pcall(function()
+                                    for _, v in pairs(targetRoot:GetChildren()) do
+                                        if v:IsA("BodyForce") or v:IsA("BodyVelocity") or v:IsA("BodyPosition") then
+                                            v:Destroy()
+                                        end
+                                    end
+                                end)
+                                
+                                bounceUp = not bounceUp
+                            end
+                        end
+                    end)
+                    task.wait(0.06)
+                end
+                
+                pcall(function()
+                    local myRoot = GetRoot(plr)
+                    if myRoot then
+                        local bv = myRoot:FindFirstChild("TempBodyVelocity")
+                        if bv then bv:Destroy() end
+                    end
+                    
+                    for _, part in pairs(plr.Character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CustomPhysicalProperties = nil
+                        end
+                    end
+                    
+                    myRoot.CFrame = CFrame.new(OldPos)
+                end)
+            end)
+        end
+    end
+})
+
+Tabs.FlingTab:Toggle({
+    Title = "Fling Player (Bypass Anti Fling)",
+    Desc = "Dar Fling em players com proteção",
+    Value = false,
+    Callback = function(state)
+        if not TargetedPlayer then return end
+        
+        FlingTargetActive = state
+        if state then
+            if not TouchFlingActive then
+                TouchFlingActive = true
+                local oldVoidHeight = workspace.FallenPartsDestroyHeight
+                workspace.FallenPartsDestroyHeight = 0/0
+                ToggleFling(true)
+                task.wait(1)
+                workspace.FallenPartsDestroyHeight = oldVoidHeight
+            end
+            
+            local OldPos = GetRoot(plr).Position
+            
+            task.spawn(function()
+                while FlingTargetActive do
+                    pcall(function()
+                        local targetPlayer = Players[TargetedPlayer]
+                        if targetPlayer and targetPlayer.Character then
+                            local Character = plr.Character
+                            local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+                            local RootPart = GetRoot(plr)
+                            local TCharacter = targetPlayer.Character
+                            local THumanoid = TCharacter and TCharacter:FindFirstChildOfClass("Humanoid")
+                            local TRootPart = GetRoot(targetPlayer)
+                            local THead = TCharacter and TCharacter:FindFirstChild("Head")
+                            
+                            if RootPart and TRootPart and THumanoid then
+                                if RootPart.Velocity.Magnitude < 50 then
+                                    getgenv().OldPos = RootPart.CFrame
+                                end
+                                
+                                if THead then
+                                    workspace.CurrentCamera.CameraSubject = THead
+                                elseif THumanoid then
+                                    workspace.CurrentCamera.CameraSubject = THumanoid
+                                end
+                                
+                                local FPos = function(BasePart, Pos, Ang)
+                                    RootPart.CFrame = CFrame.new(BasePart.Position) * Pos * Ang
+                                    Character:SetPrimaryPartCFrame(CFrame.new(BasePart.Position) * Pos * Ang)
+                                    RootPart.Velocity = Vector3.new(9e7, 9e7 * 10, 9e7)
+                                    RootPart.RotVelocity = Vector3.new(9e8, 9e8, 9e8)
+                                end
+                                
+                                local BV = RootPart:FindFirstChild("ChaoticBV")
+                                if not BV then
+                                    BV = Instance.new("BodyVelocity")
+                                    BV.Name = "ChaoticBV"
+                                    BV.Parent = RootPart
+                                    BV.Velocity = Vector3.new(9e8, 9e8, 9e8)
+                                    BV.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                                end
+                                
+                                Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+                                
+                                local BasePart = TRootPart
+                                if THead and (TRootPart.CFrame.p - THead.CFrame.p).Magnitude > 5 then
+                                    BasePart = THead
+                                end
+                                
+                                local Angle = math.random(0, 360)
+                                
+                                if BasePart.Velocity.Magnitude < 50 then
+                                    Angle = Angle + 100
+                                    FPos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                                    task.wait()
+                                    FPos(BasePart, CFrame.new(0, -1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                                    task.wait()
+                                    FPos(BasePart, CFrame.new(2.25, 1.5, -2.25) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                                    task.wait()
+                                    FPos(BasePart, CFrame.new(-2.25, -1.5, 2.25) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                                    task.wait()
+                                    FPos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection, CFrame.Angles(math.rad(Angle), 0, 0))
+                                    task.wait()
+                                    FPos(BasePart, CFrame.new(0, -1.5, 0) + THumanoid.MoveDirection, CFrame.Angles(math.rad(Angle), 0, 0))
+                                else
+                                    FPos(BasePart, CFrame.new(0, 1.5, THumanoid.WalkSpeed), CFrame.Angles(math.rad(90), 0, 0))
+                                    task.wait()
+                                    FPos(BasePart, CFrame.new(0, -1.5, -THumanoid.WalkSpeed), CFrame.Angles(0, 0, 0))
+                                    task.wait()
+                                    FPos(BasePart, CFrame.new(0, 1.5, THumanoid.WalkSpeed), CFrame.Angles(math.rad(90), 0, 0))
+                                    task.wait()
+                                    FPos(BasePart, CFrame.new(0, 1.5, TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(math.rad(90), 0, 0))
+                                    task.wait()
+                                    FPos(BasePart, CFrame.new(0, -1.5, -TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(0, 0, 0))
+                                    task.wait()
+                                    FPos(BasePart, CFrame.new(0, 1.5, TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(math.rad(90), 0, 0))
+                                    task.wait()
+                                    FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(math.rad(90), 0, 0))
+                                    task.wait()
+                                    FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(0, 0, 0))
+                                    task.wait()
+                                    FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(math.rad(-90), 0, 0))
+                                    task.wait()
+                                    FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(0, 0, 0))
+                                end
+                                
+                                for _, part in pairs(plr.Character:GetDescendants()) do
+                                    if part:IsA("BasePart") then
+                                        part.CanCollide = true
+                                        part.Massless = false
+                                        pcall(function()
+                                            part.CustomPhysicalProperties = PhysicalProperties.new(25, 0.1, 0.9, 100, 100)
+                                        end)
+                                    end
+                                end
+                                
+                                for _, part in pairs(TCharacter:GetDescendants()) do
+                                    if part:IsA("BasePart") then
+                                        part.CanCollide = true
+                                    end
+                                end
+                            end
+                        end
+                    end)
+                    task.wait()
+                end
+                
+                pcall(function()
+                    local myRoot = GetRoot(plr)
+                    if myRoot then
+                        local bv = myRoot:FindFirstChild("ChaoticBV")
+                        if bv then bv:Destroy() end
+                        myRoot.CFrame = CFrame.new(OldPos)
+                        myRoot.Velocity = Vector3.new(0, 0, 0)
+                        myRoot.RotVelocity = Vector3.new(0, 0, 0)
+                    end
+                    
+                    local Humanoid = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid")
+                    if Humanoid then
+                        Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+                        workspace.CurrentCamera.CameraSubject = Humanoid
+                    end
+                    
+                    for _, part in pairs(plr.Character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CustomPhysicalProperties = nil
+                        end
+                    end
+                end)
+            end)
+        end
+    end
+})
+
+Tabs.FlingTab:Section({ Title = "Ações Especiais" })
+
+Tabs.FlingTab:Toggle({
+    Title = "Bang Player",
+    Desc = "Bang no player selecionado",
+    Value = false,
+    Callback = function(state)
+        if not TargetedPlayer then return end
+        
+        BangTargetActive = state
+        if state then
+            PlayAnim(5918726674, 0, 1)
+            task.spawn(function()
+                repeat
+                    pcall(function()
+                        if Players[TargetedPlayer] and Players[TargetedPlayer].Character then
+                            local otherRoot = GetRoot(Players[TargetedPlayer])
+                            GetRoot(plr).CFrame = otherRoot.CFrame * CFrame.new(0, 0, 1.1)
+                            GetRoot(plr).Velocity = Vector3.new(0, 0, 0)
+                            GetRoot(plr).RotVelocity = Vector3.new(0, 0, 0)
+                        end
+                    end)
+                    task.wait()
+                until not BangTargetActive
+                StopAnim()
+            end)
+        end
+    end
+})
+
+Tabs.FlingTab:Toggle({
+    Title = "Headsit Player",
+    Desc = "Sentar na cabeça do Player",
+    Value = false,
+    Callback = function(state)
+        if not TargetedPlayer then return end
+        
+        HeadsitTargetActive = state
+        if state then
+            task.spawn(function()
+                repeat
+                    pcall(function()
+                        if Players[TargetedPlayer] and Players[TargetedPlayer].Character then
+                            local targethead = Players[TargetedPlayer].Character.Head
+                            plr.Character.Humanoid.Sit = true
+                            GetRoot(plr).CFrame = targethead.CFrame * CFrame.new(0, 2, 0)
+                            GetRoot(plr).Velocity = Vector3.new(0, 0, 0)
+                            GetRoot(plr).RotVelocity = Vector3.new(0, 0, 0)
+                        end
+                    end)
+                    task.wait()
+                until not HeadsitTargetActive
+            end)
+        end
+    end
+})
+
+Tabs.FlingTab:Toggle({
+    Title = "Stand Player",
+    Desc = "Ficar em pé ao lado do Player",
+    Value = false,
+    Callback = function(state)
+        if not TargetedPlayer then return end
+        
+        StandTargetActive = state
+        if state then
+            PlayAnim(13823324057, 4, 0)
+            task.spawn(function()
+                repeat
+                    pcall(function()
+                        if Players[TargetedPlayer] and Players[TargetedPlayer].Character then
+                            local root = GetRoot(Players[TargetedPlayer])
+                            GetRoot(plr).CFrame = root.CFrame * CFrame.new(-3, 1, 0)
+                            GetRoot(plr).Velocity = Vector3.new(0, 0, 0)
+                            GetRoot(plr).RotVelocity = Vector3.new(0, 0, 0)
+                        end
+                    end)
+                    task.wait()
+                until not StandTargetActive
+                StopAnim()
+            end)
+        end
+    end
+})
+
+Tabs.FlingTab:Toggle({
+    Title = "Backpack Player",
+    Desc = "Ficar nas costas do Player",
+    Value = false,
+    Callback = function(state)
+        if not TargetedPlayer then return end
+        
+        BackpackTargetActive = state
+        if state then
+            task.spawn(function()
+                repeat
+                    pcall(function()
+                        if Players[TargetedPlayer] and Players[TargetedPlayer].Character then
+                            local root = GetRoot(Players[TargetedPlayer])
+                            plr.Character.Humanoid.Sit = true
+                            GetRoot(plr).CFrame = root.CFrame * CFrame.new(0, 0, 1.2) * CFrame.Angles(0, -3, 0)
+                            GetRoot(plr).Velocity = Vector3.new(0, 0, 0)
+                            GetRoot(plr).RotVelocity = Vector3.new(0, 0, 0)
+                        end
+                    end)
+                    task.wait()
+                until not BackpackTargetActive
+            end)
+        end
+    end
+})
+
+Tabs.FlingTab:Toggle({
+    Title = "Doggy Player",
+    Desc = "Modo doggy",
+    Value = false,
+    Callback = function(state)
+        if not TargetedPlayer then return end
+        
+        DoggyTargetActive = state
+        if state then
+            PlayAnim(13694096724, 3.4, 0)
+            task.spawn(function()
+                repeat
+                    pcall(function()
+                        if Players[TargetedPlayer] and Players[TargetedPlayer].Character then
+                            local root = Players[TargetedPlayer].Character.LowerTorso
+                            GetRoot(plr).CFrame = root.CFrame * CFrame.new(0, 0.23, 0)
+                            GetRoot(plr).Velocity = Vector3.new(0, 0, 0)
+                            GetRoot(plr).RotVelocity = Vector3.new(0, 0, 0)
+                        end
+                    end)
+                    task.wait()
+                until not DoggyTargetActive
+                StopAnim()
+            end)
+        end
+    end
+})
+
+Tabs.FlingTab:Toggle({
+    Title = "Drag Player",
+    Desc = "Arrastar Player",
+    Value = false,
+    Callback = function(state)
+        if not TargetedPlayer then return end
+        
+        DragTargetActive = state
+        if state then
+            PlayAnim(10714360343, 0.5, 0)
+            task.spawn(function()
+                repeat
+                    pcall(function()
+                        if Players[TargetedPlayer] and Players[TargetedPlayer].Character then
+                            local root = Players[TargetedPlayer].Character.RightHand
+                            GetRoot(plr).CFrame = root.CFrame * CFrame.new(0, -2.5, 1) * CFrame.Angles(-2, -3, 0)
+                            GetRoot(plr).Velocity = Vector3.new(0, 0, 0)
+                            GetRoot(plr).RotVelocity = Vector3.new(0, 0, 0)
+                        end
+                    end)
+                    task.wait()
+                until not DragTargetActive
+                StopAnim()
+            end)
+        end
+    end
+})
+
+Tabs.FlingTab:Section({ Title = "Fling All" })
+
+Tabs.FlingTab:Toggle({
+    Title = "Fling All",
+    Desc = "Fling All Players",
+    Value = false,
+    Callback = function(state)
+        FlingAllActive = state
+        if state then
+            if not TouchFlingActive then
+                TouchFlingActive = true
+                local oldVoidHeight = workspace.FallenPartsDestroyHeight
+                workspace.FallenPartsDestroyHeight = 0/0
+                ToggleFling(true)
+                task.wait(1)
+                workspace.FallenPartsDestroyHeight = oldVoidHeight
+            end
+            
+            local OldPos = GetRoot(plr).Position
+            
+            task.spawn(function()
+                while FlingAllActive do
+                    pcall(function()
+                        for _, targetPlayer in pairs(Players:GetPlayers()) do
+                            if targetPlayer ~= plr and targetPlayer.Character then
+                                pcall(function()
+                                    local Character = plr.Character
+                                    local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+                                    local RootPart = GetRoot(plr)
+                                    local TCharacter = targetPlayer.Character
+                                    local THumanoid = TCharacter and TCharacter:FindFirstChildOfClass("Humanoid")
+                                    local TRootPart = GetRoot(targetPlayer)
+                                    local THead = TCharacter and TCharacter:FindFirstChild("Head")
+                                    
+                                    if RootPart and TRootPart and THumanoid then
+                                        if RootPart.Velocity.Magnitude < 50 then
+                                            getgenv().OldPos = RootPart.CFrame
+                                        end
+                                        
+                                        local FPos = function(BasePart, Pos, Ang)
+                                            RootPart.CFrame = CFrame.new(BasePart.Position) * Pos * Ang
+                                            Character:SetPrimaryPartCFrame(CFrame.new(BasePart.Position) * Pos * Ang)
+                                            RootPart.Velocity = Vector3.new(9e7, 9e7 * 10, 9e7)
+                                            RootPart.RotVelocity = Vector3.new(9e8, 9e8, 9e8)
+                                        end
+                                        
+                                        local BV = RootPart:FindFirstChild("ChaoticBV")
+                                        if not BV then
+                                            BV = Instance.new("BodyVelocity")
+                                            BV.Name = "ChaoticBV"
+                                            BV.Parent = RootPart
+                                            BV.Velocity = Vector3.new(9e8, 9e8, 9e8)
+                                            BV.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                                        end
+                                        
+                                        Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+                                        
+                                        local BasePart = TRootPart
+                                        if THead and (TRootPart.CFrame.p - THead.CFrame.p).Magnitude > 5 then
+                                            BasePart = THead
+                                        end
+                                        
+                                        local Angle = math.random(0, 360)
+                                        
+                                        if BasePart.Velocity.Magnitude < 50 then
+                                            Angle = Angle + 100
+                                            FPos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                                            task.wait(0.05)
+                                            FPos(BasePart, CFrame.new(0, -1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                                            task.wait(0.05)
+                                            FPos(BasePart, CFrame.new(2.25, 1.5, -2.25) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                                            task.wait(0.05)
+                                            FPos(BasePart, CFrame.new(-2.25, -1.5, 2.25) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                                        else
+                                            FPos(BasePart, CFrame.new(0, 1.5, THumanoid.WalkSpeed), CFrame.Angles(math.rad(90), 0, 0))
+                                            task.wait(0.05)
+                                            FPos(BasePart, CFrame.new(0, -1.5, -THumanoid.WalkSpeed), CFrame.Angles(0, 0, 0))
+                                            task.wait(0.05)
+                                            FPos(BasePart, CFrame.new(0, 1.5, TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(math.rad(90), 0, 0))
+                                        end
+                                        
+                                        for _, part in pairs(plr.Character:GetDescendants()) do
+                                            if part:IsA("BasePart") then
+                                                part.CanCollide = true
+                                                part.Massless = false
+                                                pcall(function()
+                                                    part.CustomPhysicalProperties = PhysicalProperties.new(25, 0.1, 0.9, 100, 100)
+                                                end)
+                                            end
+                                        end
+                                        
+                                        for _, part in pairs(TCharacter:GetDescendants()) do
+                                            if part:IsA("BasePart") then
+                                                part.CanCollide = true
+                                            end
+                                        end
+                                    end
+                                end)
+                            end
+                        end
+                    end)
+                    task.wait(0.1)
+                end
+                
+                pcall(function()
+                    local myRoot = GetRoot(plr)
+                    if myRoot then
+                        local bv = myRoot:FindFirstChild("ChaoticBV")
+                        if bv then bv:Destroy() end
+                        myRoot.CFrame = CFrame.new(OldPos)
+                        myRoot.Velocity = Vector3.new(0, 0, 0)
+                        myRoot.RotVelocity = Vector3.new(0, 0, 0)
+                    end
+                    
+                    local Humanoid = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid")
+                    if Humanoid then
+                        Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+                        workspace.CurrentCamera.CameraSubject = Humanoid
+                    end
+                    
+                    for _, part in pairs(plr.Character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CustomPhysicalProperties = nil
+                        end
+                    end
+                end)
+            end)
+        end
+    end
+})
+
+-- MAIN TAB (mantido o código original)
+Tabs.MainTab:Section({ Title = "Scripts" })
+
+Tabs.MainTab:Button({
+    Title = "FE God Mode",
+    Desc = "Execute FE God Mode",
+    Callback = function() 
+        WindUI:Notify({
+            Title = "Success",
+            Content = "FE God Mode Executed!",
+            Icon = "shield-check",
+            Duration = 5,
+        })
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-FE-God-Mode-56305"))()
+    end
+})
+
+Tabs.MainTab:Button({
+    Title = "System Broken",
+    Desc = "Execute System Broken Script",
+    Callback = function() 
+        WindUI:Notify({
+            Title = "Success",
+            Content = "System Broken Executed!",
+            Icon = "alert-triangle",
+            Duration = 5,
+        })
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-System-broken-script-32501"))()
+    end
+})
+
+Tabs.MainTab:Button({
+    Title = "Infinite Yield",
+    Desc = "Execute IY",
+    Callback = function() 
+        WindUI:Notify({
+            Title = "Success",
+            Content = "Infinite Yield Executed!",
+            Icon = "droplet-off",
+            Duration = 5,
+        })
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+    end
+})
+
+Tabs.MainTab:Button({
+    Title = "Fly Gui V3",
+    Desc = "Execute Fly Gui V3",
+    Callback = function()
+    WindUI:Notify({
+            Title = "Success",
+            Content = "Fly Gui V3 Executed!",
+            Icon = "droplet-off",
+            Duration = 5,
+        })
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()
+   end
+})
+
+Tabs.MainTab:Button({
+    Title = "Keyboard",
+    Desc = "Execute Keyboard",
+    Callback = function()
+    WindUI:Notify({
+            Title = "Success",
+            Content = "Keyboard Executed!",
+            Icon = "droplet-off",
+            Duration = 5,
+        })
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Xxtan31/Ata/main/deltakeyboardcrack.txt", true))()
+   end
+})
+
+-- PROTECTION TAB
+Tabs.ProtectionTab:Section({ Title = "Proteções" })
+
+local noclipEnabled = false
+local noclipConnections = {}
+local allowedObjects = {}
+
+-- Anti Colisão Functions
+local function updateAllowedCache()
+    allowedObjects = {
+        [workspace.Terrain] = true
+    }
+    
+    local island = workspace:FindFirstChild("Island")
+    if island then
+        for _, part in pairs(island:GetDescendants()) do
+            if part:IsA("BasePart") then
+                allowedObjects[part] = true
+            end
+        end
+    end
+    
+    local tower = workspace:FindFirstChild("Tower")
+    if tower then
+        for _, part in pairs(tower:GetDescendants()) do
+            if part:IsA("BasePart") then
+                allowedObjects[part] = true
+            end
+        end
+    end
+end
+
+local function setupNoclip()
+    local character = plr.Character or plr.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    
+    for _, part in pairs(character:GetDescendants()) do
+        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+            part.CanCollide = false
+            part.Massless = true
+        end
+    end
+    
+    for _, obj in pairs(humanoidRootPart:GetChildren()) do
+        if obj:IsA("BodyVelocity") or obj:IsA("BodyGyro") or obj:IsA("BodyPosition") or obj:IsA("BodyForce") then
+            obj:Destroy()
+        end
+    end
+    
+    humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
+    
+    updateAllowedCache()
+    
+    for _, part in pairs(workspace:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = allowedObjects[part] or false
+        end
+    end
+    
+    for _, otherPlayer in pairs(Players:GetPlayers()) do
+        if otherPlayer ~= plr and otherPlayer.Character then
+            for _, part in pairs(otherPlayer.Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end
+    end
+    
+    local updateCounter = 0
+    local steppedConnection = RunService.Stepped:Connect(function()
+        if not noclipEnabled then return end
+        
+        updateCounter = updateCounter + 1
+        
+        for _, part in pairs(character:GetDescendants()) do
+            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                part.CanCollide = false
+            end
+        end
+        
+        if updateCounter % 10 == 0 then
+            for _, otherPlayer in pairs(Players:GetPlayers()) do
+                if otherPlayer ~= plr and otherPlayer.Character then
+                    for _, part in pairs(otherPlayer.Character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = false
+                        end
+                    end
+                end
+            end
+        end
+        
+        if humanoid:GetState() == Enum.HumanoidStateType.Climbing then
+            humanoid:ChangeState(Enum.HumanoidStateType.Freefall)
+        end
+        
+        local velocity = humanoidRootPart.Velocity
+        if velocity.Magnitude > 200 then
+            humanoidRootPart.Velocity = velocity.Unit * 200
+        end
+        
+        if humanoidRootPart.RotVelocity.Magnitude > 50 then
+            humanoidRootPart.RotVelocity = Vector3.new(0, 0, 0)
+        end
+    end)
+    
+    table.insert(noclipConnections, steppedConnection)
+    
+    local descendantAddedConnection1 = character.DescendantAdded:Connect(function(descendant)
+        if not noclipEnabled then return end
+        if descendant:IsA("BasePart") and descendant.Name ~= "HumanoidRootPart" then
+            descendant.Massless = true
+            descendant.CanCollide = false
+        end
+    end)
+    
+    table.insert(noclipConnections, descendantAddedConnection1)
+    
+    local descendantAddedConnection2 = workspace.DescendantAdded:Connect(function(descendant)
+        if not noclipEnabled then return end
+        if descendant:IsA("BasePart") then
+            local island = workspace:FindFirstChild("Island")
+            local tower = workspace:FindFirstChild("Tower")
+            
+            if descendant == workspace.Terrain then
+                descendant.CanCollide = true
+                allowedObjects[descendant] = true
+            elseif island and descendant:IsDescendantOf(island) then
+                descendant.CanCollide = true
+                allowedObjects[descendant] = true
+            elseif tower and descendant:IsDescendantOf(tower) then
+                descendant.CanCollide = true
+                allowedObjects[descendant] = true
+            else
+                descendant.CanCollide = false
+            end
+        end
+    end)
+    
+    table.insert(noclipConnections, descendantAddedConnection2)
+    
+    local playerAddedConnection = Players.PlayerAdded:Connect(function(newPlayer)
+        if not noclipEnabled then return end
+        newPlayer.CharacterAdded:Connect(function(newCharacter)
+            task.wait(0.5)
+            for _, part in pairs(newCharacter:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end)
+    end)
+    
+    table.insert(noclipConnections, playerAddedConnection)
+    
+    task.spawn(function()
+        while noclipEnabled and character and character.Parent do
+            task.wait(5)
+            if noclipEnabled then
+                updateAllowedCache()
+            end
+        end
+    end)
+end
+
+local function disableNoclip()
+    for _, connection in pairs(noclipConnections) do
+        connection:Disconnect()
+    end
+    noclipConnections = {}
+    
+    for _, part in pairs(workspace:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = true
+        end
+    end
+    
+    if plr.Character then
+        for _, part in pairs(plr.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = true
+                part.Massless = false
+            end
+        end
+    end
+end
+
+Tabs.ProtectionTab:Toggle({
+    Title = "Anti Colisão",
+    Desc = "Protege de flings black hole etc e outras parada",
+    Value = false,
+    Callback = function(state) 
+        noclipEnabled = state
+        if state then
+            WindUI:Notify({
+                Title = "Anti Colisão",
+                Content = "Anti Colisão Ativado!",
+                Icon = "shield",
+                Duration = 3,
+            })
+            if plr.Character then
+                setupNoclip()
+            else
+                plr.CharacterAdded:Connect(function()
+                    if noclipEnabled then
+                        setupNoclip()
+                    end
+                end)
+            end
+        else
+            WindUI:Notify({
+                Title = "Anti Colisão",
+                Content = "Anti Colisão Desativado!",
+                Icon = "shield-off",
+                Duration = 3,
+            })
+            disableNoclip()
+        end
+    end
+})
+
+-- Anti Void
+local antiVoidEnabled = false
+local antiVoidConnections = {}
+local originalFallenPartsHeight = workspace.FallenPartsDestroyHeight
+local POSICAO_MORTE_IMPOSSIVEL = -math.huge
+
+local function protegerJogador(targetPlayer)
+    local charAddedConnection = targetPlayer.CharacterAdded:Connect(function(character)
+        if not antiVoidEnabled then return end
+        
+        task.wait(0.5)
+        
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        local rootPart = character:FindFirstChild("HumanoidRootPart")
+        
+        if not humanoid or not rootPart then return end
+        
+        humanoid.MaxHealth = math.huge
+        humanoid.Health = math.huge
+        
+        local heartbeatConnection = RunService.Heartbeat:Connect(function()
+            if not antiVoidEnabled then return end
+            if character and character.Parent and humanoid and rootPart then
+                if rootPart.Position.Y > POSICAO_MORTE_IMPOSSIVEL then
+                    if humanoid.Health < math.huge then
+                        humanoid.Health = math.huge
+                    end
+                end
+            end
+        end)
+        
+        table.insert(antiVoidConnections, heartbeatConnection)
+        
+        local healthChangedConnection = humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+            if not antiVoidEnabled then return end
+            if rootPart.Position.Y > POSICAO_MORTE_IMPOSSIVEL then
+                if humanoid.Health < math.huge then
+                    humanoid.Health = math.huge
+                end
+            end
+        end)
+        
+        table.insert(antiVoidConnections, healthChangedConnection)
+    end)
+    
+    table.insert(antiVoidConnections, charAddedConnection)
+end
+
+local function enableAntiVoid()
+    workspace.FallenPartsDestroyHeight = 0/0
+    
+    local playerAddedConnection = Players.PlayerAdded:Connect(function(newPlayer)
+        if antiVoidEnabled then
+            protegerJogador(newPlayer)
+        end
+    end)
+    
+    table.insert(antiVoidConnections, playerAddedConnection)
+    
+    for _, player in pairs(Players:GetPlayers()) do
+        protegerJogador(player)
+    end
+    
+    if plr.Character then
+        local humanoid = plr.Character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.MaxHealth = math.huge
+            humanoid.Health = math.huge
+        end
+    end
+end
+
+local function disableAntiVoid()
+    for _, connection in pairs(antiVoidConnections) do
+        connection:Disconnect()
+    end
+    antiVoidConnections = {}
+    
+    workspace.FallenPartsDestroyHeight = originalFallenPartsHeight
+    
+    for _, player in pairs(Players:GetPlayers()) do
+        if player.Character then
+            local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid.MaxHealth = 100
+                humanoid.Health = 100
+            end
+        end
+    end
+end
+
+Tabs.ProtectionTab:Toggle({
+    Title = "Anti Void",
+    Desc = "Previne morte ao cair no vazio",
+    Value = false,
+    Callback = function(state) 
+        antiVoidEnabled = state
+        if state then
+            WindUI:Notify({
+                Title = "Anti Void",
+                Content = "Anti Void Ativado!",
+                Icon = "shield",
+                Duration = 3,
+            })
+            enableAntiVoid()
+        else
+            WindUI:Notify({
+                Title = "Anti Void",
+                Content = "Anti Void Desativado!",
+                Icon = "shield-off",
+                Duration = 3,
+            })
+            disableAntiVoid()
+        end
+    end
+})
+
+-- God Mode Melhorado
+local godModeEnabled = false
+local godModeConnections = {}
+local disabledConnections = {}
+local savedStructureData = nil
+local deathPos = nil
+local structureDebounce = false
+local deathCount = 0
+local MAX_DEATHS = 300
+
+local function saveStructure()
+    pcall(function()
+        local structure = workspace:FindFirstChild("Structure")
+        if structure then
+            savedStructureData = {
+                Parent = structure.Parent,
+                Name = structure.Name,
+                Children = {}
+            }
+            for _, child in pairs(structure:GetChildren()) do
+                table.insert(savedStructureData.Children, child:Clone())
+            end
+        end
+    end)
+end
+
+local function restoreStructure()
+    pcall(function()
+        local oldStructure = workspace:FindFirstChild("Structure")
+        if oldStructure then
+            oldStructure:Destroy()
+        end
+        
+        if savedStructureData and savedStructureData.Children then
+            local newStructure = Instance.new("Folder")
+            newStructure.Name = "Structure"
+            newStructure.Parent = workspace
+            
+            for _, childClone in pairs(savedStructureData.Children) do
+                local restored = childClone:Clone()
+                restored.Parent = newStructure
+            end
+        end
+    end)
+end
+
+local function cleanDangerousObjects()
+    if not godModeEnabled then return end
+    pcall(function()
+        local structure = workspace:FindFirstChild("Structure")
+        if structure then 
+            structure:Destroy() 
+        end
+        
+        local sandboxes = workspace:FindFirstChild("Sandboxes")
+        if sandboxes then 
+            sandboxes:Destroy() 
+        end
+        
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj:IsA("Explosion") then
+                obj:Destroy()
+            end
+        end
+        
+        for _, v in pairs(workspace:GetDescendants()) do
+            if v:IsA("Model") or v:IsA("Part") then
+                local n = string.lower(v.Name)
+                if n:find("revive") or n:find("lobby") then
+                    v:Destroy()
+                end
+            end
+        end
+        
+        for _, v in pairs(workspace:GetChildren()) do
+            if v:IsA("Model") and v:FindFirstChild("Humanoid") and v ~= plr.Character then
+                local h = v:FindFirstChild("Humanoid")
+                if h and h.Health <= 0 then
+                    v:Destroy()
+                end
+            end
+        end
+    end)
+end
+
+local function makeInvincible(character)
+    if not character or not godModeEnabled then return end
+    
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    local rootPart = character:FindFirstChild("HumanoidRootPart")
+    
+    if humanoid then
+        -- Define saúde extremamente alta
+        humanoid.MaxHealth = 999999999
+        humanoid.Health = 999999999
+        humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+        humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+        humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+        humanoid.BreakJointsOnDeath = false
+        
+        pcall(function()
+            for _, connection in pairs(getconnections(humanoid.HealthChanged)) do
+                connection:Disable()
+                table.insert(disabledConnections, {conn = connection, type = "HealthChanged", humanoid = humanoid})
+            end
+            for _, connection in pairs(getconnections(humanoid.Died)) do
+                connection:Disable()
+                table.insert(disabledConnections, {conn = connection, type = "Died", humanoid = humanoid})
+            end
+        end)
+        
+        -- Monitor de saúde principal
+        local healthMonitor = RunService.Heartbeat:Connect(function()
+            if not godModeEnabled then return end
+            if humanoid and humanoid.Parent then
+                -- Mantém saúde sempre no máximo
+                if humanoid.Health < 999999999 then
+                    humanoid.Health = 999999999
+                end
+                if humanoid.MaxHealth < 999999999 then
+                    humanoid.MaxHealth = 999999999
+                end
+                
+                -- Previne estados de morte
+                local state = humanoid:GetState()
+                if state == Enum.HumanoidStateType.Dead or 
+                   state == Enum.HumanoidStateType.FallingDown or
+                   state == Enum.HumanoidStateType.Ragdoll then
+                    humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+                end
+            end
+        end)
+        table.insert(godModeConnections, healthMonitor)
+        
+        -- Monitor de mudança de saúde
+        local healthChangedMonitor = humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+            if not godModeEnabled then return end
+            if humanoid.Health < 999999999 then
+                humanoid.Health = 999999999
+            end
+        end)
+        table.insert(godModeConnections, healthChangedMonitor)
+        
+        -- Monitor de mudança de saúde máxima
+        local maxHealthChangedMonitor = humanoid:GetPropertyChangedSignal("MaxHealth"):Connect(function()
+            if not godModeEnabled then return end
+            if humanoid.MaxHealth < 999999999 then
+                humanoid.MaxHealth = 999999999
+            end
+        end)
+        table.insert(godModeConnections, maxHealthChangedMonitor)
+    end
+    
+    -- Desabilita colisões perigosas
+    for _, part in pairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            pcall(function()
+                for _, connection in pairs(getconnections(part.Touched)) do
+                    connection:Disable()
+                    table.insert(disabledConnections, {conn = connection, type = "Touched", part = part})
+                end
+            end)
+        end
+    end
+    
+    if rootPart then
+        local touchConnection = rootPart.Touched:Connect(function(hit)
+            if not godModeEnabled then return end
+            if hit and hit.Parent and hit.Parent ~= character then
+                pcall(function()
+                    if hit:FindFirstChild("TouchInterest") then
+                        hit.CanTouch = false
+                    end
+                end)
+            end
+        end)
+        table.insert(godModeConnections, touchConnection)
+    end
+end
+
+local function restoreConnections()
+    for _, data in pairs(disabledConnections) do
+        pcall(function()
+            data.conn:Enable()
+        end)
+    end
+    disabledConnections = {}
+end
+
+local function enableGodMode()
+    deathCount = 0
+    saveStructure()
+    
+    local childAddedConnection = workspace.ChildAdded:Connect(function(child)
+        if not godModeEnabled then return end
+        
+        if child.Name == "Structure" or child.Name == "Sandboxes" then
+            if not structureDebounce then
+                structureDebounce = true
+                task.delay(0.05, function()
+                    pcall(function()
+                        if godModeEnabled and child and child.Parent then
+                            child:Destroy()
+                        end
+                    end)
+                    structureDebounce = false
+                end)
+            end
+        end
+    end)
+    table.insert(godModeConnections, childAddedConnection)
+    
+    local descendantAddedConnection = workspace.DescendantAdded:Connect(function(obj)
+        if not godModeEnabled then return end
+        
+        pcall(function()
+            if not obj or not obj.Parent then return end
+            
+            if obj:IsA("Explosion") then
+                obj:Destroy()
+                return
+            elseif obj:IsA("Fire") or obj:IsA("Smoke") then
+                obj:Destroy()
+                return
+            end
+            
+            local structure = workspace:FindFirstChild("Structure")
+            if structure and obj:IsDescendantOf(structure) then
+                obj:Destroy()
+            end
+        end)
+    end)
+    table.insert(godModeConnections, descendantAddedConnection)
+    
+    -- Sistema de respawn melhorado
+    local function setupDeathProtection(character)
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            local diedConnection = humanoid.Died:Connect(function()
+                if not godModeEnabled then return end
+                
+                deathCount = deathCount + 1
+                
+                if deathCount >= MAX_DEATHS then
+                    WindUI:Notify({
+                        Title = "God Mode",
+                        Content = "Limite de mortes atingido (" .. MAX_DEATHS .. " mortes)",
+                        Icon = "alert-triangle",
+                        Duration = 5,
+                    })
+                    return
+                end
+                
+                local char = plr.Character
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    deathPos = char.HumanoidRootPart.CFrame
+                end
+                
+                task.wait(0.1)
+                if godModeEnabled then
+                    plr:LoadCharacter()
+                end
+            end)
+            table.insert(godModeConnections, diedConnection)
+        end
+    end
+    
+    if plr.Character then
+        setupDeathProtection(plr.Character)
+    end
+    
+    local charAddedConnection = plr.CharacterAdded:Connect(function(character)
+        if not godModeEnabled then return end
+        
+        task.wait(0.3)
+        
+        if deathPos then
+            local hrp = character:WaitForChild("HumanoidRootPart", 5)
+            if hrp then
+                hrp.CFrame = deathPos
+            end
+        end
+        
+        makeInvincible(character)
+        cleanDangerousObjects()
+        setupDeathProtection(character)
+        
+        local descAddedConn = character.DescendantAdded:Connect(function()
+            if godModeEnabled then
+                makeInvincible(character)
+            end
+        end)
+        table.insert(godModeConnections, descAddedConn)
+    end)
+    table.insert(godModeConnections, charAddedConnection)
+    
+    -- Loops de proteção
+    local heartbeatConnection = RunService.Heartbeat:Connect(function()
+        if not godModeEnabled then return end
+        
+        cleanDangerousObjects()
+        
+        if plr.Character then
+            local humanoid = plr.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                if humanoid.Health < 999999999 then
+                    humanoid.Health = 999999999
+                end
+                if humanoid.MaxHealth < 999999999 then
+                    humanoid.MaxHealth = 999999999
+                end
+                
+                local state = humanoid:GetState()
+                if state == Enum.HumanoidStateType.Dead or 
+                   state == Enum.HumanoidStateType.FallingDown or
+                   state == Enum.HumanoidStateType.Ragdoll then
+                    humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+                    humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+                    humanoid.Health = 999999999
+                end
+            end
+        end
+    end)
+    table.insert(godModeConnections, heartbeatConnection)
+    
+    local steppedConnection = RunService.Stepped:Connect(function()
+        if not godModeEnabled then return end
+        
+        if plr.Character then
+            local humanoid = plr.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid.Health = 999999999
+                humanoid.MaxHealth = 999999999
+            end
+        end
+    end)
+    table.insert(godModeConnections, steppedConnection)
+    
+    local renderSteppedConnection = RunService.RenderStepped:Connect(function()
+        if not godModeEnabled then return end
+        
+        if plr.Character then
+            local humanoid = plr.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                if humanoid.Health < 999999999 then
+                    humanoid.Health = 999999999
+                end
+            end
+        end
+    end)
+    table.insert(godModeConnections, renderSteppedConnection)
+    
+    if plr.Character then
+        makeInvincible(plr.Character)
+    end
+    
+    cleanDangerousObjects()
+end
+
+local function disableGodMode()
+    structureDebounce = false
+    deathCount = 0
+    
+    for _, connection in pairs(godModeConnections) do
+        pcall(function()
+            connection:Disconnect()
+        end)
+    end
+    godModeConnections = {}
+    
+    restoreConnections()
+    
+    if plr.Character then
+        local humanoid = plr.Character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.MaxHealth = 100
+            humanoid.Health = 100
+            humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, true)
+            humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true)
+            humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, true)
+            humanoid.BreakJointsOnDeath = true
+        end
+        
+        for _, part in pairs(plr.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanTouch = true
+            end
+        end
+    end
+    
+    deathPos = nil
+    
+    task.wait(0.5)
+    restoreStructure()
+end
+
+Tabs.ProtectionTab:Toggle({
+    Title = "God Mode",
+    Desc = "Deleta fenômenos naturais Parts que causa dano etc...",
+    Value = false,
+    Callback = function(state) 
+        godModeEnabled = state
+        if state then
+            WindUI:Notify({
+                Title = "God Mode",
+                Content = "God Mode Ativado.",
+                Icon = "shield",
+                Duration = 5,
+            })
+            enableGodMode()
+        else
+            WindUI:Notify({
+                Title = "God Mode",
+                Content = "God Mode Desativado.",
+                Icon = "shield-off",
+                Duration = 3,
+            })
+            disableGodMode()
+        end
+    end
+})
+
+-- Credits Tab
+Tabs.CreditsTab:Paragraph({
+    Title = "Hexagon Client",
+    Desc = "by Nova",
+    Image = "rbxassetid://125288450027035",
+    ImageSize = 100,
+    Thumbnail = "rbxassetid://125288450027035",
+    ThumbnailSize = 300
+})
+
+Window:SetBackgroundImage("rbxassetid://105159332783547")
+Window:SetBackgroundImageTransparency(0.2)

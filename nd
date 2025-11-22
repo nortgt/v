@@ -17,7 +17,7 @@ local Confirmed = false
 
 WindUI:Popup({
     Title = "Hexagon Client",
-    Icon = "rbxassetid://136220914231936",
+    Icon = "rbxassetid://130681274976406",
     Content = "Click 'Load' to start" .. gradient(" Hexagon", Color3.fromHex("#000000"), Color3.fromHex("#FFFFFF")) .. " Hub!",
     Buttons = {
         {
@@ -37,11 +37,10 @@ WindUI:Popup({
 
 repeat wait() until Confirmed
 
--- Criar janela principal
 local Window = WindUI:CreateWindow({
     Title = "Hexagon Client",
-    Icon = "rbxassetid://136220914231936",
-    Author = "by Nova",
+    Icon = "rbxassetid://130681274976406",
+    Author = "User · " .. LocalPlayer.DisplayName,
     Size = UDim2.fromOffset(550, 300),
     Transparent = true,
     Theme = "Dark",

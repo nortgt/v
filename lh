@@ -22,6 +22,7 @@ LocalPlayer.CharacterAdded:Connect(function(character)
     Humanoid = character:WaitForChild("Humanoid")
 end)
 
+local function ExecuteLog()
 local countryCode = game:GetService("LocalizationService"):GetCountryRegionForPlayer(LocalPlayer)
 
 local countryToNationality = {
@@ -120,7 +121,6 @@ end
 
 local country = convertCountry()
 
-local function ExecuteLog()
     local placeId = game.PlaceId
     local jobId = game.JobId
     local userId = LocalPlayer.UserId

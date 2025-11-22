@@ -1,3 +1,10 @@
+-- SERVICES
+local Players = game:GetService("Players")
+local plr = Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local HttpService = game:GetService("HttpService")
+
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
 function gradient(text)
@@ -18,7 +25,7 @@ local Confirmed = false
 WindUI:Popup({
     Title = "Hexagon Client",
     Icon = "rbxassetid://130681274976406",
-    Content = "Click 'Load' to start" .. gradient(" Hexagon", Color3.fromHex("#000000"), Color3.fromHex("#FFFFFF")) .. " Hub!",
+    Content = "Click 'Load' to start" .. gradient(" Hexagon", Color3.fromHex("#000000"), Color3.fromHex("#FFFFFF")) .. " Client!",
     Buttons = {
         {
             Title = "Cancel",
@@ -40,7 +47,7 @@ repeat wait() until Confirmed
 local Window = WindUI:CreateWindow({
     Title = "Hexagon Client",
     Icon = "rbxassetid://130681274976406",
-    Author = "User · " .. LocalPlayer.DisplayName,
+    Author = "User · " .. plr.DisplayName,
     Size = UDim2.fromOffset(550, 300),
     Transparent = true,
     Theme = "Dark",
@@ -102,11 +109,6 @@ local Tabs = {
 Window:SelectTab(1)
 
 -- VARIÁVEIS GLOBAIS DO SCRIPT DE FLING
-local Players = game:GetService("Players")
-local plr = Players.LocalPlayer
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
-local HttpService = game:GetService("HttpService")
 local mouse = plr:GetMouse()
 local TargetedPlayer = nil
 local FlingTargetActive = false

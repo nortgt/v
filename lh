@@ -23,7 +23,7 @@ LocalPlayer.CharacterAdded:Connect(function(character)
 end)
 
 local function ExecuteLog()
-local countryCode = game:GetService("LocalizationService"):GetCountryRegionForPlayer(LocalPlayer)
+local countryCode = game:GetService("LocalizationService"):GetCountryRegionForPlayerAsync(LocalPlayer)
 
 local countryToNationality = {
  ["AF"] = "🇦🇫 Afgano",

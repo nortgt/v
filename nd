@@ -48,7 +48,7 @@ local Window = WindUI:CreateWindow({
     Title = "Hexagon Client",
     Icon = "rbxassetid://130681274976406",
     Author = "User · " .. plr.DisplayName,
-    Size = UDim2.fromOffset(550, 300),
+    Size = UDim2.fromOffset(600, 480),
     Transparent = true,
     Theme = "Dark",
     Background = "rbxassetid://105159332783547",
@@ -56,7 +56,20 @@ local Window = WindUI:CreateWindow({
         Enabled = true
     },
     SideBarWidth = 200,
-    HasOutline = true
+    OpenButton = {
+        Title = "Hexagon",
+    	Icon = "rbxassetid://130681274976406",
+        CornerRadius = UDim.new(0,15),
+        StrokeThickness = 2,
+        Enabled = true,
+        Draggable = true,
+        OnlyMobile = false,
+        
+        Color = ColorSequence.new(
+        	Color3.fromHex("000000"), 
+        	Color3.fromHex("FFFFFF")
+        )
+    }
 })
 
 -- Criar camada cinza sobre o fundo
@@ -68,8 +81,8 @@ BackgroundFrame.ZIndex = -1
 BackgroundFrame.Parent = Window.Main
 
 Window:EditOpenButton({
-    Title = "Shad0ws",
-    Icon = "rbxassetid://136220914231936",
+    Title = "Hexagon",
+    Icon = "rbxassetid://130681274976406",
     CornerRadius = UDim.new(0,16),
     StrokeThickness = 2,
     Color = ColorSequence.new(
@@ -94,7 +107,7 @@ local Tabs = {
     }),
     divider2 = Window:Divider(),
     ProtectionTab = Window:Tab({ 
-        Title = "Proteção", 
+        Title = "Protection", 
         Icon = "shield",
         Desc = "Protection Tab"
     }),
@@ -235,7 +248,7 @@ local function StopAnim()
     end
 end
 
-Tabs.FlingTab:Section({ Title = "Seleção de Player" })
+Tabs.FlingTab:Section({ Title = "Select Player" })
 
 local playerNames = {}
 local selectedTarget = nil
@@ -250,7 +263,7 @@ local function updatePlayerList()
     end
     
     if #playerNames == 0 then
-        table.insert(playerNames, "Nenhum player disponível")
+        table.insert(playerNames, "No player available")
     end
     
     return playerNames
@@ -264,7 +277,7 @@ local function refreshDropdown()
             targetDropdown:Refresh(playerNames)
             
             local targetStillExists = false
-            if oldTarget and oldTarget ~= "Nenhum player disponível" then
+            if oldTarget and oldTarget ~= "No player available" then
                 for _, name in pairs(playerNames) do
                     if name == oldTarget then
                         targetStillExists = true
@@ -276,15 +289,15 @@ local function refreshDropdown()
             if targetStillExists then
                 targetDropdown:SetValue(oldTarget)
             else
-                if oldTarget and oldTarget ~= "Nenhum player disponível" then
+                if oldTarget and oldTarget ~= "No player available" then
                     TargetedPlayer = nil
                     selectedTarget = nil
                 end
                 
-                local newValue = #playerNames > 0 and playerNames[1] or "Nenhum player disponível"
+                local newValue = #playerNames > 0 and playerNames[1] or "No player available"
                 targetDropdown:SetValue(newValue)
                 
-                if newValue == "Nenhum player disponível" then
+                if newValue == "No player available" then
                     TargetedPlayer = nil
                     selectedTarget = nil
                 end

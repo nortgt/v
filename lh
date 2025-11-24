@@ -73,7 +73,7 @@ local userData = whitelist[username]
         end
     end
 
-    return true, userData.type
+    return true
 end
 
 -- Verificación principal

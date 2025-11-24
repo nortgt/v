@@ -19,7 +19,69 @@ local function newNotification(title, message, duration)
     })
 end
 
--- 🔗 URL RAW DEL GITHUB
+local function createRankTag(player, rankType)
+	local function applyTag(char)
+    local head = char:WaitForChild("Head")
+
+    local old = head:FindFirstChild("NameTag")
+    if old then old:Destroy() end
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "NameTag"
+    billboard.Size = UDim2.new(5, 0, 2.8, 0)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
+    billboard.AlwaysOnTop = true
+    billboard.MaxDistance = 120
+    billboard.Parent = head
+
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.BackgroundTransparency = 1
+    frame.Parent = billboard
+
+    local rankFrame = Instance.new("Frame")
+    rankFrame.Size = UDim2.new(0.7, 0, 0.28, 0)
+    rankFrame.Position = UDim2.new(0.15, 0, 0.43, 0)
+    rankFrame.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
+    rankFrame.BackgroundTransparency = 0.2
+    rankFrame.Parent = frame
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 14)
+    corner.Parent = rankFrame
+
+    local rankText = Instance.new("TextLabel")
+    rankText.Size = UDim2.new(1, 0, 1, 0)
+    rankText.BackgroundTransparency = 1
+    rankText.TextScaled = true
+    rankText.Font = Enum.Font.GothamBold
+    rankText.TextColor3 = Color3.new(1, 1, 1)
+    rankText.TextTransparency = 0.1
+    rankText.Text = tostring(rankType):upper()
+    rankText.Parent = rankFrame
+
+    local nameText = Instance.new("TextLabel")
+    nameText.Size = UDim2.new(1, 0, 0.3, 0)
+    nameText.Position = UDim2.new(0.15, 0, 0.73, 0)
+    nameText.BackgroundTransparency = 1
+    nameText.TextScaled = true
+    nameText.Font = Enum.Font.GothamMedium
+    nameText.TextColor3 = Color3.new(0, 0, 0)
+    nameText.Text = "@" .. player.DisplayName
+    nameText.TextTransparency = 0.2
+    nameText.Font = Enum.Font.FredokaOne
+    nameText.TextXAlignment = Enum.TextXAlignment.Left
+    nameText.Parent = frame
+	end
+
+	if player.Character then
+    	applyTag(player.Character)
+	end)
+
+	player.CharacterAdded:Connect(applyTag)
+end
+
+-- 🔗 WHITELIST WITH GITHUB
 local GITHUB_URL = "https://raw.githubusercontent.com/nortgt/v/refs/heads/main/whitelist.json"
 
 -- Función para convertir fechas
@@ -95,63 +157,6 @@ local function verifyWhitelist()
 
         return false
     end
-
-local function createRankTag(player, rankType)
-	player.CharacterAdded:Connect(function(character)
-
-    local head = character:WaitForChild("Head")
-
-    local old = head:FindFirstChild("NameTag")
-    if old then old:Destroy() end
-
-    local billboard = Instance.new("BillboardGui")
-    billboard.Name = "NameTag"
-    billboard.Size = UDim2.new(5, 0, 2.8, 0)
-    billboard.StudsOffset = Vector3.new(0, 3, 0)
-    billboard.AlwaysOnTop = true
-    billboard.MaxDistance = 120
-    billboard.Parent = head
-
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(1, 0, 1, 0)
-    frame.BackgroundTransparency = 1
-    frame.Parent = billboard
-
-    local rankFrame = Instance.new("Frame")
-    rankFrame.Size = UDim2.new(0.7, 0, 0.28, 0)
-    rankFrame.Position = UDim2.new(0.15, 0, 0.43, 0)
-    rankFrame.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
-    rankFrame.BackgroundTransparency = 0.2
-    rankFrame.Parent = frame
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 14)
-    corner.Parent = rankFrame
-
-    local rankText = Instance.new("TextLabel")
-    rankText.Size = UDim2.new(1, 0, 1, 0)
-    rankText.BackgroundTransparency = 1
-    rankText.TextScaled = true
-    rankText.Font = Enum.Font.GothamBold
-    rankText.TextColor3 = Color3.new(1, 1, 1)
-    rankText.TextTransparency = 0.1
-    rankText.Text = tostring(rankType):upper()
-    rankText.Parent = rankFrame
-
-    local nameText = Instance.new("TextLabel")
-    nameText.Size = UDim2.new(1, 0, 0.3, 0)
-    nameText.Position = UDim2.new(0.15, 0, 0.73, 0)
-    nameText.BackgroundTransparency = 1
-    nameText.TextScaled = true
-    nameText.Font = Enum.Font.GothamMedium
-    nameText.TextColor3 = Color3.new(0, 0, 0)
-    nameText.Text = "@" .. player.DisplayName
-    nameText.TextTransparency = 0.2
-    nameText.Font = Enum.Font.FredokaOne
-    nameText.TextXAlignment = Enum.TextXAlignment.Left
-    nameText.Parent = frame
-	end)
-end
 
     -- Aprobado
 	createRankTag(LocalPlayer, info)

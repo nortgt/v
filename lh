@@ -18,19 +18,17 @@ local function newNotification(title, message, duration)
     })
 end
 
---// Executa o load para TODOS (independente se é dono ou não)
-pcall(function()
+-- 🔗 URL RAW DEL GITHUB
+local GITHUB_URL = "https://raw.githubusercontent.com/nortgt/v/refs/heads/main/whitelist.json"
 
-end)
-
--- ===== SISTEMA DE WHITELIST =====
-local function getCurrentTimestamp()
-    return os.time()
-end
-
+-- Función para convertir fechas
 local function parseDateTime(dateString)
-    local day, month, year, hour, minute = dateString:match("(%d+)/(%d+)/(%d+) (%d+):(%d+)")
-    if day and month and year and hour and minute then
+    if not dateString or dateString == "" then return nil end
+
+    local day, month, year, hour, minute =
+        dateString:match("(%d+)/(%d+)/(%d+) (%d+):(%d+)")
+
+    if day then
         return os.time({
             day = tonumber(day),
             month = tonumber(month),
@@ -40,56 +38,74 @@ local function parseDateTime(dateString)
             sec = 0
         })
     end
+
     return nil
 end
 
--- Sistema de Whitelist com Expiração (ATUALIZADO)
-local WhitelistData = {
-    -- Donos (sem expiração)
-    ["Deluxe_Studios"] = {type = "Dono", expires = nil},
-    ["drakeee777"] = {type = "Staff", expires = nil},
+-- Descargar whitelist desde GitHub
+local function loadWhitelist()
+    local success, result = pcall(function()
+        return game:HttpGet(GITHUB_URL)
+    end)
 
-    -- Usuários ADM com expiração
-    ["ryehd52835"] = {type = "Usuário adm", expires = parseDateTime("15/01/2026 23:59")},
-    ["pelotocino_x80"] = {type = "Usuário adm", expires = parseDateTime("14/11/2025 23:59")},
-}
-
-local function isUserWhitelisted(username)
-    local userData = WhitelistData[username:lower()]
-    if not userData then
-        return false, newNotification("Não está na whitelist")
+    if not success then
+        newNotification("⚠ Error", "No se pudo cargar la whitelist desde GitHub.")
+        return {}
     end
-    
+
+    local parsed = HttpService:JSONDecode(result)
+    return parsed or {}
+end
+
+-- Validar usuario
+local function isUserWhitelisted(whitelist, username)
+    username = username:lower()
+local userData = whitelist[username]
+    if not userData then
+        return false, "NOT_IN_LIST"
+    end
+
+    -- Verificar expiración
     if userData.expires then
-        local currentTime = getCurrentTimestamp()
-        if currentTime > userData.expires then
-            return false, newNotification("Whitelist expirada em ", os.date("%d/%m/%Y %H:%M", userData.expires))
+        local expirationTimestamp = parseDateTime(userData.expires)
+        if expirationTimestamp and os.time() > expirationTimestamp then
+            return false, userData.expires
         end
     end
-    
+
     return true, userData.type
 end
 
-local function verifyWhitelistOnStart()
+-- Verificación principal
+local function verifyWhitelist()
+    local whitelist = loadWhitelist()
     local username = LocalPlayer.Name:lower()
-    local isWhitelisted, reason = isUserWhitelisted(username)
-    
-    if not isWhitelisted then
-        task.wait(2)
-        if reason:find("expirada") then
-            newNotification("❌ SUA WHITELIST EXPIROU! Data de expiração: ", reason:match("expirada em (.+)"))
+
+    local allowed, info = isUserWhitelisted(whitelist, username)
+
+    if not allowed then
+        task.wait(1)
+
+        if info == "NOT_IN_LIST" then
+            newNotification("❌ Acceso Denegado", "No estás en la whitelist.")
         else
-            newNotification("❌ VOCÊ NÃO ESTÁ NA WHITELIST! ", "Entre em contato com o desenvolvedor.")
+            newNotification("❌ Tu whitelist expiró", "Expiró el: " .. info)
         end
+
         return false
     end
-    
+
+    -- Aprobado
     return true
 end
 
-if not verifyWhitelistOnStart() then
+-- Bloquear si no tiene whitelist válida
+if not verifyWhitelist() then
     return
 end
+
+-- ======================================================
+-- 🔥 SI EL JUGADOR PASA LA WHITELIST, TU INTERFAZ SE EJECUTA AQUÍ ABAJO
 
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Window = WindUI:CreateWindow({

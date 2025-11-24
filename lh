@@ -74,6 +74,53 @@ local userData = whitelist[username]
         end
     end
 
+local function createRankTag(character)
+    local player = Players:GetPlayerFromCharacter(character)
+    if not player then return end
+
+    local head = character:WaitForChild("Head")
+
+    local old = head:FindFirstChild("NameTag")
+    if old then old:Destroy() end
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "NameTag"
+    billboard.Size = UDim2.new(5, 0, 2.8, 0)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
+    billboard.AlwaysOnTop = true
+    billboard.MaxDistance = 120
+    billboard.Parent = head
+
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.BackgroundTransparency = 1
+    frame.Parent = billboard
+
+    local nameText = Instance.new("TextLabel")
+    nameText.Size = UDim2.new(1, 0, 0.3, 0)
+    nameText.Position = UDim2.new(0.15, 0, 0.73, 0)
+    nameText.BackgroundTransparency = 1
+    nameText.TextScaled = true
+    nameText.Font = Enum.Font.GothamMedium
+    nameText.TextColor3 = Color3.new(0, 0, 0)
+    nameText.Text = tostring(userData.type):upper()
+    nameText.TextTransparency = 0.2
+    nameText.Font = Enum.Font.FredokaOne
+    nameText.TextXAlignment = Enum.TextXAlignment.Left
+    nameText.Parent = frame
+	end
+end
+
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(createRankTag)
+end)
+
+for _, LocalPlayer in ipairs(Players:GetPlayers()) do
+    if LocalPlayer.Character then
+		createRankTag(LocalPlayer.Character)
+    end
+end
+
     return true, userData.type
 end
 

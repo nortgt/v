@@ -1,18 +1,15 @@
 {
   "roun95": {
-    "type": "Owner",
-    "expires": null
+    "expires": nil
   },
   "deluxe_studios": {
     "type": "Admin",
-    "expires": null
+    "expires": nil
   },
   "ace_gamer248": {
-    "type": "AdminUser",
     "expires": "24/12/2025 23:59"
   },
   "yoyo_bre9": {
-    "type": "AdminUser",
     "expires": "27/11/2025 23:59"
   }
 }

@@ -11,6 +11,315 @@ local HttpService = game:GetService("HttpService")
 
 local LocalPlayer = Players.LocalPlayer
 
+-- Serverscript para NameTags con whitelist y expiración desde GitHub
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+
+-- Configuración
+local WHITELIST_URL = "https://raw.githubusercontent.com/nortgt/v/main/whitelist2.json"  -- Reemplaza con tu URL
+local UPDATE_INTERVAL = 90  -- Segundos entre actualizaciones
+
+-- Cache de datos de whitelist
+local whitelistData = {}
+local lastUpdate = 0
+
+-- Función para convertir fecha string a timestamp
+local function parseExpiration(expirationString)
+    if not expirationString or expirationString == "never" or expirationString == "" then
+        return nil -- Sin expiración
+    end
+    
+    -- Formato: "YYYY-MM-DD HH:MM:SS" o "YYYY-MM-DD"
+    local pattern = "(%d+)-(%d+)-(%d+)%s*(%d*):?(%d*):?(%d*)"
+    local year, month, day, hour, minute, second = expirationString:match(pattern)
+    
+    if not year then return nil end
+    
+    year = tonumber(year) or 2025
+    month = tonumber(month) or 1
+    day = tonumber(day) or 1
+    hour = tonumber(hour) or 0
+    minute = tonumber(minute) or 0
+    second = tonumber(second) or 0
+    
+    -- Crear tabla de tiempo
+    local timeTable = {
+        year = year,
+        month = month,
+        day = day,
+        hour = hour,
+        min = minute,
+        sec = second
+    }
+    
+    return os.time(timeTable)
+end
+
+-- Función para verificar si un usuario ha expirado
+local function isUserExpired(userData)
+    if not userData or not userData.expiration then
+        return false -- Sin expiración configurada
+    end
+    
+    -- Owners nunca expiran
+    if userData.rank:lower() == "owner" then
+        return false
+    end
+    
+    local currentTime = os.time()
+    local expirationTime = userData.expirationTimestamp
+    
+    return expirationTime and currentTime > expirationTime
+end
+
+-- Función para formatear tiempo restante
+local function getTimeRemaining(expirationTimestamp)
+    if not expirationTimestamp then return "Permanente" end
+    
+    local currentTime = os.time()
+    local timeLeft = expirationTimestamp - currentTime
+    
+    if timeLeft <= 0 then
+        return "Expirado"
+    end
+    
+    local days = math.floor(timeLeft / 86400)
+    local hours = math.floor((timeLeft % 86400) / 3600)
+    local minutes = math.floor((timeLeft % 3600) / 60)
+    
+    if days > 0 then
+        return string.format("%d días, %d horas", days, hours)
+    elseif hours > 0 then
+        return string.format("%d horas, %d minutos", hours, minutes)
+    else
+        return string.format("%d minutos", minutes)
+    end
+end
+
+-- Función para obtener datos de la whitelist desde GitHub
+local function fetchWhitelistFromGitHub()
+    local success, result = pcall(function()
+        return HttpService:GetAsync(WHITELIST_URL)
+    end)
+    
+    if success then
+        local data = HttpService:JSONDecode(result)
+        whitelistData = {}
+        
+        -- Procesar cada usuario
+        for _, user in ipairs(data) do
+            if user[1] and user[2] then  -- [1] = Nombre, [2] = Rango
+                local userData = {
+                    username = user[1],
+                    rank = user[2],
+                    expiration = user[3] or nil -- [3] = Fecha de expiración (opcional)
+                }
+                
+                -- Convertir expiración a timestamp
+                if userData.expiration then
+                    userData.expirationTimestamp = parseExpiration(userData.expiration)
+                end
+                
+                whitelistData[user[1]:lower()] = userData
+            end
+        end
+        
+        lastUpdate = os.time()
+        print("✅ Whitelist actualizada desde GitHub. Usuarios: " .. #data)
+        return true
+    else
+        warn("❌ Error al cargar whitelist: " .. tostring(result))
+        return false
+    end
+end
+
+-- Función para obtener datos de un usuario (con verificación de expiración)
+local function getUserData(player)
+    -- Actualizar cache si es necesario
+    if os.time() - lastUpdate > UPDATE_INTERVAL then
+        fetchWhitelistFromGitHub()
+    end
+    
+    local userData = whitelistData[player.Name:lower()]
+    
+    -- Verificar si el usuario ha expirado
+    if userData and isUserExpired(userData) then
+        print("⚠️ Usuario " .. player.Name .. " ha expirado")
+        return nil
+    end
+    
+    return userData
+end
+
+-- Función para obtener color según el rango
+local function getRankColor(rank)
+    local colors = {
+        ["Owner"] = Color3.fromRGB(255, 0, 0),        -- Rojo
+        ["Admin"] = Color3.fromRGB(255, 50, 50),      -- Rojo claro
+        ["Moderador"] = Color3.fromRGB(0, 100, 255),  -- Azul
+        ["VIP"] = Color3.fromRGB(0, 255, 0),          -- Verde
+        ["Builder"] = Color3.fromRGB(255, 165, 0),    -- Naranja
+        ["Helper"] = Color3.fromRGB(0, 255, 255),     -- Cian
+        ["Member"] = Color3.fromRGB(255, 255, 0),     -- Amarillo
+    }
+    
+    return colors[rank] or Color3.fromRGB(255, 255, 255)  -- Blanco por defecto
+end
+
+-- Función para crear/actualizar NameTag
+local function updateNameTag(player, userData)
+    local character = player.Character
+    if not character then return end
+    
+    -- Esperar a que el personaje esté completamente cargado
+    local humanoid = character:FindFirstChild("Humanoid")
+    local head = character:FindFirstChild("Head")
+    
+    if not humanoid or not head then
+        character:WaitForChild("Humanoid")
+        head = character:WaitForChild("Head")
+    end
+    
+    -- Limpiar NameTags antiguos
+    local existingTag = head:FindFirstChild("RankNameTag")
+    if existingTag then
+        existingTag:Destroy()
+    end
+    
+    -- Crear nuevo NameTag solo si el usuario está en la whitelist y no ha expirado
+    if userData and userData.rank and not isUserExpired(userData) then
+        -- Crear BillboardGui
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "RankNameTag"
+        billboard.Adornee = head
+        billboard.Size = UDim2.new(0, 200, 0, 100)
+        billboard.StudsOffset = Vector3.new(0, 2.8, 0)
+        billboard.AlwaysOnTop = true
+        billboard.MaxDistance = 100
+        billboard.Enabled = true
+        billboard.Parent = head
+        
+        -- Frame de fondo
+        local background = Instance.new("Frame")
+        background.Size = UDim2.new(1, 0, 1, 0)
+        background.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        background.BackgroundTransparency = 0.3
+        background.BorderSizePixel = 0
+        background.Parent = billboard
+        
+        -- Crear esquinas redondeadas
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 8)
+        corner.Parent = background
+        
+        -- Contenedor principal
+        local container = Instance.new("Frame")
+        container.Size = UDim2.new(1, -10, 1, -10)
+        container.Position = UDim2.new(0, 5, 0, 5)
+        container.BackgroundTransparency = 1
+        container.Parent = background
+        
+        -- Etiqueta del rango
+        local rankLabel = Instance.new("TextLabel")
+        rankLabel.Size = UDim2.new(1, 0, 0.4, 0)
+        rankLabel.Position = UDim2.new(0, 0, 0, 0)
+        rankLabel.BackgroundTransparency = 1
+        rankLabel.Text = string.upper(userData.rank)
+        rankLabel.TextColor3 = getRankColor(userData.rank)
+        rankLabel.TextScaled = true
+        rankLabel.Font = Enum.Font.GothamBold
+        rankLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+        rankLabel.TextStrokeTransparency = 0
+        rankLabel.Parent = container
+        
+        -- Etiqueta del nombre de usuario
+        local nameLabel = Instance.new("TextLabel")
+        nameLabel.Size = UDim2.new(1, 0, 0.3, 0)
+        nameLabel.Position = UDim2.new(0, 0, 0.4, 0)
+        nameLabel.BackgroundTransparency = 1
+        nameLabel.Text = player.Name
+        nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        nameLabel.TextScaled = true
+        nameLabel.Font = Enum.Font.Gotham
+        nameLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+        nameLabel.TextStrokeTransparency = 0.3
+        nameLabel.Parent = container
+        
+        -- Etiqueta de tiempo restante
+        local timeLabel = Instance.new("TextLabel")
+        timeLabel.Size = UDim2.new(1, 0, 0.3, 0)
+        timeLabel.Position = UDim2.new(0, 0, 0.7, 0)
+        timeLabel.BackgroundTransparency = 1
+        timeLabel.Text = getTimeRemaining(userData.expirationTimestamp)
+        timeLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+        timeLabel.TextScaled = true
+        timeLabel.Font = Enum.Font.GothamMedium
+        timeLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+        timeLabel.TextStrokeTransparency = 0.5
+        timeLabel.Parent = container
+        
+        print("✅ NameTag creado para " .. player.Name .. " - Rango: " .. userData.rank .. " - Expira: " .. getTimeRemaining(userData.expirationTimestamp))
+    end
+end
+
+-- Manejar conexión de jugadores
+Players.PlayerAdded:Connect(function(player)
+    -- Esperar a que el jugador cargue
+    wait(2)
+    
+    local userData = getUserData(player)
+    
+    if userData then
+        -- Actualizar cuando el personaje aparezca
+        player.CharacterAdded:Connect(function(character)
+            wait(1)
+            updateNameTag(player, userData)
+        end)
+        
+        -- Actualizar si ya tiene personaje
+        if player.Character then
+            updateNameTag(player, userData)
+        end
+    else
+        print("❌ Usuario " .. player.Name .. " no está en whitelist o ha expirado")
+    end
+end)
+
+-- Función para verificar expiraciones y remover NameTags
+local function checkExpirations()
+    for _, player in ipairs(Players:GetPlayers()) do
+        local userData = whitelistData[player.Name:lower()]
+        
+        if userData and isUserExpired(userData) then
+            -- Remover NameTag si ha expirado
+            local character = player.Character
+            if character then
+                local head = character:FindFirstChild("Head")
+                if head then
+                    local nameTag = head:FindFirstChild("RankNameTag")
+                    if nameTag then
+                        nameTag:Destroy()
+                        print("🗑️ NameTag removido para " .. player.Name .. " (Expirado)")
+                    end
+                end
+            end
+        end
+    end
+end
+
+-- Inicializar el sistema
+print("🚀 Iniciando sistema de NameTags con expiración...")
+
+-- Cargar whitelist al inicio
+fetchWhitelistFromGitHub()
+
+-- Actualizar periódicamente y verificar expiraciones
+while true do
+    wait(UPDATE_INTERVAL)
+    fetchWhitelistFromGitHub()
+    checkExpirations()
+end
+
 local function newNotification(title, message, duration)
     StarterGui:SetCore("SendNotification",{
         Title = title,

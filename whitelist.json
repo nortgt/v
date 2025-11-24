@@ -3,9 +3,9 @@
     "type": "Owner",
     "expires": null
   },
-  "deluxe_studio": {
+  "deluxe_studios": {
     "type": "Admin",
-    "expires": "24/12/2025 23:59"
+    "expires": "23/11/2025 23:59"
   },
   "ace_gamer248": {
     "type": "Admin",

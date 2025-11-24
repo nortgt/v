@@ -7,6 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Debris = game:GetService("Debris")
+local HttpService = game:GetService("HttpService")
 
 local LocalPlayer = Players.LocalPlayer
 
@@ -73,7 +74,7 @@ local userData = whitelist[username]
         end
     end
 
-    return true
+    return true, userData.type
 end
 
 -- Verificación principal

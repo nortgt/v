@@ -105,21 +105,9 @@ if not verifyWhitelist() then
     return
 end
 
-local translate = {}
-
-translate.Text = loadstring(game:HttpGet("https://raw.githubusercontent.com/nxvap/Hexagon/main/main/translations.lua"))()
-
-local lang = (game.Players.LocalPlayer.LocaleId or "en-US"):sub(1, 2):lower()
-if not translate.Text[lang] then lang = "en" end
-translate.Lang = lang
-
-function translated(msg)
-return self.Text[self.Lang][msg] or msg
-end
-
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Window = WindUI:CreateWindow({
-    Title = translated("Info"),
+    Title = "Hexagon Client",
 	Icon = "rbxassetid://130681274976406",
     Author = "Admin",
     Size = UDim2.fromOffset(550,450),

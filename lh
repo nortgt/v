@@ -74,53 +74,6 @@ local userData = whitelist[username]
         end
     end
 
-local function createRankTag(character)
-    local player = Players:GetPlayerFromCharacter(character)
-    if not player then return end
-
-    local head = character:WaitForChild("Head")
-
-    local old = head:FindFirstChild("NameTag")
-    if old then old:Destroy() end
-
-    local billboard = Instance.new("BillboardGui")
-    billboard.Name = "NameTag"
-    billboard.Size = UDim2.new(5, 0, 2.8, 0)
-    billboard.StudsOffset = Vector3.new(0, 3, 0)
-    billboard.AlwaysOnTop = true
-    billboard.MaxDistance = 120
-    billboard.Parent = head
-
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(1, 0, 1, 0)
-    frame.BackgroundTransparency = 1
-    frame.Parent = billboard
-
-    local nameText = Instance.new("TextLabel")
-    nameText.Size = UDim2.new(1, 0, 0.3, 0)
-    nameText.Position = UDim2.new(0.15, 0, 0.73, 0)
-    nameText.BackgroundTransparency = 1
-    nameText.TextScaled = true
-    nameText.Font = Enum.Font.GothamMedium
-    nameText.TextColor3 = Color3.new(0, 0, 0)
-    nameText.Text = tostring(userData.type):upper()
-    nameText.TextTransparency = 0.2
-    nameText.Font = Enum.Font.FredokaOne
-    nameText.TextXAlignment = Enum.TextXAlignment.Left
-    nameText.Parent = frame
-	end
-end
-
-Players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(createRankTag)
-end)
-
-for _, LocalPlayer in ipairs(Players:GetPlayers()) do
-    if LocalPlayer.Character then
-		createRankTag(LocalPlayer.Character)
-    end
-end
-
     return true, userData.type
 end
 
@@ -152,9 +105,21 @@ if not verifyWhitelist() then
     return
 end
 
+local translate = {}
+
+translate.Text = loadstring(game:HttpGet("https://raw.githubusercontent.com/nxvap/Hexagon/main/main/translations.lua"))()
+
+local lang = (game.Players.LocalPlayer.LocaleId or "en-US"):sub(1, 2):lower()
+if not translate.Text[lang] then lang = "en" end
+translate.Lang = lang
+
+function translate:Text(msg)
+return self.Text[self.Lang][msg] or msg
+end
+
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Window = WindUI:CreateWindow({
-    Title = "Hexagon Client",
+    Title = translate:Text("Info"),
 	Icon = "rbxassetid://130681274976406",
     Author = "Admin",
     Size = UDim2.fromOffset(550,450),

@@ -95,15 +95,6 @@ local function verifyWhitelist()
 
         return false
     end
-    -- Aprobado
-	createRankTag(LocalPlayer, info)
-    return true
-end
-
--- Bloquear si no tiene whitelist válida
-if not verifyWhitelist() then
-    return
-end
 
 local function createRankTag(player, rankType)
 	player.CharacterAdded:Connect(function(character)
@@ -160,6 +151,16 @@ local function createRankTag(player, rankType)
     nameText.TextXAlignment = Enum.TextXAlignment.Left
     nameText.Parent = frame
 	end)
+end
+
+    -- Aprobado
+	createRankTag(LocalPlayer, info)
+    return true
+end
+
+-- Bloquear si no tiene whitelist válida
+if not verifyWhitelist() then
+    return
 end
 
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()

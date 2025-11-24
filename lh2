@@ -1,0 +1,101 @@
+local Players = game:GetService("Players")
+local TextChatService = game:GetService("TextChatService")
+local StarterGui = game:GetService("StarterGui")
+local CoreGui = game:GetService("CoreGui")
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local Debris = game:GetService("Debris")
+local HttpService = game:GetService("HttpService")
+
+local LocalPlayer = Players.LocalPlayer
+
+local function newNotification(title, message, duration)
+    StarterGui:SetCore("SendNotification",{
+        Title = title,
+        Text = message,
+        Duration = duration or 5
+    })
+end
+
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+local Window = WindUI:CreateWindow({
+    Title = "Hexagon Client",
+	Icon = "rbxassetid://130681274976406",
+    Author = "Admin",
+    Size = UDim2.fromOffset(550,450),
+    Transparent = true,
+    Theme = "Dark",
+})
+
+local playerNames = {}
+for _, player in ipairs(Players:GetPlayers()) do
+    table.insert(playerNames, player.Name)
+end
+local SelectedPlayer = LocalPlayer.Name
+
+local TabComandos = Window:Tab({ Title = "Comandos", Icon = "terminal" })
+local Dropdown = TabComandos:Dropdown({
+    Title = "Select Player",
+    Values = playerNames,
+    Callback = function(value)
+        SelectedPlayer = value
+    end
+})
+
+-- Update player list on join/leave
+table.insert(connections, Players.PlayerAdded:Connect(function(player)
+    table.insert(playerNames, player.Name)
+    Dropdown:SetValues(playerNames)
+end))
+
+table.insert(connections, Players.PlayerRemoving:Connect(function(player)
+    for i, name in ipairs(playerNames) do
+        if name == player.Name then
+            table.remove(playerNames, i)
+            break
+        end
+    end
+    Dropdown:SetValues(playerNames)
+    RemoveJail(player)
+end))
+
+-- Command Buttons
+local buttons = {
+    { "Verificar Hubs", ";verifique" },
+    { "Kick", ";kick" },
+    { "Kill", ";kill" },
+    { "Kill Plus", ";killplus" },
+    { "Fling", ";fling" },
+    { "Bring", ";bring" },
+    { "Jail", ";jail" },
+    { "Unjail", ";unjail" },
+    { "Freeze", ";freeze" },
+    { "Unfreeze", ";unfreeze" },
+    { "Tag", ";tag" },
+    { "Untag", ";untag" },
+    { "Tag All", ";tag all" },
+    { "Untag All", ";untag all" },
+    { "Float", ";float" },
+    { "Jumpscare 1", ";jumps1" },
+    { "Jumpscare 2", ";jumps2" },
+    { "Jumpscare 3", ";jumps3" },
+    { "Jumpscare 4", ";jumps4" }
+}
+
+for _, button in ipairs(buttons) do
+    local title, cmd = button[1], button[2]
+    TabComandos:Button({
+        Title = title,
+        Callback = function()
+            if cmd == ";jail" then
+                CreateAndManageJail(Players:FindFirstChild(SelectedPlayer))
+            elseif cmd == ";unjail" then
+                RemoveJail(Players:FindFirstChild(SelectedPlayer))
+            else
+                sendChat(cmd .. (string.find(cmd, "^;[%w]+%s+all$") or not string.find(cmd, "^;jumps") and " " .. SelectedPlayer or ""))
+            end
+        end
+    })
+end

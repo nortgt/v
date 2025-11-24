@@ -113,13 +113,13 @@ local lang = (game.Players.LocalPlayer.LocaleId or "en-US"):sub(1, 2):lower()
 if not translate.Text[lang] then lang = "en" end
 translate.Lang = lang
 
-function translate:Text(msg)
+function translated(msg)
 return self.Text[self.Lang][msg] or msg
 end
 
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Window = WindUI:CreateWindow({
-    Title = translate:Text("Info"),
+    Title = translated("Info"),
 	Icon = "rbxassetid://130681274976406",
     Author = "Admin",
     Size = UDim2.fromOffset(550,450),

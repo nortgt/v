@@ -132,7 +132,7 @@ local function ExecuteLog()
 
     -- Si no obtuvimos avatar, puedes poner una URL por defecto
     if not avatarUrl then
-        avatarUrl = "https://via.placeholder.com/420"  -- o cualquier imagen fallback válida
+        avatarUrl = "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-DF4CD2B7BB435266663B970D94B6CB32-Png/420/420/AvatarHeadshot/Png/noFilter"  -- o cualquier imagen fallback válida
     end
 
     local data = {

@@ -5400,23 +5400,7 @@ end)
 -- ADMIN
 -- ==============================
 
-local whitelistDev = {
-    ["Deluxe_Studios"] = true,
-    ["Roun95"] = true,
-}
-
-local admintabLock
-
-if not whitelistDev[LocalPlayer.Name] then
-	admintabLock = true
-    StarterGui:SetCore("SendNotification", {
-        Title = "Acesso Negado - Dev Mode",
-        Text = "Você não está na whitelist de devs do Lyra Devs! Contate o criador. (Exclusivo para usuários de Lyra Devs)",
-        Duration = 5
-    })
-end
-
-AdminTab:Section({Title = Translator:text("Admin Commands"), Icon = "square-terminal", Locked = admintabLock or false })
+AdminTab:Section({Title = Translator:text("Admin Commands"), Icon = "square-terminal" })
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -5581,6 +5565,15 @@ local function getPlayersList()
 	end
 	return t
 end
+
+AdminTab:Paragraph({
+    Title = "Hexagon Client (Admin Access)",
+    Desc = "To use these options, Contact us on Discord",
+    Image = "rbxassetid://130681274976406",
+    ImageSize = 100,
+    -- Thumbnail = "rbxassetid://130681274976406",
+    -- ThumbnailSize = 300
+})
 
 local TargetName
 local Dropdown = AdminTab:Dropdown({

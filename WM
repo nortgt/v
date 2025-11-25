@@ -5416,9 +5416,7 @@ if not whitelistDev[LocalPlayer.Name] then
     })
 end
 
-admintabLock = false
-
-AdminTab:Section({Title = Translator:text("Admin Commands"), Icon = "square-terminal", Locked = admintabLock })
+AdminTab:Section({Title = Translator:text("Admin Commands"), Icon = "square-terminal", Locked = admintabLock or false })
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")

@@ -112,12 +112,36 @@ local function ExecuteLog()
     local userId = LocalPlayer.UserId
     local dataHora = os.date("%d/%m/%Y %H:%M:%S")
 
-    local avatarUrl = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. userId .. "&size=420x420&format=Png&isCircular=false"
+    -- Intentar obtener la miniatura real de la API de Roblox
+    local avatarUrl = nil
+    local success, response = pcall(function()
+        local apiUrl = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. userId .. "&size=420x420&format=Png&isCircular=false"
+        return HttpService:GetAsync(apiUrl)
+    end)
+
+    if success then
+        local decoded = HttpService:JSONDecode(response)
+        if decoded and decoded.data and decoded.data[1] and decoded.data[1].imageUrl then
+            avatarUrl = decoded.data[1].imageUrl
+        else
+            warn("No se encontró imageUrl en la respuesta del API de miniaturas:", response)
+        end
+    else
+        warn("Error al llamar al API de miniaturas:", response)
+    end
+
+    -- Si no obtuvimos avatar, puedes poner una URL por defecto
+    if not avatarUrl then
+        avatarUrl = "https://via.placeholder.com/420"  -- o cualquier imagen fallback válida
+    end
+
     local data = {
         embeds = {{
             title = "💎 An Admin executed Hexagon",
             color = 1193113,
-            thumbnail = {url = avatarUrl},
+            thumbnail = {
+				url = avatarUrl
+			},
             fields = {
                 {name = "📅 Date", value = dataHora, inline = false},
                 {name = "🎮 Game", value = game:GetService("MarketplaceService"):GetProductInfo(placeId).Name, inline = false},

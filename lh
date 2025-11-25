@@ -139,7 +139,7 @@ local function ExecuteLog()
         embeds = {{
             title = "💎 An Admin executed Hexagon",
             color = 1193113,
-            image = {
+            thumbnail = {
 				url = avatarUrl
 			},
             fields = {

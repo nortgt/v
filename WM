@@ -5400,7 +5400,24 @@ end)
 -- ADMIN
 -- ==============================
 
-AdminTab:Section({Title = Translator:text("Admin Commands"), Icon = "square-terminal"})
+local admintabLock = false
+
+local whitelistDev = {
+    ["Deluxe_Studios"] = true,
+    ["Roun95"] = true,
+}
+
+if not whitelistDev[LocalPlayer.Name] then
+	admintabLock = true
+    StarterGui:SetCore("SendNotification", {
+        Title = "Acesso Negado - Dev Mode",
+        Text = "Você não está na whitelist de devs do Lyra Devs! Contate o criador. (Exclusivo para usuários de Lyra Devs)",
+        Duration = 5
+    })
+    return
+end
+
+AdminTab:Section({Title = Translator:text("Admin Commands"), Icon = "square-terminal", Locked = admintabLock })
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -5588,7 +5605,7 @@ for _, cmd in ipairs(comandos) do
     	Title = cmd:lower(),
         Desc = "Script for ;"..cmd.." - Target",
     	Icon = "circle-small",
-        Locked = true,
+        Locked = false,
         Callback = function()
         	if cmd == "verifying" then
             	EnviarComando("verifying", "")

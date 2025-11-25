@@ -124,10 +124,10 @@ local function ExecuteLog()
         if decoded and decoded.data and decoded.data[1] and decoded.data[1].imageUrl then
             avatarUrl = decoded.data[1].imageUrl
         else
-            warn("No se encontró imageUrl en la respuesta del API de miniaturas:", response)
+            warn("ImageUrl not found in the response from the thumbnails API:", response)
         end
     else
-        warn("Error al llamar al API de miniaturas:", response)
+        warn("Error calling the thumbnails API:", response)
     end
 
     -- Si no obtuvimos avatar, puedes poner una URL por defecto
@@ -139,7 +139,7 @@ local function ExecuteLog()
         embeds = {{
             title = "💎 An Admin executed Hexagon",
             color = 1193113,
-            thumbnail = {
+            image = {
 				url = avatarUrl
 			},
             fields = {

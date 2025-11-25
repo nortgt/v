@@ -5468,20 +5468,20 @@ local function ProcessarMensagem(msgText, authorName)
         end
     end
 
-    if comandoLower:match(".freeze%s+" .. targetLower) then
+    if comandoLower:match(".frost%s+" .. targetLower) then
         if humanoid then
             playerOriginalSpeed[targetLower] = humanoid.WalkSpeed
             humanoid.WalkSpeed = 0
         end
     end
 
-    if comandoLower:match(".unfreeze%s+" .. targetLower) then
+    if comandoLower:match(".desfrosted%s+" .. targetLower) then
         if humanoid then
             humanoid.WalkSpeed = playerOriginalSpeed[targetLower] or 16
         end
     end
 
-    if comandoLower:match(".jail%s+" .. targetLower) then
+    if comandoLower:match(".tocage%s+" .. targetLower) then
         if character then
             local root = character:FindFirstChild("HumanoidRootPart")
             if root then
@@ -5517,7 +5517,7 @@ local function ProcessarMensagem(msgText, authorName)
         end
     end
 
-    if comandoLower:match(".unjail%s+" .. targetLower) then
+    if comandoLower:match(".uncaged%s+" .. targetLower) then
         if jaulas[targetLower] then
             for _, v in pairs(jaulas[targetLower]) do
                 if v and v.Destroy then pcall(v.Destroy, v) end
@@ -5673,7 +5673,7 @@ Players.PlayerRemoving:Connect(function()
 	Dropdown:SetValues(getPlayersList())
 end)
 
-local comandos = { "verify","kick","kill","killplus","fling","bring","freeze","unfreeze","jail","unjail" }
+local comandos = { "verify","shutdown","kill","killplus","fling","bring","frost","desfrosted","tocage","uncaged" }
 for _, cmd in ipairs(comandos) do
 	AdminTab:Button({
     	Title = cmd:lower(),

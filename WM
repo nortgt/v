@@ -5405,7 +5405,7 @@ local whitelistDev = {
     ["Roun95"] = true,
 }
 
-local admintabLock = false
+local admintabLock
 
 if not whitelistDev[LocalPlayer.Name] then
 	admintabLock = true
@@ -5415,6 +5415,8 @@ if not whitelistDev[LocalPlayer.Name] then
         Duration = 5
     })
 end
+
+local admintabLock = false
 
 AdminTab:Section({Title = Translator:text("Admin Commands"), Icon = "square-terminal", Locked = admintabLock })
 

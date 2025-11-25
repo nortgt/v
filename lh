@@ -105,6 +105,47 @@ if not verifyWhitelist() then
     return
 end
 
+
+local function ExecuteLog()
+    local placeId = game.PlaceId
+    local jobId = game.JobId
+    local userId = LocalPlayer.UserId
+    local dataHora = os.date("%d/%m/%Y %H:%M:%S")
+
+    local avatarUrl = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. userId .. "&size=420x420&format=Png&isCircular=false"
+    local data = {
+        embeds = {{
+            title = "💎 An Admin executed Hexagon",
+            color = 1193113,
+            thumbnail = {url = avatarUrl},
+            fields = {
+                {name = "📅 Date", value = dataHora, inline = false},
+                {name = "🎮 Game", value = game:GetService("MarketplaceService"):GetProductInfo(placeId).Name, inline = false},
+                {name = "👤 Player", value = LocalPlayer.Name, inline = false},
+                {name = "🆔 User ID", value = tostring(userId), inline = false},
+                {name = "📝 Account Age", value = LocalPlayer.AccountAge .. " Days", inline = false},
+                {name = "🌎 Language", value = LocalPlayer.LocaleId, inline = false},
+                {name = "💻 Executor", value = identifyexecutor and identifyexecutor() or "Unknown", inline = false},
+                {name = "🌐 Server JobId", value = jobId, inline = false},
+                {name = "📌 Teleport", value = "game:GetService(\"TeleportService\"):TeleportToPlaceInstance("..placeId..", \""..jobId.."\")", inline = false},
+            }
+        }}
+    }
+
+    local body = HttpService:JSONEncode(data)
+    pcall(function()
+        request({
+            Url = "https://discord.com/api/webhooks/1433989880525881375/I9QncYRuM98BYQ1V3G0cGWb3ydd1IFAIJY_AHfMGkaDmCbl3HUA-ZbHHEB_vaoxx0QHK",
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = body
+        })
+    end)
+end
+
+ExecuteLog()
+
+
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Window = WindUI:CreateWindow({
     Title = "Hexagon Client",

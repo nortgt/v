@@ -5568,11 +5568,11 @@ end
 
 AdminTab:Paragraph({
     Title = "Hexagon Client (Admin Access)",
-    Desc = "To use these options, Contact us on Discord",
-    Image = "rbxassetid://130681274976406",
-    ImageSize = 48
+    Desc = "To unlock this area, Contact us on Discord",
     -- Thumbnail = "rbxassetid://130681274976406",
-    -- ThumbnailSize = 300
+    -- ThumbnailSize = 300,
+    Image = "rbxassetid://130681274976406",
+    ImageSize = 64
 })
 
 local TargetName

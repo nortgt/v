@@ -5416,7 +5416,7 @@ if not whitelistDev[LocalPlayer.Name] then
     })
 end
 
-local admintabLock = false
+admintabLock = false
 
 AdminTab:Section({Title = Translator:text("Admin Commands"), Icon = "square-terminal", Locked = admintabLock })
 

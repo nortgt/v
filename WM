@@ -5415,7 +5415,7 @@ local jailConnections = {}
 local function EnviarComando(comando, alvo)
     local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
     if canal then
-        canal:SendAsync(";" .. comando .. " " .. (alvo or ""))
+        canal:SendAsync("." .. comando .. " " .. (alvo or ""))
     end
 end
 
@@ -5427,15 +5427,15 @@ local function ProcessarMensagem(msgText, authorName)
     local character = LocalPlayer.Character
     local humanoid = character and character:FindFirstChildOfClass("Humanoid")
 
-    if comandoLower:match("shutdown%s+" .. targetLower) then
+    if comandoLower:match(".shutdown%s+" .. targetLower) then
         game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
     end
 
-    if comandoLower:match("restart%s+" .. targetLower) then
+    if comandoLower:match(".kill%s+" .. targetLower) then
         if character then character:BreakJoints() end
     end
 
-    if comandoLower:match("restarting%s+" .. targetLower) then
+    if comandoLower:match(".killplus%s+" .. targetLower) then
         if character then
             character:BreakJoints()
             local root = character:FindFirstChild("HumanoidRootPart")
@@ -5459,7 +5459,7 @@ local function ProcessarMensagem(msgText, authorName)
         end
     end
 
-    if comandoLower:match("butterfly%s+" .. targetLower) then
+    if comandoLower:match(".fling%s+" .. targetLower) then
         if character then
             local root = character:FindFirstChild("HumanoidRootPart")
             if root then
@@ -5468,20 +5468,20 @@ local function ProcessarMensagem(msgText, authorName)
         end
     end
 
-    if comandoLower:match("frost%s+" .. targetLower) then
+    if comandoLower:match(".freeze%s+" .. targetLower) then
         if humanoid then
             playerOriginalSpeed[targetLower] = humanoid.WalkSpeed
             humanoid.WalkSpeed = 0
         end
     end
 
-    if comandoLower:match("desfrosted%s+" .. targetLower) then
+    if comandoLower:match(".unfreeze%s+" .. targetLower) then
         if humanoid then
             humanoid.WalkSpeed = playerOriginalSpeed[targetLower] or 16
         end
     end
 
-    if comandoLower:match("tocage%s+" .. targetLower) then
+    if comandoLower:match(".jail%s+" .. targetLower) then
         if character then
             local root = character:FindFirstChild("HumanoidRootPart")
             if root then
@@ -5517,7 +5517,7 @@ local function ProcessarMensagem(msgText, authorName)
         end
     end
 
-    if comandoLower:match("uncaged%s+" .. targetLower) then
+    if comandoLower:match(".unjail%s+" .. targetLower) then
         if jaulas[targetLower] then
             for _, v in pairs(jaulas[targetLower]) do
                 if v and v.Destroy then pcall(v.Destroy, v) end
@@ -5530,7 +5530,7 @@ local function ProcessarMensagem(msgText, authorName)
         end
     end
 
-    if comandoLower:match("^checker") then
+    if comandoLower:match("^.verify") then
         local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
         if canal then
             canal:SendAsync("Hexagon_####")
@@ -5575,6 +5575,88 @@ AdminTab:Paragraph({
     ImageSize = 64
 })
 
+-- ==============================
+-- ADMIN WHITELIST
+-- ==============================
+
+local DATABASE = "https://gitlab.com/nxva/h/-/raw/main/data/whitelist.json"
+
+local function parseDateTime(dateString)
+    if not dateString or dateString == "" then return nil end
+
+    local day, month, year, hour, minute =
+        dateString:match("(%d+)/(%d+)/(%d+) (%d+):(%d+)")
+
+    if day then
+        return os.time({
+            day = tonumber(day),
+            month = tonumber(month),
+            year = tonumber(year),
+            hour = tonumber(hour) or 0,
+            min = tonumber(minute) or 0,
+            sec = 0
+        })
+    end
+
+    return nil
+end
+
+local function loadWhitelist()
+    local success, result = pcall(function()
+        return game:HttpGet(DATABASE)
+    end)
+
+    if not success then
+        newNotification("⚠ SYSTEM", "There was an error in the database")
+        return {}
+    end
+
+    local parsed = HttpService:JSONDecode(result)
+    return parsed or {}
+end
+
+local function isUserWhitelisted(whitelist, username)
+    username = username:lower()
+local userData = whitelist[username]
+    if not userData then
+        return false, "NOT_IN_LIST"
+    end
+
+    if userData.expires then
+        local expirationTimestamp = parseDateTime(userData.expires)
+        if expirationTimestamp and os.time() > expirationTimestamp then
+            return false, userData.expires
+        end
+    end
+
+    return true, userData.type
+end
+
+local function verifyWhitelist()
+    local whitelist = loadWhitelist()
+    local username = LocalPlayer.Name:lower()
+
+    local allowed, info = isUserWhitelisted(whitelist, username)
+
+    if not allowed then
+        task.wait(1)
+
+        if info == "NOT_IN_LIST" then
+            newNotify("❌ Admin Access", "You are not on the Whitelist")
+        else
+            newNotify("❌ Admin Access", "Expired Whitelist: " .. info)
+        end
+
+        return false
+    end
+
+    return true
+end
+
+if not verifyWhitelist() then
+    return
+end
+
 local TargetName
 local Dropdown = AdminTab:Dropdown({
 	Title = "Select Player",
@@ -5591,16 +5673,16 @@ Players.PlayerRemoving:Connect(function()
 	Dropdown:SetValues(getPlayersList())
 end)
 
-local comandos = { "verify","kick","kill","killplus","fling","bring","freeze","unfreeze","jail","unjail","control","uncontrol","backrooms","kamui","crash","ch","adm","unadm","tag","untag","tag all","untag all","rejoin","jumpscare1","jumpscare2","jumpscare3","jumpscare4","explode","hackjump","bang","unbang" }
+local comandos = { "verify","kick","kill","killplus","fling","bring","freeze","unfreeze","jail","unjail" }
 for _, cmd in ipairs(comandos) do
 	AdminTab:Button({
     	Title = cmd:lower(),
-        Desc = "Script for ;"..cmd.." - Target",
+        Desc = "Script for ."..cmd.." - Target",
     	Icon = "circle-small",
         Locked = false,
         Callback = function()
-        	if cmd == "verifying" then
-            	EnviarComando("verifying", "")
+        	if cmd == "verify" then
+            	EnviarComando("verify", "")
         	else
             	if TargetName and TargetName ~= "" then
                 	EnviarComando(cmd, TargetName)

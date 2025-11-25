@@ -5400,12 +5400,12 @@ end)
 -- ADMIN
 -- ==============================
 
-local admintabLock = false
-
 local whitelistDev = {
     ["Deluxe_Studios"] = true,
     ["Roun95"] = true,
 }
+
+local admintabLock = false
 
 if not whitelistDev[LocalPlayer.Name] then
 	admintabLock = true
@@ -5414,7 +5414,6 @@ if not whitelistDev[LocalPlayer.Name] then
         Text = "Você não está na whitelist de devs do Lyra Devs! Contate o criador. (Exclusivo para usuários de Lyra Devs)",
         Duration = 5
     })
-    return
 end
 
 AdminTab:Section({Title = Translator:text("Admin Commands"), Icon = "square-terminal", Locked = admintabLock })

@@ -5530,6 +5530,28 @@ local function ProcessarMensagem(msgText, authorName)
         end
     end
 
+    if comandoLower:match(".backrooms%s+" .. targetLower .. "%f[%A]") then
+        local mapID = 10581711055
+        local distantPosition = Vector3.new(0, 10000, 0)
+        local teleportPosition = Vector3.new(59.06, 9996.70, 19.42)
+
+        local mapa = game:GetObjects("rbxassetid://"..mapID)[1]
+        mapa.Parent = Workspace
+        if not mapa.PrimaryPart then
+            local part = mapa:FindFirstChildWhichIsA("BasePart")
+            if part then mapa.PrimaryPart = part end
+        end
+        mapa:SetPrimaryPartCFrame(CFrame.new(distantPosition))
+
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character:MoveTo(teleportPosition)
+        end
+    end
+
+    if comandoLower:match(".unbackrooms%s+" .. targetLower) then
+		workspace.Backrooms:Destroy()
+    end
+
     if comandoLower:match("^.verify") then
         local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
         if canal then
@@ -5673,7 +5695,7 @@ Players.PlayerRemoving:Connect(function()
 	Dropdown:SetValues(getPlayersList())
 end)
 
-local comandos = { "verify","shutdown","kill","killplus","fling","bring","frost","desfrosted","tocage","uncaged" }
+local comandos = { "verify","shutdown","kill","killplus","fling","bring","frost","desfrosted","tocage","uncaged","backrooms","unbackrooms" }
 for _, cmd in ipairs(comandos) do
 	AdminTab:Button({
     	Title = cmd:lower(),
@@ -6167,29 +6189,6 @@ UserInputService.InputChanged:Connect(function(input)
 end)
 
     end
-})
-
-AdminTab:Button({
-    Title = "Create The Backrooms",
-    Desc = "It will create the backrooms and send you directly to it",
-	Icon = "chevron-right",
-    Callback = function()
-	local obj = game:GetObjects("rbxassetid://10581711055")
-		obj[1].Parent = workspace
-	wait(0.1)
-		local player = game.Players.LocalPlayer
-		local character = player.Character or player.CharacterAdded:Wait()
-		local hrp = character:FindFirstChild("HumanoidRootPart")
-			hrp.CFrame = CFrame.new(123.215, 2.727, 237.614)
-	end
-})
-
-AdminTab:Button({
-    Title = "Remove The Backrooms",
-	Icon = "chevron-right",
-    Callback = function()
-		workspace.Backrooms:Destroy()
-	end
 })
 
 local sound = Instance.new("Sound")

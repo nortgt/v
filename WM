@@ -5465,7 +5465,7 @@ local function ProcessarMensagem(msgText, authorName)
         if character then
             local root = character:FindFirstChild("HumanoidRootPart")
             if root then
-                TweenService:Create(root, TweenInfo.new(1, Enum.EasingStyle.Linear), {CFrame = CFrame.new(0,100000,0)}):Play()
+                TweenService:Create(root, TweenInfo.new(1, Enum.EasingStyle.Linear), {CFrame = CFrame.new(0,99999,0)}):Play()
             end
         end
     end
@@ -5555,6 +5555,12 @@ local function ProcessarMensagem(msgText, authorName)
 
     if comandoLower:match(".unbackrooms%s+" .. targetLower) then
 		workspace.Backrooms:Destroy()
+    end
+
+    if comandoLower:match(".bring%s+" .. targetLower) then
+    local targetPlayer = targetLower and Players:FindFirstChild(targetLower)
+        if targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            targetPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(2, 0, 0)
     end
 
 local JUMPSCARES = {

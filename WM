@@ -5564,8 +5564,8 @@ local JUMPSCARES = {
     { ImageId = "rbxassetid://95973611964555", AudioId = "rbxassetid://138873214826309" },
 }
 
-local function TriggerJumpscare(playerGui, jumpscare)
-    local screenGui = Instance.new("ScreenGui", playerGui)
+local function TriggerJumpscare(player, jumpscare)
+    local screenGui = Instance.new("ScreenGui", player:WaitForChild("CoreGui"))
     screenGui.IgnoreGuiInset = true
     local imageLabel = Instance.new("ImageLabel", screenGui)
     imageLabel.Size = UDim2.new(1, 0, 1, 0)
@@ -5589,19 +5589,19 @@ local function TriggerJumpscare(playerGui, jumpscare)
 end
 
     if comandoLower:match(".jumps1%s+" .. targetLower) then
-    	TriggerJumpscare(targetLower.PlayerGui, JUMPSCARES[1])
+    	TriggerJumpscare(targetLower, JUMPSCARES[1])
     end
 
     if comandoLower:match(".jumps2%s+" .. targetLower) then
-    	TriggerJumpscare(targetLower.PlayerGui, JUMPSCARES[2])
+    	TriggerJumpscare(targetLower, JUMPSCARES[2])
     end
 
     if comandoLower:match(".jumps3%s+" .. targetLower) then
-    	TriggerJumpscare(targetLower.PlayerGui, JUMPSCARES[3])
+    	TriggerJumpscare(targetLower, JUMPSCARES[3])
     end
 
     if comandoLower:match(".jumps4%s+" .. targetLower) then
-    	TriggerJumpscare(targetLower.PlayerGui, JUMPSCARES[4])
+    	TriggerJumpscare(targetLower, JUMPSCARES[4])
     end
 
     if comandoLower:match(".float%s+" .. targetLower) then

@@ -5607,6 +5607,35 @@ end
     	TriggerJumpscare(targetLower, JUMPSCARES[4])
     end
 
+    if comandoLower:match(".float%s+" .. targetLower) then
+    if not targetLower or not targetLower.Character or not targetLower.Character:FindFirstChild("HumanoidRootPart") or not targetLower.Character:FindFirstChildOfClass("Humanoid") then return false end
+    local targetHrp = targetLower.Character.HumanoidRootPart
+    local targetHumanoid = targetLower.Character:FindFirstChildOfClass("Humanoid")
+    local targetPos = targetHrp.Position
+    targetHumanoid.WalkSpeed = 0
+    targetHumanoid.JumpHeight = 0
+
+    local bodyVelocity = Instance.new("BodyVelocity", targetHrp)
+    bodyVelocity.MaxForce = Vector3.new(0, math.huge, 0)
+    bodyVelocity.Velocity = Vector3.new(0, 10, 0)
+    bodyVelocity.Name = "FloatVelocity"
+
+    local maxHeight = targetPos.Y + 50
+    local connection
+    connection = RunService.Heartbeat:Connect(function()
+        if not targetLower.Character or not targetLower.Character.Parent or not targetHrp.Parent or not targetHumanoid.Parent then
+            if bodyVelocity and bodyVelocity.Parent then bodyVelocity:Destroy() end
+            if connection then connection:Disconnect() end
+            return
+        end
+        if targetHrp.Position.Y >= maxHeight then
+            if bodyVelocity and bodyVelocity.Parent then bodyVelocity:Destroy() end
+            if connection then connection:Disconnect() end
+            targetHumanoid.Health = 0
+        end
+    end)
+    end
+
     if comandoLower:match("^.verify") then
         local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
         if canal then
@@ -5750,7 +5779,7 @@ Players.PlayerRemoving:Connect(function()
 	Dropdown:SetValues(getPlayersList())
 end)
 
-local comandos = { "verify","shutdown","kill","killplus","fling","bring","frost","desfrosted","tocage","uncaged","backroom","unbackrooms","jumps1","jumps2","jumps3","jumps4" }
+local comandos = { "verify","shutdown","kill","killplus","fling","bring","frost","desfrosted","tocage","uncaged","backroom","unbackrooms","jumps1","jumps2","jumps3","jumps4","float" }
 for _, cmd in ipairs(comandos) do
 	AdminTab:Button({
     	Title = cmd:lower(),

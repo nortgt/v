@@ -5564,6 +5564,7 @@ local function ProcessarMensagem(msgText, authorName)
     local targetPlayer = targetLower and Players:FindFirstChild(targetLower)
         if targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
             targetPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(2, 0, 0)
+		end
     end
 
     if comandoLower:match("^.verify") then

@@ -5530,7 +5530,7 @@ local function ProcessarMensagem(msgText, authorName)
         end
     end
 
-    if comandoLower:match(".backrooms%s+" .. targetLower .. "%f[%A]") then
+    if comandoLower:match(".backroom%s+" .. targetLower) then
         local mapID = 10581711055
         local distantPosition = Vector3.new(0, 10000, 0)
         local teleportPosition = Vector3.new(59.06, 9996.70, 19.42)
@@ -5695,7 +5695,7 @@ Players.PlayerRemoving:Connect(function()
 	Dropdown:SetValues(getPlayersList())
 end)
 
-local comandos = { "verify","shutdown","kill","killplus","fling","bring","frost","desfrosted","tocage","uncaged","backrooms","unbackrooms" }
+local comandos = { "verify","shutdown","kill","killplus","fling","bring","frost","desfrosted","tocage","uncaged","backroom","unbackrooms" }
 for _, cmd in ipairs(comandos) do
 	AdminTab:Button({
     	Title = cmd:lower(),

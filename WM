@@ -5567,6 +5567,7 @@ local JUMPSCARES = {
 local function TriggerJumpscare(player, jumpscare)
     if not player or player ~= LocalPlayer then return false end
     local screenGui = Instance.new("ScreenGui", CoreGui)
+    screenGui.Name = "JumpscareGui"
     screenGui.IgnoreGuiInset = true
     local imageLabel = Instance.new("ImageLabel", screenGui)
     imageLabel.Size = UDim2.new(1, 0, 1, 0)
@@ -5595,15 +5596,15 @@ end
     end
 
     if comandoLower:match(".jumps2%s+" .. targetLower) then
-    	TriggerJumpscare(LocalPlayer, JUMPSCARES[2])
+    	TriggerJumpscare(targetLower, JUMPSCARES[2])
     end
 
     if comandoLower:match(".jumps3%s+" .. targetLower) then
-    	TriggerJumpscare(LocalPlayer, JUMPSCARES[3])
+    	TriggerJumpscare(targetLower, JUMPSCARES[3])
     end
 
     if comandoLower:match(".jumps4%s+" .. targetLower) then
-    	TriggerJumpscare(LocalPlayer, JUMPSCARES[4])
+    	TriggerJumpscare(targetLower, JUMPSCARES[4])
     end
 
     if comandoLower:match("^.verify") then

@@ -5558,16 +5558,14 @@ local function ProcessarMensagem(msgText, authorName)
     end
 
 local JUMPSCARES = {
-    { Name = ".jumps1", ImageId = "rbxassetid://126754882337711", AudioId = "rbxassetid://138873214826309" },
-    { Name = ".jumps2", ImageId = "rbxassetid://86379969987314", AudioId = "rbxassetid://143942090" },
-    { Name = ".jumps3", ImageId = "rbxassetid://127382022168206", AudioId = "rbxassetid://143942090" },
-    { Name = ".jumps4", ImageId = "rbxassetid://95973611964555", AudioId = "rbxassetid://138873214826309" },
+    { ImageId = "rbxassetid://126754882337711", AudioId = "rbxassetid://138873214826309" },
+    { ImageId = "rbxassetid://86379969987314", AudioId = "rbxassetid://143942090" },
+    { ImageId = "rbxassetid://127382022168206", AudioId = "rbxassetid://143942090" },
+    { ImageId = "rbxassetid://95973611964555", AudioId = "rbxassetid://138873214826309" },
 }
 
-local function TriggerJumpscare(player, jumpscare)
-    if not player or player ~= LocalPlayer then return false end
-    local screenGui = Instance.new("ScreenGui", CoreGui)
-    screenGui.Name = "JumpscareGui"
+local function TriggerJumpscare(playerGui, jumpscare)
+    local screenGui = Instance.new("ScreenGui", playerGui)
     screenGui.IgnoreGuiInset = true
     local imageLabel = Instance.new("ImageLabel", screenGui)
     imageLabel.Size = UDim2.new(1, 0, 1, 0)
@@ -5591,19 +5589,19 @@ local function TriggerJumpscare(player, jumpscare)
 end
 
     if comandoLower:match(".jumps1%s+" .. targetLower) then
-    	TriggerJumpscare(targetLower, JUMPSCARES[1])
+    	TriggerJumpscare(targetLower.PlayerGui, JUMPSCARES[1])
     end
 
     if comandoLower:match(".jumps2%s+" .. targetLower) then
-    	TriggerJumpscare(targetLower, JUMPSCARES[2])
+    	TriggerJumpscare(targetLower.PlayerGui, JUMPSCARES[2])
     end
 
     if comandoLower:match(".jumps3%s+" .. targetLower) then
-    	TriggerJumpscare(targetLower, JUMPSCARES[3])
+    	TriggerJumpscare(targetLower.PlayerGui, JUMPSCARES[3])
     end
 
     if comandoLower:match(".jumps4%s+" .. targetLower) then
-    	TriggerJumpscare(targetLower, JUMPSCARES[4])
+    	TriggerJumpscare(targetLower.PlayerGui, JUMPSCARES[4])
     end
 
     if comandoLower:match(".float%s+" .. targetLower) then

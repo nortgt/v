@@ -5622,17 +5622,18 @@ end
     		local maxHeight = targetPos.Y + 50
     		local connection
     		connection = RunService.Heartbeat:Connect(function()
-        	if not character or not character.Parent or not targetHrp.Parent or not targetHumanoid.Parent then
-            	if bodyVelocity and bodyVelocity.Parent then bodyVelocity:Destroy() end
-            	if connection then connection:Disconnect() end
-            	return
-        	end
-        	if targetHrp.Position.Y >= maxHeight then
-            	if bodyVelocity and bodyVelocity.Parent then bodyVelocity:Destroy() end
-	            if connection then connection:Disconnect() end
-    	        targetHumanoid.Health = 0
-        	end
-    	end)
+        		if not character or not character.Parent or not targetHrp.Parent or not targetHumanoid.Parent then
+            		if bodyVelocity and bodyVelocity.Parent then bodyVelocity:Destroy() end
+            		if connection then connection:Disconnect() end
+            		return
+        		end
+        		if targetHrp.Position.Y >= maxHeight then
+            		if bodyVelocity and bodyVelocity.Parent then bodyVelocity:Destroy() end
+	            	if connection then connection:Disconnect() end
+    	        	targetHumanoid.Health = 0
+        		end
+    		end)
+		end
     end
 
     if comandoLower:match("^.verify") then

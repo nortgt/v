@@ -5408,16 +5408,11 @@ local TextChatService = game:GetService("TextChatService")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
-local JUMPSCARES = {
-    { Name = ".jumps1", ImageId = "rbxassetid://126754882337711", AudioId = "rbxassetid://138873214826309" },
-    { Name = ".jumps2", ImageId = "rbxassetid://86379969987314", AudioId = "rbxassetid://143942090" },
-    { Name = ".jumps3", ImageId = "rbxassetid://127382022168206", AudioId = "rbxassetid://143942090" },
-    { Name = ".jumps4", ImageId = "rbxassetid://95973611964555", AudioId = "rbxassetid://138873214826309" },
-}
-
-local playerOriginalSpeed = {}
 local jaulas = {}
 local jailConnections = {}
+
+local playerOriginalSpeed = {}
+local playerOriginalJump = {}
 
 local function EnviarComando(comando, alvo)
     local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
@@ -5478,13 +5473,16 @@ local function ProcessarMensagem(msgText, authorName)
     if comandoLower:match(".frost%s+" .. targetLower) then
         if humanoid then
             playerOriginalSpeed[targetLower] = humanoid.WalkSpeed
+            playerOriginalJump[targetLower] = humanoid.JumpPower
             humanoid.WalkSpeed = 0
+			humanoid.JumpPower = 0
         end
     end
 
     if comandoLower:match(".desfrosted%s+" .. targetLower) then
         if humanoid then
             humanoid.WalkSpeed = playerOriginalSpeed[targetLower] or 16
+            humanoid.JumpPower = playerOriginalJump[targetLower] or 50
         end
     end
 
@@ -5537,6 +5535,28 @@ local function ProcessarMensagem(msgText, authorName)
         end
     end
 
+    if comandoLower:match(".backroom%s+" .. targetLower) then
+        local mapID = 10581711055
+        local distantPosition = Vector3.new(0, 10000, 0)
+        local teleportPosition = Vector3.new(59.06, 9996.70, 19.42)
+
+        local mapa = game:GetObjects("rbxassetid://"..mapID)[1]
+        mapa.Parent = Workspace
+        if not mapa.PrimaryPart then
+            local part = mapa:FindFirstChildWhichIsA("BasePart")
+            if part then mapa.PrimaryPart = part end
+        end
+        mapa:SetPrimaryPartCFrame(CFrame.new(distantPosition))
+
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character:MoveTo(teleportPosition)
+        end
+    end
+
+    if comandoLower:match(".unbackrooms%s+" .. targetLower) then
+		workspace.Backrooms:Destroy()
+    end
+
     if comandoLower:match(".float%s+" .. targetLower) then
         if character then
             local targetHrp = character:FindFirstChild("HumanoidRootPart")
@@ -5571,43 +5591,7 @@ local function ProcessarMensagem(msgText, authorName)
     local targetPlayer = targetLower and Players:FindFirstChild(targetLower)
         if targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
             targetPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(2, 0, 0)
-		end
-    end
-
-local function TriggerJumpscare(player, jumpscare)
-    if not player or player ~= LocalPlayer then return false end
-    local screenGui = Instance.new("ScreenGui", CoreGui)
-    screenGui.Name = "JumpscareGui"
-    screenGui.IgnoreGuiInset = true
-    local imageLabel = Instance.new("ImageLabel", screenGui)
-    imageLabel.Size = UDim2.new(1, 0, 1, 0)
-    imageLabel.Position = UDim2.new(0, 0, 0, 0)
-    imageLabel.BackgroundTransparency = 1
-    imageLabel.Image = jumpscare.ImageId
-    local sound = Instance.new("Sound", screenGui)
-    sound.SoundId = jumpscare.AudioId
-    sound.Volume = 1
-    sound.Looped = false
-    sound:Play()
-    local flashCount = 10
-    local flashInterval = 0.2
-    for i = 1, flashCount do
-        if not screenGui.Parent then break end
-        imageLabel.ImageTransparency = (i % 2 == 0) and 0.3 or 0
-        task.wait(flashInterval)
-    end
-    sound:Stop()
-    screenGui:Destroy()
-    return true
-end
-
-	if table.find({ ".jumps1", ".jumps2", ".jumps3", ".jumps4" }, comandoLower) then
-        for _, j in ipairs(JUMPSCARES) do
-            if j.Name == comandoLower then
-                TriggerJumpscare(targetLower, j)
-                break
-            end
-        end
+	end
     end
 
     if comandoLower:match("^.verify") then
@@ -5753,7 +5737,7 @@ Players.PlayerRemoving:Connect(function()
 	Dropdown:SetValues(getPlayersList())
 end)
 
-local comandos = { "verify","shutdown","kill","killplus","fling","bring","frost","desfrosted","tocage","uncaged","float","jumps1","jumps2","jumps3","jumps4" }
+local comandos = { "verify","shutdown","kill","killplus","fling","bring","frost","desfrosted","tocage","uncaged","backroom","unbackrooms","float" }
 for _, cmd in ipairs(comandos) do
 	AdminTab:Button({
     	Title = cmd:lower(),
@@ -6247,29 +6231,6 @@ UserInputService.InputChanged:Connect(function(input)
 end)
 
     end
-})
-
-AdminTab:Button({
-    Title = "Create The Backrooms",
-    Desc = "It will create the backrooms and send you directly to it",
-	Icon = "chevron-right",
-    Callback = function()
-	local obj = game:GetObjects("rbxassetid://10581711055")
-		obj[1].Parent = workspace
-	wait(0.1)
-		local player = game.Players.LocalPlayer
-		local character = player.Character or player.CharacterAdded:Wait()
-		local hrp = character:FindFirstChild("HumanoidRootPart")
-			hrp.CFrame = CFrame.new(123.215, 2.727, 237.614)
-	end
-})
-
-AdminTab:Button({
-    Title = "Remove The Backrooms",
-	Icon = "chevron-right",
-    Callback = function()
-		workspace.Backrooms:Destroy()
-	end
 })
 
 local sound = Instance.new("Sound")

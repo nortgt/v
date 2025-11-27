@@ -5588,7 +5588,6 @@ local function TriggerJumpscare(player, jumpscare)
     end
     sound:Destroy()
     screenGui:Destroy()
-    return true
 end
 
     if comandoLower:match(".jumps1%s+" .. targetLower) then
@@ -5608,32 +5607,32 @@ end
     end
 
     if comandoLower:match(".float%s+" .. targetLower) then
-    if not targetLower or not targetLower.Character or not targetLower.Character:FindFirstChild("HumanoidRootPart") or not targetLower.Character:FindFirstChildOfClass("Humanoid") then return false end
-    local targetHrp = targetLower.Character.HumanoidRootPart
-    local targetHumanoid = targetLower.Character:FindFirstChildOfClass("Humanoid")
-    local targetPos = targetHrp.Position
-    targetHumanoid.WalkSpeed = 0
-    targetHumanoid.JumpHeight = 0
+        if character then
+            local targetHrp = character:FindFirstChild("HumanoidRootPart")
+    		local targetHumanoid = character:FindFirstChildOfClass("Humanoid")
+    		local targetPos = targetHrp.Position
+    		targetHumanoid.WalkSpeed = 0
+    		targetHumanoid.JumpHeight = 0
 
-    local bodyVelocity = Instance.new("BodyVelocity", targetHrp)
-    bodyVelocity.MaxForce = Vector3.new(0, math.huge, 0)
-    bodyVelocity.Velocity = Vector3.new(0, 10, 0)
-    bodyVelocity.Name = "FloatVelocity"
+    		local bodyVelocity = Instance.new("BodyVelocity", targetHrp)
+    		bodyVelocity.MaxForce = Vector3.new(0, math.huge, 0)
+    		bodyVelocity.Velocity = Vector3.new(0, 10, 0)
+    		bodyVelocity.Name = "FloatVelocity"
 
-    local maxHeight = targetPos.Y + 50
-    local connection
-    connection = RunService.Heartbeat:Connect(function()
-        if not targetLower.Character or not targetLower.Character.Parent or not targetHrp.Parent or not targetHumanoid.Parent then
-            if bodyVelocity and bodyVelocity.Parent then bodyVelocity:Destroy() end
-            if connection then connection:Disconnect() end
-            return
-        end
-        if targetHrp.Position.Y >= maxHeight then
-            if bodyVelocity and bodyVelocity.Parent then bodyVelocity:Destroy() end
-            if connection then connection:Disconnect() end
-            targetHumanoid.Health = 0
-        end
-    end)
+    		local maxHeight = targetPos.Y + 50
+    		local connection
+    		connection = RunService.Heartbeat:Connect(function()
+        	if not character or not character.Parent or not targetHrp.Parent or not targetHumanoid.Parent then
+            	if bodyVelocity and bodyVelocity.Parent then bodyVelocity:Destroy() end
+            	if connection then connection:Disconnect() end
+            	return
+        	end
+        	if targetHrp.Position.Y >= maxHeight then
+            	if bodyVelocity and bodyVelocity.Parent then bodyVelocity:Destroy() end
+	            if connection then connection:Disconnect() end
+    	        targetHumanoid.Health = 0
+        	end
+    	end)
     end
 
     if comandoLower:match("^.verify") then

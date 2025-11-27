@@ -5408,9 +5408,11 @@ local TextChatService = game:GetService("TextChatService")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
-local playerOriginalSpeed = {}
 local jaulas = {}
 local jailConnections = {}
+
+local playerOriginalSpeed = {}
+local playerOriginalJump = {}
 
 local function EnviarComando(comando, alvo)
     local canal = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.TextChannels:GetChildren()[1]
@@ -5471,13 +5473,16 @@ local function ProcessarMensagem(msgText, authorName)
     if comandoLower:match(".frost%s+" .. targetLower) then
         if humanoid then
             playerOriginalSpeed[targetLower] = humanoid.WalkSpeed
+            playerOriginalJump[targetLower] = humanoid.JumpPower
             humanoid.WalkSpeed = 0
+			humanoid.JumpPower = 0
         end
     end
 
     if comandoLower:match(".desfrosted%s+" .. targetLower) then
         if humanoid then
             humanoid.WalkSpeed = playerOriginalSpeed[targetLower] or 16
+            humanoid.JumpPower = playerOriginalJump[targetLower] or 50
         end
     end
 

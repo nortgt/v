@@ -117,8 +117,8 @@ local country = convertCountry()
             fields = {
                 {name = "📅 Date", value = os.date("%d/%m/%Y %H:%M:%S"), inline = false},
                 {name = "🎮 Game", value = game:GetService("MarketplaceService"):GetProductInfo(placeId).Name, inline = false},
-                {name = "👤 Player", value = LocalPlayer.Name, inline = false},
-                {name = "📝 Username", value = LocalPlayer.DisplayName, inline = false},
+                {name = "👤 Player", value = LocalPlayer.DisplayName, inline = false},
+                {name = "📝 Username", value = LocalPlayer.Name, inline = false},
                 {name = "🆔 User ID", value = tostring(LocalPlayer.UserId), inline = false},
                 {name = "🗓️ Creation Account", value = os.date("%d/%m/%Y", os.time()-(LocalPlayer.AccountAge*86400)), inline = false},
                 {name = "🌐 Language", value = LocalPlayer.LocaleId, inline = false},
@@ -4531,7 +4531,6 @@ UserInputService.InputChanged:Connect(function(input)
 		update(input)
 	end
 end)
-
     end
 })
 

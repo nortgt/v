@@ -289,11 +289,11 @@ local Ranks = {
 }
 
 local RankIcons = {
-    Owner = "rbxassetid://130681274976406",
-    Admin = "rbxassetid://130681274976406",
-    Mod = "rbxassetid://108946066610871",
+    Owner = "rbxassetid://120545479757972",
+    Admin = "rbxassetid://120545479757972",
+    Mod = "rbxassetid://120545479757972",
     VIP = "rbxassetid://VIP_ICON",
-    Staff = "rbxassetid://130681274976406"
+    Staff = "rbxassetid://120545479757972"
 }
 
 local RankColors = {
@@ -434,7 +434,7 @@ end
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Window = WindUI:CreateWindow({
     Title = Translator:text("Hexagon Client"),
-    Icon = "rbxassetid://130681274976406",
+    Icon = "rbxassetid://120545479757972",
     Author = "User · " .. LocalPlayer.DisplayName,
     Size = UDim2.fromOffset(550, 450),
     Transparent = true,
@@ -442,7 +442,7 @@ local Window = WindUI:CreateWindow({
 
     OpenButton = {
         Title = "Hexagon",
-    	Icon = "rbxassetid://130681274976406",
+    	Icon = "rbxassetid://120545479757972",
         CornerRadius = UDim.new(0,15),
         StrokeThickness = 2,
         Enabled = true,
@@ -461,7 +461,7 @@ local function newNotify(title, msg, duration, icon)
     	Title = title,
     	Content = msg,
     	Duration = duration or 3,
-    	Icon = icon or "rbxassetid://130681274976406",
+    	Icon = icon or "rbxassetid://120545479757972",
 	})
 end
 
@@ -566,7 +566,7 @@ InfoTab:Space()
 
 InfoTab:Section({
     Title =  [[Hexagon Client aims to be a reliable and secure option for you, compared to other alternatives.
-Developed by Nova (Owner of @Roun95, Co-owner of @Deluxe_Studios).
+Developed by Nova (Owner @Roun95, Co-owner @Deluxe_Studios).
 Offering you an innovative, user-friendly, and simple design, along with a variety of innovative, useful, and reliable options.]],
     TextSize = 18,
     TextTransparency = .35,
@@ -656,8 +656,8 @@ PlayerTab:Toggle({
     end
 })
 
-local ResetValuesTab
-ResetValuesTab = PlayerTab:Button({
+local ResetValuesBtn
+ResetValuesBtn = PlayerTab:Button({
 	Title = Translator:text("Reset Values"),
     Icon = "chevron-right",
     Default = false,
@@ -671,7 +671,7 @@ ResetValuesTab = PlayerTab:Button({
     end
     Workspace.Gravity = 196.2
     infJumpEnabled = false
-    ResetValuesTab:Highlight()
+    ResetValuesBtn:Highlight()
     end
 })
 
@@ -1946,10 +1946,6 @@ local function findPlayerByPartialName(partial)
     return nil
 end
 
-local function headsitNotify(player)
-	newNotify("Player selected", player.Name .. " selected", 5, Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100))
-end
-
 TrollTab:Input({
     Title = Translator:text("Headsit Player"),
     Desc = "Enter part of the player name",
@@ -1957,7 +1953,7 @@ TrollTab:Input({
     local foundPlayer = findPlayerByPartialName(Value)
         if foundPlayer then
             selectedPlayerName = foundPlayer.Name
-            headsitNotify(foundPlayer)
+	newNotify("Player selected", foundPlayer.Name .. " selected", 5, Players:GetUserThumbnailAsync(foundPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100))
         else
             newNotify("No player found with that name")
         end
@@ -3935,9 +3931,7 @@ end
 AdminTab:Paragraph({
     Title = "Hexagon Client (Admin Access)",
     Desc = "To unlock this area, Contact us on Discord",
-    -- Thumbnail = "rbxassetid://130681274976406",
-    -- ThumbnailSize = 300,
-    Image = "rbxassetid://130681274976406",
+    Image = "rbxassetid://120545479757972",
     ImageSize = 64
 })
 

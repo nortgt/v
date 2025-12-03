@@ -4,13 +4,13 @@ local function HXShield()
   for spyId, spyName in pairs(CoreGui:GetChildren()) do
     local Detect = spyName.Name:lower()
     if Detect:find("spy") or Detect:find("simple") or Detect:find("executed") then
-      LocalPlayer:Kick("HEXAGON SHIELD")
+      LocalPlayer:Kick("🛡️ HEXAGON SHIELD: Threat Detected 🗡️")
     end
   end
   for spyId, spyName in pairs(getgenv()) do
     local Detect = tostring(spyId):lower()
     if Detect:find("spy") or Detect:find("simple") then
-      LocalPlayer:Kick("HEXAGON SHIELD")
+      LocalPlayer:Kick("🛡️ HEXAGON SHIELD: Threat Detected 🗡️")
     end
   end
 end

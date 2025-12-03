@@ -1,3 +1,85 @@
+local r0_0 = game:GetService("Players")
+local r1_0 = game:GetService("CoreGui")
+local r2_0 = r0_0.LocalPlayer
+local function r3_0()
+  -- line: [0, 0] id: 165
+  for r3_165, r4_165 in pairs(r1_0:GetChildren()) do
+    local r5_165 = r4_165.Name:lower()
+    if r5_165:find("spy") or r5_165:find("simple") or r5_165:find("executed") then
+      r2_0:Kick("�ي امشي منا")
+    end
+  end
+  for r3_165, r4_165 in pairs(getgenv()) do
+    local r5_165 = tostring(r3_165):lower()
+    if r5_165:find("spy") or r5_165:find("simple") then
+      r2_0:Kick("�ي امشي منا")
+    end
+  end
+end
+r3_0()
+r1_0.ChildAdded:Connect(r3_0)
+task.spawn(function()
+  -- line: [0, 0] id: 6
+  while task.wait(1) do
+    r3_0()
+  end
+end)
+local r4_0 = game.Players.LocalPlayer
+local r5_0 = r4_0:FindFirstChild("PlayerGui")
+if not r5_0 then
+  return 
+end
+Instance.new("ScreenGui").Parent = r5_0
+local r7_0 = Instance.new("ImageLabel")
+r7_0.Parent = r6_0
+r7_0.Size = UDim2.new(0, 0, 0, 0)
+r7_0.Position = UDim2.new(0.5, 0, 0.5, 0)
+r7_0.AnchorPoint = Vector2.new(0.5, 0.5)
+r7_0.BackgroundTransparency = 1
+r7_0.Image = "rbxassetid://13879097036"
+r7_0.ScaleType = Enum.ScaleType.Fit
+r7_0.ImageTransparency = 0
+r7_0.BorderSizePixel = 0
+local r8_0 = Instance.new("Sound")
+r8_0.SoundId = "rbxassetid://1592708450"
+r8_0.Parent = r4_0.Character or r4_0:WaitForChild("Character")
+r8_0:Play()
+local r9_0 = 4.2
+local r10_0 = 2
+local r11_0 = 0
+local r12_0 = 12
+local r13_0 = 0.2
+local r14_0 = 1.5
+local r15_0 = game:GetService("RunService")
+local function r17_0()
+  -- line: [0, 0] id: 102
+  local r0_102 = tick()
+  while tick() - r0_102 < r10_0 do
+    local r1_102 = (tick() - r0_102) / r10_0
+    r7_0.Size = UDim2.new(r1_102, 0, r1_102, 0)
+    task.wait(0.01)
+  end
+  r7_0.Size = UDim2.new(1, 0, 1, 0)
+end
+task.spawn(function()
+  -- line: [0, 0] id: 135
+  local r0_135 = tick()
+  while r7_0.Parent do
+    local r1_135 = tick() - r0_135
+    local r2_135 = r9_0 - r1_135
+    if r1_135 < r9_0 - r14_0 and r11_0 < r12_0 then
+      r11_0 = r11_0 + r13_0
+    elseif r11_0 > 0 then
+      r11_0 = r11_0 - r13_0
+    end
+    r7_0.Rotation = r7_0.Rotation + r11_0
+    task.wait(0.0001)
+  end
+end)
+task.spawn(r17_0)
+task.wait(r9_0)
+r6_0:Destroy()
+
 local Players, RunService, ReplicatedStorage, StarterGui, UIS = game:GetService("Players"), game:GetService("RunService"), game:GetService("ReplicatedStorage"), game:GetService("StarterGui"), game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()

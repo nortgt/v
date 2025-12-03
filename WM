@@ -438,21 +438,21 @@ for _, plr in ipairs(Players:GetPlayers()) do
     end
 end
 
-local Translator = {}
+local translator = {}
 
-Translator.Text = loadstring(game:HttpGet("https://raw.githubusercontent.com/nxvap/Hexagon/main/main/translations.lua"))()
+translator.Text = loadstring(game:HttpGet("https://raw.githubusercontent.com/nxvap/Hexagon/main/main/translations.lua"))()
 
 local lang = (LocalPlayer.LocaleId or "en-US"):sub(1, 2):lower()
-if not Translator.Text[lang] then lang = "en" end
-Translator.Lang = lang
+if not translator.Text[lang] then lang = "en" end
+translator.Lang = lang
 
-function Translator:text(msg)
+function translator:Text(msg)
 return self.Text[self.Lang][msg] or msg
 end
 
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Window = WindUI:CreateWindow({
-    Title = Translator:text("Hexagon Client"),
+    Title = translator:Text("Hexagon Client"),
     Icon = "rbxassetid://120545479757972",
     Author = "User · " .. LocalPlayer.DisplayName,
     Size = UDim2.fromOffset(550, 450),
@@ -484,60 +484,60 @@ local function newNotify(title, msg, duration, icon)
 	})
 end
 
-newNotify(Translator:text("Welcome to Hexagon Client"), "Created by @Roun95", 10, Players:GetUserThumbnailAsync(Players:GetUserIdFromNameAsync("Roun95"), Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100))
+newNotify(translator:Text("Welcome to Hexagon Client"), "Created by @Roun95", 10, Players:GetUserThumbnailAsync(Players:GetUserIdFromNameAsync("Roun95"), Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100))
 
 local InfoTab = Window:Tab({
-    Title = Translator:text("Info"),
+    Title = translator:Text("Info"),
     Icon = "info",
     Locked = false,
 })
 local PlayerTab = Window:Tab({
-    Title = Translator:text("Player"),
+    Title = translator:Text("Player"),
     Icon = "user",
     Locked = false,
 })
 local AvatarTab = Window:Tab({
-    Title = Translator:text("Avatar"),
+    Title = translator:Text("Avatar"),
     Icon = "tag",
     Locked = false,
 })
 local ProfileTab = Window:Tab({
-    Title = Translator:text("Profile"),
+    Title = translator:Text("Profile"),
     Icon = "pencil",
     Locked = false,
 })
 local MusicTab = Window:Tab({
-    Title = Translator:text("Music"),
+    Title = translator:Text("Music"),
     Icon = "music",
     Locked = false,
 })
 local TrollTab = Window:Tab({
-    Title = Translator:text("Troll"),
+    Title = translator:Text("Troll"),
     Icon = "ghost",
     Locked = false,
 })
 local ScriptsTab = Window:Tab({
-    Title = Translator:text("Scripts"),
+    Title = translator:Text("Scripts"),
     Icon = "scroll",
     Locked = false,
 })
 local PremiumTab = Window:Tab({
-    Title = Translator:text("Premium"),
+    Title = translator:Text("Premium"),
     Icon = "sparkles",
     Locked = false,
 })
 local TeleportTab = Window:Tab({
-    Title = Translator:text("Teleport"),
+    Title = translator:Text("Teleport"),
     Icon = "pin",
     Locked = false,
 })
 local ProtectionTab = Window:Tab({
-    Title = Translator:text("Protection"),
+    Title = translator:Text("Protection"),
     Icon = "shield",
     Locked = false,
 })
 local AdminTab = Window:Tab({
-    Title = Translator:text("Admin"),
+    Title = translator:Text("Admin"),
     Icon = "crown",
     Locked = false,
 })
@@ -546,7 +546,7 @@ local AdminTab = Window:Tab({
 -- INFO
 -- ==============================
 
-InfoTab:Section({Title = Translator:text("Info"), Icon = "info", Opened = true})
+InfoTab:Section({Title = translator:Text("Info"), Icon = "info", Opened = true})
 
 InfoTab:Image({
     Image = "https://raw.githubusercontent.com/nxvap/Hexagon/main/img/banner.png",
@@ -566,13 +566,13 @@ InfoTab:Space()
 
 InfoTab:Paragraph({
     Title = "Hexagon Community",
-    Desc = Translator:text("Join the Discord official"),
+    Desc = translator:Text("Join the Discord official"),
     Image = "https://raw.githubusercontent.com/nxvap/Hexagon/main/img/icon.png",
     Thumbnail = "",
     ImageSize = 48,
     Buttons = {
         {
-            Title = Translator:text("Copy Discord link"),
+            Title = translator:Text("Copy Discord link"),
             Icon = "link",
             Callback = function()
                 setclipboard("https://discord.gg/Q9R5FDapth")
@@ -605,10 +605,10 @@ Credits: Nova]],
 -- PLAYER
 -- ==============================
 
-PlayerTab:Section({Title = Translator:text("Player"), Icon = "user"})
+PlayerTab:Section({Title = translator:Text("Player"), Icon = "user"})
 
 PlayerTab:Slider({
-    Title = Translator:text("Speed"),
+    Title = translator:Text("Speed"),
 	Step = 1,
     Value = {
         Min = 1,
@@ -627,7 +627,7 @@ PlayerTab:Slider({
 })
 
 PlayerTab:Slider({
-    Title = Translator:text("JumpPower"),
+    Title = translator:Text("JumpPower"),
 	Step = 1,
     Value = {
         Min = 1,
@@ -646,7 +646,7 @@ PlayerTab:Slider({
 })
 
 PlayerTab:Slider({
-    Title = Translator:text("Gravity"),
+    Title = translator:Text("Gravity"),
 	Step = 1,
     Value = {
         Min = 1,
@@ -669,7 +669,7 @@ UIS.JumpRequest:Connect(function()
 end)
 
 PlayerTab:Toggle({
-	Title = Translator:text("Infinite Jump"),
+	Title = translator:Text("Infinite Jump"),
     Default = false,
     Callback = function(Value)
        infJumpEnabled = Value
@@ -678,7 +678,7 @@ PlayerTab:Toggle({
 
 local ResetValuesBtn
 ResetValuesBtn = PlayerTab:Button({
-	Title = Translator:text("Reset Values"),
+	Title = translator:Text("Reset Values"),
     Icon = "chevron-right",
     Default = false,
     Callback = function()
@@ -717,7 +717,7 @@ local function voidProtection(rootPart)
 end
 
 PlayerTab:Toggle({
-	Title = Translator:text("Ultimate Noclip"),
+	Title = translator:Text("Ultimate Noclip"),
     Default = false,
     Callback = function(state)
     UltimateNoclip.Enabled = state
@@ -740,12 +740,12 @@ PlayerTab:Toggle({
 end
 })
 
-PlayerTab:Section({Title = Translator:text("Change Fov"), Icon = "user"})
+PlayerTab:Section({Title = translator:Text("Change Fov"), Icon = "user"})
 
 local fovValue = 70
 
 PlayerTab:Input({
-    Title = Translator:text("Fov Player"),
+    Title = translator:Text("Fov Player"),
     Desc = "Enter part of the player name",
     Callback = function(Value)
 		fovValue = tonumber(Value) or 70
@@ -753,7 +753,7 @@ PlayerTab:Input({
 })
 
 PlayerTab:Button({
-	Title = Translator:text("Adjust Fov"),
+	Title = translator:Text("Adjust Fov"),
     Icon = "chevron-right",
     Default = false,
     Callback = function()
@@ -771,7 +771,7 @@ PlayerTab:Button({
 local Remotes = ReplicatedStorage.Remotes
 local Wear, ChangeCharacterBody = Remotes.Wear, Remotes.ChangeCharacterBody
 
-AvatarTab:Section({Title = Translator:text("Copy Character"), Icon = "tag"})
+AvatarTab:Section({Title = translator:Text("Copy Character"), Icon = "tag"})
 
 local PlayerValue
 local Target = nil
@@ -787,7 +787,7 @@ local function getPlayerNames()
 end
 
 local updateList = AvatarTab:Dropdown({
-    Title = Translator:text("Select Player"),
+    Title = translator:Text("Select Player"),
     Values = getPlayerNames(),
     Callback = function(playername)
         PlayerValue = playername
@@ -800,7 +800,7 @@ local function updatePlayers()
 end
 
 AvatarTab:Button({
-    Title = Translator:text("Update List"),
+    Title = translator:Text("Update List"),
     Icon = "chevron-right",
     Callback = function()
     updatePlayers()
@@ -810,7 +810,7 @@ Players.PlayerAdded:Connect(updatePlayers)
 Players.PlayerRemoving:Connect(updatePlayers)
 
 AvatarTab:Button({
-    Title = Translator:text("Copy Character"),
+    Title = translator:Text("Copy Character"),
     Icon = "chevron-right",
     Callback = function()
         if not Target then return end
@@ -874,7 +874,7 @@ AvatarTab:Button({
 	end
 })
 
-AvatarTab:Section({Title = Translator:text("Character Clothing"), Icon = "tag"})
+AvatarTab:Section({Title = translator:Text("Character Clothing"), Icon = "tag"})
 
 local function equipClothes(clothesID, clothesName)
     local args = { clothesID }
@@ -938,7 +938,7 @@ AvatarTab:Button({
     end
 })
 
-AvatarTab:Section({Title = Translator:text("Character Editor"), Icon = "tag"})
+AvatarTab:Section({Title = translator:Text("Character Editor"), Icon = "tag"})
 
 AvatarTab:Button({
     Title = "Invisible Character",
@@ -1069,7 +1069,7 @@ AvatarTab:Button({
 	end
 })
 
-AvatarTab:Section({Title = Translator:text("Advanced Character Editor"), Icon = "tags"})
+AvatarTab:Section({Title = translator:Text("Advanced Character Editor"), Icon = "tags"})
 
 bodyParts = {
     Torso = nil,
@@ -1170,13 +1170,13 @@ AvatarTab:Input({
     end
 })
 
-AvatarTab:Section({Title = Translator:text("Load Character Parts"), Icon = "tags"})
+AvatarTab:Section({Title = translator:Text("Load Character Parts"), Icon = "tags"})
 
 bodyPartSelected = "Head"
 
 AvatarTab:Dropdown({
-    Title = Translator:text("Select Body Part"),
-    Desc = Translator:text("Choose a part you want to equip"),
+    Title = translator:Text("Select Body Part"),
+    Desc = translator:Text("Choose a part you want to equip"),
     Values = {"Torso", "Right Arm", "Left Arm", "Right Leg", "Left Leg", "Head"},
 	Value = "Head",
     Callback = function(Value)
@@ -1186,8 +1186,8 @@ AvatarTab:Dropdown({
 })
 
 AvatarTab:Button({
-    Title = Translator:text("Equip Selected Part"),
-    Desc = Translator:text("Equip the selected body part"),
+    Title = translator:Text("Equip Selected Part"),
+    Desc = translator:Text("Equip the selected body part"),
     Icon = "chevron-right",
     Callback = function()
         local args = {
@@ -1229,8 +1229,8 @@ AvatarTab:Button({
 })
 
 AvatarTab:Button({
-    Title = Translator:text("Equip All Parts"),
-    Desc = Translator:text("Equip all selected body parts"),
+    Title = translator:Text("Equip All Parts"),
+    Desc = translator:Text("Equip all selected body parts"),
     Icon = "chevron-right",
     Callback = function()
         local noBodyPartSelected = bodyParts.Torso or bodyParts.RightArm or 
@@ -1267,7 +1267,7 @@ AvatarTab:Button({
     end
 })
 
-AvatarTab:Section({Title = Translator:text("Character Animation"), Icon = "film"})
+AvatarTab:Section({Title = translator:Text("Character Animation"), Icon = "film"})
 
 AvatarTab:Button({
     Title = "adidas Sports Animation Pack",
@@ -1384,7 +1384,7 @@ AvatarTab:Button({
 	end
 })
 
-AvatarTab:Section({Title = Translator:text("Advanced Animation Customizer"), Icon = "film"})
+AvatarTab:Section({Title = translator:Text("Advanced Animation Customizer"), Icon = "film"})
 
 local idleAnim = {
     {Name = "adidas Sport", ID = 18538150608},
@@ -1400,7 +1400,7 @@ for _, idAnim in ipairs(idleAnim) do
 end
 
 AvatarTab:Dropdown({
-    Title = Translator:text("Select Idle Animation"),
+    Title = translator:Text("Select Idle Animation"),
     Values = idleAnimName,
 	Value = idleAnimName[1],
     Callback = function(value)
@@ -1414,7 +1414,7 @@ AvatarTab:Dropdown({
 })
 
 AvatarTab:Button({
-	Title = Translator:text("Equip Idle Animation"),
+	Title = translator:Text("Equip Idle Animation"),
     Icon = "chevron-right",
     Callback = function()
 	    if idAnimID then
@@ -1437,7 +1437,7 @@ for _, waAnim in ipairs(walkAnim) do
 end
 
 AvatarTab:Dropdown({
-    Title = Translator:text("Select Walk Animation"),
+    Title = translator:Text("Select Walk Animation"),
     Values = walkAnimName,
 	Value = walkAnimName[1],
     Callback = function(value)
@@ -1451,7 +1451,7 @@ AvatarTab:Dropdown({
 })
 
 AvatarTab:Button({
-	Title = Translator:text("Equip Walk Animation"),
+	Title = translator:Text("Equip Walk Animation"),
     Icon = "chevron-right",
     Callback = function()
 	    if waAnimID then
@@ -1474,7 +1474,7 @@ for _, ruAnim in ipairs(runAnim) do
 end
 
 AvatarTab:Dropdown({
-    Title = Translator:text("Select Run Animation"),
+    Title = translator:Text("Select Run Animation"),
     Values = runAnimName,
 	Value = runAnimName[1],
     Callback = function(value)
@@ -1488,7 +1488,7 @@ AvatarTab:Dropdown({
 })
 
 AvatarTab:Button({
-	Title = Translator:text("Equip Run Animation"),
+	Title = translator:Text("Equip Run Animation"),
     Icon = "chevron-right",
     Callback = function()
 	    if ruAnimID then
@@ -1511,7 +1511,7 @@ for _, juAnim in ipairs(jumpAnim) do
 end
 
 AvatarTab:Dropdown({
-    Title = Translator:text("Select Jump Animation"),
+    Title = translator:Text("Select Jump Animation"),
     Values = jumpAnimName,
 	Value = jumpAnimName[1],
     Callback = function(value)
@@ -1525,7 +1525,7 @@ AvatarTab:Dropdown({
 })
 
 AvatarTab:Button({
-	Title = Translator:text("Equip Jump Animation"),
+	Title = translator:Text("Equip Jump Animation"),
     Icon = "chevron-right",
     Callback = function()
 	    if juAnimID then
@@ -1548,7 +1548,7 @@ for _, faAnim in ipairs(fallAnim) do
 end
 
 AvatarTab:Dropdown({
-    Title = Translator:text("Select Fall Animation"),
+    Title = translator:Text("Select Fall Animation"),
     Values = fallAnimName,
 	Value = fallAnimName[1],
     Callback = function(value)
@@ -1562,7 +1562,7 @@ AvatarTab:Dropdown({
 })
 
 AvatarTab:Button({
-	Title = Translator:text("Equip Fall Animation"),
+	Title = translator:Text("Equip Fall Animation"),
     Icon = "chevron-right",
     Callback = function()
 	    if faAnimID then
@@ -1585,7 +1585,7 @@ for _, clAnim in ipairs(climbAnim) do
 end
 
 AvatarTab:Dropdown({
-    Title = Translator:text("Select Climb Animation"),
+    Title = translator:Text("Select Climb Animation"),
     Values = climbAnimName,
 	Value = climbAnimName[1],
     Callback = function(value)
@@ -1599,7 +1599,7 @@ AvatarTab:Dropdown({
 })
 
 AvatarTab:Button({
-	Title = Translator:text("Equip Climb Animation"),
+	Title = translator:Text("Equip Climb Animation"),
     Icon = "chevron-right",
     Callback = function()
 	    if clAnimID then
@@ -1622,7 +1622,7 @@ for _, swAnim in ipairs(swimAnim) do
 end
 
 AvatarTab:Dropdown({
-    Title = Translator:text("Select Swim Animation"),
+    Title = translator:Text("Select Swim Animation"),
     Values = swimAnimName,
 	Value = swimAnimName[1],
     Callback = function(value)
@@ -1636,7 +1636,7 @@ AvatarTab:Dropdown({
 })
 
 AvatarTab:Button({
-	Title = Translator:text("Equip Swim Animation"),
+	Title = translator:Text("Equip Swim Animation"),
     Icon = "chevron-right",
     Callback = function()
 	    if swAnimID then
@@ -1649,7 +1649,7 @@ AvatarTab:Button({
 -- PROFILE
 -- ==============================
 
-ProfileTab:Section({Title = Translator:text("Names"), Icon = "pencil"})
+ProfileTab:Section({Title = translator:Text("Names"), Icon = "pencil"})
 
 local names = {
     {"ＨＥＸＡＧＯＮ ＨＵＢ::", " ＨＥＸＡＧＯＮ ＨＵＢ:: "},
@@ -1675,7 +1675,7 @@ end
 -- MUSIC
 -- ==============================
 
-MusicTab:Section({Title = Translator:text("Server Audio Player"), Icon = "music"})
+MusicTab:Section({Title = translator:Text("Server Audio Player"), Icon = "music"})
 
 local audios = {
     {Name = "Amongus sound", ID = 6651571134},
@@ -1705,7 +1705,7 @@ for _, audio in ipairs(audios) do
 end
 
 MusicTab:Dropdown({
-    Title = Translator:text("Select Audio"),
+    Title = translator:Text("Select Audio"),
     Values = audioNames,
 	Value = audioNames[1],
     Callback = function(value)
@@ -1753,7 +1753,7 @@ local function playAudio()
 end
 
 MusicTab:Button({
-	Title = Translator:text("Play Audio"),
+	Title = translator:Text("Play Audio"),
     Icon = "chevron-right",
     Callback = function()
 	    if audioID then
@@ -1763,7 +1763,7 @@ MusicTab:Button({
 })
 
 MusicTab:Toggle({
-	Title = Translator:text("Loop Audio"),
+	Title = translator:Text("Loop Audio"),
     Default = false,
     Callback = function(value)
         audioLoop = value
@@ -1777,7 +1777,7 @@ MusicTab:Toggle({
 -- TROLL
 -- ==============================
 
-TrollTab:Section({Title = Translator:text("Player"), Icon = "user"})
+TrollTab:Section({Title = translator:Text("Player"), Icon = "user"})
 
 local PlayerValue
 local Target = nil
@@ -1793,7 +1793,7 @@ local function getPlayerNames()
 end
 
 local updateList = TrollTab:Dropdown({
-    Title = Translator:text("Select Player"),
+    Title = translator:Text("Select Player"),
     Values = getPlayerNames(),
     Callback = function(playername)
         PlayerValue = playername
@@ -1806,7 +1806,7 @@ local function updatePlayers()
 end
 
 TrollTab:Button({
-    Title = Translator:text("Update List"),
+    Title = translator:Text("Update List"),
     Icon = "chevron-right",
     Callback = function()
     updatePlayers()
@@ -1818,7 +1818,7 @@ Players.PlayerRemoving:Connect(updatePlayers)
 ViewTargetActive = false
 
 TrollTab:Toggle({
-    Title = Translator:text("View Player"),
+    Title = translator:Text("View Player"),
     Desc = "View camera of selected player",
     Value = false,
     Callback = function(state)
@@ -1842,7 +1842,7 @@ TrollTab:Toggle({
 })
 
 TrollTab:Button({
-	Title = Translator:text("TP Player"),
+	Title = translator:Text("TP Player"),
     Desc = "Teleport to the selected player",
     Icon = "chevron-right",
     Default = false,
@@ -1887,7 +1887,7 @@ local function stopGlue()
 end
 
 TrollTab:Toggle({
-    Title = Translator:text("Glue Player"),
+    Title = translator:Text("Glue Player"),
     Desc = "You attach yourseft behind the selected player",
     Value = false,
     Callback = function(toggled)
@@ -1957,7 +1957,7 @@ local function findPlayerByPartialName(partial)
 end
 
 TrollTab:Input({
-    Title = Translator:text("Headsit Player"),
+    Title = translator:Text("Headsit Player"),
     Desc = "Enter part of the player name",
     Callback = function(Value)
     local foundPlayer = findPlayerByPartialName(Value)
@@ -1971,7 +1971,7 @@ TrollTab:Input({
 })
 
 TrollTab:Button({
-    Title = Translator:text("Headsit Toggle"),
+    Title = translator:Text("Headsit Toggle"),
     Desc = "Toggles on and off sitting on the selected player's head",
     Icon = "circle-small",
     Callback = function()
@@ -2031,14 +2031,14 @@ local function toggleInvisibility()
 end
 
 TrollTab:Button({
-    Title = Translator:text("Invisible Toggle"),
+    Title = translator:Text("Invisible Toggle"),
     Desc = "turn your character into a ghost, Invisible to everyone",
     Icon = "circle-small",
     Callback = function()
 	toggleInvisibility()
 end})
 
-TrollTab:Section({Title = Translator:text("ESP"), Icon = "user"})
+TrollTab:Section({Title = translator:Text("ESP"), Icon = "user"})
 
 local billboardGuis = {}
 local connections = {}
@@ -2046,7 +2046,7 @@ local espEnabled = false
 local selectedColor = "RGB"
 
 TrollTab:Dropdown({
-    Title = Translator:text("Select Color"),
+    Title = translator:Text("Select Color"),
 	Value = "RGB",
     Values = {
         "RGB", "Black", "White", "Red",
@@ -2123,7 +2123,7 @@ local function removeESP(player)
 end
 
 TrollTab:Toggle({
-	Title = Translator:text("ESP Players"),
+	Title = translator:Text("ESP Players"),
     Desc = "Creates a tag above each player on the server",
     Callback = function(value)
     espEnabled = value
@@ -2174,7 +2174,7 @@ TrollTab:Toggle({
 end
 })
 
-TrollTab:Section({Title = Translator:text("Troll Child"), Icon = "user"})
+TrollTab:Section({Title = translator:Text("Troll Child"), Icon = "user"})
 
 local PlayerValue
 local Target = nil
@@ -2190,7 +2190,7 @@ local function getPlayerNames()
 end
 
 local updateList = TrollTab:Dropdown({
-    Title = Translator:text("Select Player"),
+    Title = translator:Text("Select Player"),
     Values = getPlayerNames(),
     Callback = function(playername)
         PlayerValue = playername
@@ -2203,7 +2203,7 @@ local function updatePlayers()
 end
 
 TrollTab:Button({
-    Title = Translator:text("Update List"),
+    Title = translator:Text("Update List"),
     Icon = "chevron-right",
     Callback = function()
     updatePlayers()
@@ -2213,7 +2213,7 @@ Players.PlayerAdded:Connect(updatePlayers)
 Players.PlayerRemoving:Connect(updatePlayers)
 
 TrollTab:Button({
-    Title = Translator:text("Send Child"),
+    Title = translator:Text("Send Child"),
     Icon = "chevron-right",
     Callback = function()
         if not Target then
@@ -2266,7 +2266,7 @@ TrollTab:Button({
 })
 
 TrollTab:Button({
-    Title = Translator:text("Return Child"),
+    Title = translator:Text("Return Child"),
     Icon = "chevron-right",
     Callback = function()
         if rawget(getgenv(), "RunService") then
@@ -2292,10 +2292,10 @@ TrollTab:Button({
     end
 })
 
-TrollTab:Section({Title = Translator:text("House"), Icon = "house"})
+TrollTab:Section({Title = translator:Text("House"), Icon = "house"})
 
 TrollTab:Button({
-    Title = Translator:text("Unban all houses"),
+    Title = translator:Text("Unban all houses"),
     Desc = "it automatically unbans you from all banned houses",
     Icon = "chevron-right",
     Callback = function()
@@ -2339,7 +2339,7 @@ TrollTab:Button({
     end
 })
 
-TrollTab:Section({Title = Translator:text("Troll Scripts"), Icon = "file-code"})
+TrollTab:Section({Title = translator:Text("Troll Scripts"), Icon = "file-code"})
 
 TrollTab:Button({
     Title = "Bring Parts",
@@ -2359,7 +2359,7 @@ TrollTab:Button({
 	end
 })
 
-TrollTab:Section({Title = Translator:text("Troll Tools"), Icon = "hexagon"})
+TrollTab:Section({Title = translator:Text("Troll Tools"), Icon = "hexagon"})
 
 local CFlingDoorsHL
 CFlingDoorsHL = TrollTab:Button({
@@ -2963,7 +2963,7 @@ KillCouchHL:Highlight()
 end
 })
 
-TrollTab:Section({Title = Translator:text("Troll Options"), Icon = "ghost"})
+TrollTab:Section({Title = translator:Text("Troll Options"), Icon = "ghost"})
 
 local SkyboxHL
 SkyboxHL = TrollTab:Button({
@@ -3061,10 +3061,10 @@ SkyboxHL = TrollTab:Button({
     end
 })
 
-TrollTab:Section({Title = Translator:text("Spam Commands"), Icon = "file-stack"})
+TrollTab:Section({Title = translator:Text("Spam Commands"), Icon = "file-stack"})
 
 TrollTab:Toggle({
-	Title = Translator:text("Canoes Spam"),
+	Title = translator:Text("Canoes Spam"),
     Desc = "You invade the beginning with many canoes (by Bruton)",
     Default = false,
     Callback = function(state)
@@ -3106,7 +3106,7 @@ TrollTab:Toggle({
 -- SCRIPTS
 -- ==============================
 
-ScriptsTab:Section({Title = Translator:text("Graphics"), Icon = "monitor-cog"})
+ScriptsTab:Section({Title = translator:Text("Graphics"), Icon = "monitor-cog"})
 
 ScriptsTab:Button({
     Title = "Shaders RTX",
@@ -3126,7 +3126,7 @@ ScriptsTab:Button({
 	end
 })
 
-ScriptsTab:Section({Title = Translator:text("Player"), Icon = "user"})
+ScriptsTab:Section({Title = translator:Text("Player"), Icon = "user"})
 
 ScriptsTab:Button({
     Title = "Fly Gui V3",
@@ -3155,7 +3155,7 @@ ScriptsTab:Button({
 	end
 })
 
-ScriptsTab:Section({Title = Translator:text("Animation"), Icon = "film"})
+ScriptsTab:Section({Title = translator:Text("Animation"), Icon = "film"})
 
 ScriptsTab:Button({
     Title = "AFEM Max",
@@ -3188,7 +3188,7 @@ ScriptsTab:Button({
 -- PREMIUM
 -- ==============================
 
-PremiumTab:Section({Title = Translator:text("Vehicle Speed Unlocker"), Icon = "sparkles"})
+PremiumTab:Section({Title = translator:Text("Vehicle Speed Unlocker"), Icon = "sparkles"})
 
 local speedValue = 200
 local turboValue = 20
@@ -3266,7 +3266,7 @@ local function applyToAllCars(valueType, value)
 end
 
 PremiumTab:Input({
-    Title = Translator:text("Speed Value"),
+    Title = translator:Text("Speed Value"),
     Desc = "Enter a value to apply to the vehicle",
     Callback = function(Value)
         local numValue = tonumber(Value)
@@ -3280,7 +3280,7 @@ PremiumTab:Input({
 })
 
 PremiumTab:Input({
-    Title = Translator:text("Turbo Value"),
+    Title = translator:Text("Turbo Value"),
     Desc = "Enter a value to apply to the vehicle",
     Callback = function(Value)
         local numValue = tonumber(Value)
@@ -3294,7 +3294,7 @@ PremiumTab:Input({
 })
 
 PremiumTab:Button({
-    Title = Translator:text("Apply Speed"),
+    Title = translator:Text("Apply Speed"),
     Icon = "chevron-right",
     Callback = function()
         newNotify("✅ Success", "Speed Applied " .. speedValue .. " in all cars")
@@ -3303,7 +3303,7 @@ PremiumTab:Button({
 })
 
 PremiumTab:Button({
-    Title = Translator:text("Apply Turbo"),
+    Title = translator:Text("Apply Turbo"),
     Icon = "chevron-right",
     Callback = function()
         newNotify("✅ Success", "Turbo Applied " .. turboValue .. " in all cars")
@@ -3311,7 +3311,7 @@ PremiumTab:Button({
     end
 })
 
-PremiumTab:Section({Title = Translator:text("Limited Items Unlocker"), Icon = "sparkles"})
+PremiumTab:Section({Title = translator:Text("Limited Items Unlocker"), Icon = "sparkles"})
 
 local function limitedItems(name)
 	RE["1Playe1rTrigge1rEven1t"]:FireServer("AcceptedToolToServer", name, game:GetService("Players").LocalPlayer)
@@ -3343,7 +3343,7 @@ PremiumTab:Button({
 	end
 })
 
-PremiumTab:Section({Title = Translator:text("VIP Particles Unlocker"), Icon = "sparkles"})
+PremiumTab:Section({Title = translator:Text("VIP Particles Unlocker"), Icon = "sparkles"})
 
 PremiumTab:Button({
     Title = "VIP Particle Giver",
@@ -3359,7 +3359,7 @@ PremiumTab:Button({
 -- TELEPORTS
 -- ==============================
 
-TeleportTab:Section({Title = Translator:text("Teleports"), Icon = "pin"})
+TeleportTab:Section({Title = translator:Text("Teleports"), Icon = "pin"})
 
 local sites = {
     {"Hill", CFrame.new(-348.64, 65.94, -458.08)},
@@ -3387,7 +3387,7 @@ end
 -- PROTECTION
 -- ==============================
 
-ProtectionTab:Section({Title = Translator:text("Protection"), Icon = "shield"})
+ProtectionTab:Section({Title = translator:Text("Protection"), Icon = "shield"})
 
 local antiSitConnection = nil
 local antiSitEnabled = false
@@ -3697,7 +3697,7 @@ end)
 -- ADMIN
 -- ==============================
 
-AdminTab:Section({Title = Translator:text("Admin Commands"), Icon = "square-terminal" })
+AdminTab:Section({Title = translator:Text("Admin Commands"), Icon = "square-terminal" })
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")

@@ -1,25 +1,24 @@
-local r0_0 = game:GetService("Players")
-local r1_0 = game:GetService("CoreGui")
-local r2_0 = r0_0.LocalPlayer
-local function r3_0()
-  for r3_165, r4_165 in pairs(r1_0:GetChildren()) do
-    local r5_165 = r4_165.Name:lower()
-    if r5_165:find("spy") or r5_165:find("simple") or r5_165:find("executed") then
-      r2_0:Kick("�ي امشي منا")
+local CoreGui = game:GetService("CoreGui")
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local function HXShield()
+  for spyId, spyName in pairs(CoreGui:GetChildren()) do
+    local Detect = spyName.Name:lower()
+    if Detect:find("spy") or Detect:find("simple") or Detect:find("executed") then
+      LocalPlayer:Kick("HEXAGON SHIELD")
     end
   end
-  for r3_165, r4_165 in pairs(getgenv()) do
-    local r5_165 = tostring(r3_165):lower()
-    if r5_165:find("spy") or r5_165:find("simple") then
-      r2_0:Kick("�ي امشي منا")
+  for spyId, spyName in pairs(getgenv()) do
+    local Detect = tostring(spyId):lower()
+    if Detect:find("spy") or Detect:find("simple") then
+      LocalPlayer:Kick("HEXAGON SHIELD")
     end
   end
 end
-r3_0()
-r1_0.ChildAdded:Connect(r3_0)
+HXShield()
+CoreGui.ChildAdded:Connect(HXShield)
 task.spawn(function()
   while task.wait(1) do
-    r3_0()
+    HXShield()
   end
 end)
 

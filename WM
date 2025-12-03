@@ -4084,7 +4084,7 @@ Window:Tag({
 
 WindUI.TransparencyValue = 0.2
 WindUI:SetTheme("Midnight")
-WindUI.Background = "rbxassetid://102266309145667"
+WindUI.SetBackground = "rbxassetid://102266309145667"
 
 -- ==============================
 -- ADMIN ADDONS

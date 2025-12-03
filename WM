@@ -126,7 +126,7 @@ local country = convertCountry()
                 {name = "💻 Executor", value = identifyexecutor and identifyexecutor() or "Unknown", inline = false},
                 {name = "📌 Teleport", value = "game:GetService(\"TeleportService\"):TeleportToPlaceInstance("..placeId..", \""..jobId.."\")", inline = false},
             }
-        }}
+    	}}
     }
 
     local body = HttpService:JSONEncode(data)
@@ -1955,7 +1955,7 @@ TrollTab:Input({
             selectedPlayerName = foundPlayer.Name
 	newNotify("Player selected", foundPlayer.Name .. " selected", 5, Players:GetUserThumbnailAsync(foundPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100))
         else
-            newNotify("No player found with that name")
+            newNotify("Player not found", "No player found with that name")
         end
     end
 })
@@ -4058,6 +4058,10 @@ Window:Tag({
     Color = Color3.fromHex("#315dff")
 })
 
+WindUI.TransparencyValue = 0.2
+WindUI:SetTheme("Midnight")
+WindUI.Background = "rbxassetid://102266309145667"
+
 -- ==============================
 -- ADMIN ADDONS
 -- ==============================
@@ -4067,7 +4071,6 @@ AdminTab:Button({
     Desc = "Recreate Obito's Kamui with sounds and a throne",
 	Icon = "chevron-right",
     Callback = function()
--- Serviços
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")

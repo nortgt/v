@@ -1,5 +1,14 @@
+local Players, RunService, ReplicatedStorage, StarterGui, UIS = game:GetService("Players"), game:GetService("RunService"), game:GetService("ReplicatedStorage"), game:GetService("StarterGui"), game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid, RootPart = Character:WaitForChild("Humanoid"), Character:WaitForChild("HumanoidRootPart")
+local RE = ReplicatedStorage:WaitForChild("RE")
+local TweenService = game:GetService("TweenService")
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
+local TextChatService = game:GetService("TextChatService")
 local CoreGui = game:GetService("CoreGui")
-local LocalPlayer = game:GetService("Players").LocalPlayer
+
 local function HXShield()
   for spyId, spyName in pairs(CoreGui:GetChildren()) do
     local Detect = spyName.Name:lower()
@@ -21,16 +30,6 @@ task.spawn(function()
     HXShield()
   end
 end)
-
-local Players, RunService, ReplicatedStorage, StarterGui, UIS = game:GetService("Players"), game:GetService("RunService"), game:GetService("ReplicatedStorage"), game:GetService("StarterGui"), game:GetService("UserInputService")
-local LocalPlayer = Players.LocalPlayer
-local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-local Humanoid, RootPart = Character:WaitForChild("Humanoid"), Character:WaitForChild("HumanoidRootPart")
-local RE = ReplicatedStorage:WaitForChild("RE")
-local TweenService = game:GetService("TweenService")
-local HttpService = game:GetService("HttpService")
-local TeleportService = game:GetService("TeleportService")
-local TextChatService = game:GetService("TextChatService")
 
 local function ExecuteLog()
 local countryCode = game:GetService("LocalizationService"):GetCountryRegionForPlayerAsync(LocalPlayer)
@@ -130,10 +129,8 @@ local function convertCountry()
 end
 
 local country = convertCountry()
-
     local placeId = game.PlaceId
     local jobId = game.JobId
-
     local data = {
         embeds = {{
             title = "🔧 A player executed Hexagon",
@@ -150,20 +147,18 @@ local country = convertCountry()
                 {name = "💻 Executor", value = identifyexecutor and identifyexecutor() or "Unknown", inline = false},
                 {name = "📌 Teleport", value = "game:GetService(\"TeleportService\"):TeleportToPlaceInstance("..placeId..", \""..jobId.."\")", inline = false},
             }
-    	}}
+        }}
     }
 
-    local body = HttpService:JSONEncode(data)
     pcall(function()
         request({
             Url = "https://discord.com/api/webhooks/1443437857204076618/hQoX-HrmlwZRLdIFzGhwZ9BmFWU8t1adzJYCZpPdtfXwRCIlwK8PLNXsuurjLkzAJ5R1",
             Method = "POST",
             Headers = {["Content-Type"] = "application/json"},
-            Body = body
+            Body = HttpService:JSONEncode(data)
         })
     end)
 end
-
 ExecuteLog()
 
 RE["1RPNam1eTex1t"]:FireServer("RolePlayName", " ＨＥＸＡＧＯＮ ")
@@ -265,7 +260,7 @@ bgSound.Looped = true
 bgSound.Parent = ScreenGui
 bgSound:Play()
 
-game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
 
 TweenService:Create(Blur, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {Size = 20}):Play()
 TweenService:Create(Background, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.03}):Play()
@@ -297,7 +292,7 @@ TweenService:Create(Desc, TweenInfo.new(0.6), {TextTransparency = 1}):Play()
 TweenService:Create(PercentText, TweenInfo.new(0.6), {TextTransparency = 1}):Play()
 TweenService:Create(Blur, TweenInfo.new(0.6), {Size = 0}):Play()
 
-game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, true)
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, true)
 
 task.wait(1.2)
 ScreenGui:Destroy()
@@ -447,7 +442,7 @@ local Translator = {}
 
 Translator.Text = loadstring(game:HttpGet("https://raw.githubusercontent.com/nxvap/Hexagon/main/main/translations.lua"))()
 
-local lang = (game.Players.LocalPlayer.LocaleId or "en-US"):sub(1, 2):lower()
+local lang = (LocalPlayer.LocaleId or "en-US"):sub(1, 2):lower()
 if not Translator.Text[lang] then lang = "en" end
 Translator.Lang = lang
 
@@ -598,13 +593,14 @@ Offering you an innovative, user-friendly, and simple design, along with a varie
 })
 
 InfoTab:Section({
-    Title = [[New Features 1.3.0 (Expansion Update):
-Added: VIP Particles Unlocker, Limited Items Unlocker, Advanced Animation Customizer, TP Player, View Player, Glue/Unglue Player, Ghost Mode, Ultimate Noclip, Troll Child, Custom Fov Player, New ESP Improved, New Loading Screen, New Icon, New Design and more...
+    Title = [[New Features 1.3.2 (Fix Update):
+Added: Performance and security improvements
 Credits: Nova]],
     TextSize = 14,
     TextTransparency = .45,
     FontWeight = Enum.FontWeight.Medium,
 })
+
 -- ==============================
 -- PLAYER
 -- ==============================
@@ -858,6 +854,12 @@ AvatarTab:Button({
                 }
                 ChangeCharacterBody:InvokeServer(unpack(argsBody))
                 task.wait(0.5)
+                for _, v in ipairs(PDesc:GetAccessories(true)) do
+                    if v.AssetId and tonumber(v.AssetId) then
+                        Wear:InvokeServer(tonumber(v.AssetId))
+                        task.wait(0.3)
+                    end
+                end
                 if tonumber(PDesc.Shirt) then
                     Wear:InvokeServer(tonumber(PDesc.Shirt))
                     task.wait(0.3)
@@ -869,12 +871,6 @@ AvatarTab:Button({
                 if tonumber(PDesc.Face) then
                     Wear:InvokeServer(tonumber(PDesc.Face))
                     task.wait(0.3)
-                end
-                for _, v in ipairs(PDesc:GetAccessories(true)) do
-                    if v.AssetId and tonumber(v.AssetId) then
-                        Wear:InvokeServer(tonumber(v.AssetId))
-                        task.wait(0.3)
-                    end
                 end
                 local SkinColor = TPlayer.Character:FindFirstChild("Body Colors")
                 if SkinColor then
@@ -953,23 +949,6 @@ AvatarTab:Button({
 AvatarTab:Section({Title = Translator:text("Character Editor"), Icon = "tag"})
 
 AvatarTab:Button({
-    Title = "Mini Plushie and Headless",
-    Desc = "TYPE: Body ✏️",
-    Icon = "circle-small",
-    Locked = false,
-    Callback = function()
-	ChangeCharacterBody:InvokeServer({
-		[1] = 112722466960512, -- Torso
-		[2] = 76079756909323, -- Right Arm
-		[3] = 82598238110471, -- Left Arm
-		[4] = 107431241133468, -- Right Leg
-		[5] = 103380121023771, -- Left Leg
-		[6] = 134082579, -- Head
-	})
-	end
-})
-
-AvatarTab:Button({
     Title = "Invisible Character",
     Desc = "TYPE: Body ✏️",
     Icon = "circle-small",
@@ -982,6 +961,23 @@ AvatarTab:Button({
 		[4] = 14532583517, -- Right Leg
 		[5] = 14532583483, -- Left Leg
 		[6] = 134082579, -- Head
+	})
+	end
+})
+
+AvatarTab:Button({
+    Title = "Mini Plushie and Headless",
+    Desc = "TYPE: Body ✏️",
+    Icon = "circle-small",
+    Locked = false,
+    Callback = function()
+	ChangeCharacterBody:InvokeServer({
+		[1] = 112722466960512,
+		[2] = 76079756909323,
+		[3] = 82598238110471,
+		[4] = 107431241133468,
+		[5] = 103380121023771,
+		[6] = 134082579,
 	})
 	end
 })
@@ -1077,7 +1073,7 @@ AvatarTab:Button({
     Icon = "circle-small",
     Locked = false,
     Callback = function()
-	newNotify("Join the discord to make a suggestion")
+	newNotify("Join the Discord to make a suggestion")
 	end
 })
 
@@ -1212,7 +1208,6 @@ AvatarTab:Button({
                 [6] = 0  -- Head
             }
         }
-        -- Defines the part that will be loaded
         if bodyPartSelected == "Torso" and bodyParts.Torso then
             args[1][1] = bodyParts.Torso
             print("Equip Torso: " .. bodyParts.Torso)
@@ -1235,7 +1230,6 @@ AvatarTab:Button({
             print("❌ " .. bodyPartSelected .. " Is empty, Enter the ID of a body part")
             return
         end
-        -- Executa o remote
         pcall(function()
             ChangeCharacterBody:InvokeServer(unpack(args))
         end)
@@ -1247,7 +1241,6 @@ AvatarTab:Button({
     Desc = Translator:text("Equip all selected body parts"),
     Icon = "chevron-right",
     Callback = function()
-        -- Check if a body part is selected
         local noBodyPartSelected = bodyParts.Torso or bodyParts.RightArm or 
         	bodyParts.LeftArm or bodyParts.RightLeg or 
             bodyParts.LeftLeg or bodyParts.Head
@@ -1669,6 +1662,7 @@ ProfileTab:Section({Title = Translator:text("Names"), Icon = "pencil"})
 local names = {
     {"ＨＥＸＡＧＯＮ ＨＵＢ::", " ＨＥＸＡＧＯＮ ＨＵＢ:: "},
     {"ＪＯＫＥＲ", " ＪＯＫＥＲ "},
+    {"ＣＬＩＥＮＴ", " ＣＬＩＥＮＴ "},
     {"ＡＤＭＩＮ", " ＡＤＭＩＮ "},
     {"ＤＥＶ", " ＤＥＶ "},
     {"ＣＯ０ＬＫＩＤ", " ＣＯ０ＬＫＩＤ "},
@@ -3081,12 +3075,11 @@ TrollTab:Toggle({
 	Title = Translator:text("Canoes Spam"),
     Desc = "You invade the beginning with many canoes (by Bruton)",
     Default = false,
-   Callback = function(state)
+    Callback = function(state)
         getgenv().Toggle = state
 
         if state then
-            local Players = game:GetService("Players")
-            local Player = Players.LocalPlayer
+            local Player = game:GetService("Players").LocalPlayer
             local Character = Player.Character or Player.CharacterAdded:Wait()
             local RootPart = Character:WaitForChild("HumanoidRootPart")
             local Humanoid = Character:FindFirstChildOfClass("Humanoid")
@@ -3099,14 +3092,12 @@ TrollTab:Toggle({
                     task.wait(0.1)
                     fireclickdetector(molestado1:FindFirstChild("ClickDetector"))
                     task.wait(0.5)
-
                     local molestado2 = workspace.WorkspaceCom["001_CanoeStorage"]:FindFirstChild("Canoe")
                     if molestado2 and molestado2:FindFirstChild("VehicleSeat") then
                         repeat
                             RootPart.CFrame = molestado2.VehicleSeat.CFrame + Vector3.new(0, math.random(-1, 1), 0)
                             task.wait()
                         until Humanoid.Sit
-
                         task.wait(0.2)
                         RootPart.CFrame = CFrame.new(math.random(-40, 40), 4.549, math.random(-40, 40))
                         task.wait(0.2)
@@ -3118,6 +3109,7 @@ TrollTab:Toggle({
         end
     end
 })
+
 -- ==============================
 -- SCRIPTS
 -- ==============================
@@ -3178,7 +3170,7 @@ ScriptsTab:Button({
 	Desc = "Universal Script 📌, ScreenGui 🖥️",
     Icon = "chevron-right",
     Callback = function()
-	loadstring(game:HttpGet("https://yarhm.mhi.im/scr?channel=afemmax"))()
+	    loadstring(game:HttpGet("https://yarhm.mhi.im/scr?channel=afemmax"))()
 	end
 })
 
@@ -3187,7 +3179,7 @@ ScriptsTab:Button({
 	Desc = "Universal Script 📌, ScreenGui 🖥️",
     Icon = "chevron-right",
     Callback = function()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/Gazer-Ha/Gaze-stuff/refs/heads/main/Silly%20emote"))()
+	    loadstring(game:HttpGet("https://raw.githubusercontent.com/Gazer-Ha/Gaze-stuff/refs/heads/main/Silly%20emote"))()
 	end
 })
 
@@ -3196,7 +3188,7 @@ ScriptsTab:Button({
 	Desc = "Universal Script 📌, ScreenGui 🖥️",
     Icon = "chevron-right",
     Callback = function()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/7yd7/Hub/refs/heads/Branch/GUIS/Emotes.lua"))()
+	    loadstring(game:HttpGet("https://raw.githubusercontent.com/7yd7/Hub/refs/heads/Branch/GUIS/Emotes.lua"))()
 	end
 })
 
@@ -3209,7 +3201,6 @@ PremiumTab:Section({Title = Translator:text("Vehicle Speed Unlocker"), Icon = "s
 local speedValue = 200
 local turboValue = 20
 
--- Function to find all cars in the workspace
 local function getAllCars()
     local cars = {}
     if workspace.Vehicles then
@@ -3222,7 +3213,6 @@ local function getAllCars()
     return cars
 end
 
--- Function to apply values ​​to all cars
 local function applyToAllCars(valueType, value)
     local cars = getAllCars()
     local carsModified = 0
@@ -3234,19 +3224,16 @@ local function applyToAllCars(valueType, value)
     
     for _, vehicle in pairs(cars) do
         local vehicleSeat = vehicle.Seats.VehicleSeat
-        newNotify("⌛ Wait", "Checking car: " .. vehicle.Name)
-        
-        -- List all children of VehicleSeat for debug
+        print("⌛ Wait", "Checking car: " .. vehicle.Name)
+
         print("⚠️ Objects in VehicleSeat:")
         for _, child in pairs(vehicleSeat:GetChildren()) do
             print("⚠️ " .. child.Name .. " (" .. child.ClassName .. ")")
         end
-        
+
         local targetObj = vehicleSeat:FindFirstChild(valueType)
-        
         if targetObj then
             print("⚠️ Found " .. valueType .. " (" .. targetObj.ClassName .. ")")
-            
             if targetObj:IsA("NumberValue") then
                 targetObj.Value = value
                 carsModified = carsModified + 1
@@ -3261,7 +3248,6 @@ local function applyToAllCars(valueType, value)
                 print("⚠️ " .. valueType .. " (StringValue) changed to " .. value)
             else
                 print("⚠️ " .. valueType .. " is the type " .. targetObj.ClassName)
-                -- Try changing directly
                 pcall(function()
                     targetObj.Value = value
                     carsModified = carsModified + 1
@@ -3270,8 +3256,6 @@ local function applyToAllCars(valueType, value)
             end
         else
             print("❌ Failed " .. valueType .. " not found in VehicleSeat")
-            
-            -- Try as direct property of VehicleSeat
             local success = pcall(function()
                 if valueType == "MaxSpeed" then
                     vehicleSeat.MaxSpeed = value
@@ -3281,7 +3265,6 @@ local function applyToAllCars(valueType, value)
                 carsModified = carsModified + 1
                 print("⚠️ " .. valueType .. " (VehicleSeat property) changed to " .. value)
             end)
-            
             if not success then
                 print("❌ Failed to change " .. valueType .. " as property")
             end
@@ -3959,17 +3942,14 @@ AdminTab:Paragraph({
     ImageSize = 64
 })
 
--- ==============================
+-- ////////////////////
 -- ADMIN WHITELIST
--- ==============================
-
-local DATABASE = "https://raw.githubusercontent.com/nxvap/Hexagon/refs/heads/main/main/whitelist.json"
+-- ////////////////////
 
 local function parseDateTime(dateString)
     if not dateString or dateString == "" then return nil end
 
-    local day, month, year, hour, minute =
-        dateString:match("(%d+)/(%d+)/(%d+) (%d+):(%d+)")
+    local day, month, year, hour, minute = dateString:match("(%d+)/(%d+)/(%d+) (%d+):(%d+)")
 
     if day then
         return os.time({
@@ -3981,13 +3961,12 @@ local function parseDateTime(dateString)
             sec = 0
         })
     end
-
     return nil
 end
 
 local function loadWhitelist()
     local success, result = pcall(function()
-        return game:HttpGet(DATABASE)
+        return game:HttpGet("https://raw.githubusercontent.com/nxvap/Hexagon/refs/heads/main/main/whitelist.json")
     end)
 
     if not success then
@@ -4012,28 +3991,23 @@ local userData = whitelist[username]
             return false, userData.expires
         end
     end
-
     return true, userData.type
 end
 
 local function verifyWhitelist()
     local whitelist = loadWhitelist()
     local username = LocalPlayer.Name:lower()
-
     local allowed, info = isUserWhitelisted(whitelist, username)
 
     if not allowed then
         task.wait(1)
-
         if info == "NOT_IN_LIST" then
             newNotify("❌ Admin Access", "You are not on the Whitelist")
         else
             newNotify("❌ Admin Access", "Expired Whitelist: " .. info)
         end
-
         return false
     end
-
     return true
 end
 
@@ -4082,13 +4056,9 @@ Window:Tag({
     Color = Color3.fromHex("#315dff")
 })
 
-WindUI.TransparencyValue = 0.2
-WindUI:SetTheme("Midnight")
-WindUI.SetBackground = "rbxassetid://102266309145667"
-
--- ==============================
+-- ////////////////////
 -- ADMIN ADDONS
--- ==============================
+-- ////////////////////
 
 AdminTab:Button({
     Title = "Obito Kamui Dimension",

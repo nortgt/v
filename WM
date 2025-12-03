@@ -829,6 +829,10 @@ AvatarTab:Button({
                         task.wait(0.2)
                     end
                 end
+                if tonumber(LDesc.Face) then
+                    Wear:InvokeServer(tonumber(LDesc.Face))
+                    task.wait(0.2)
+                end
                 local PDesc = THumanoid:GetAppliedDescription()
                 local argsBody = {
                     [1] = {
@@ -850,15 +854,15 @@ AvatarTab:Button({
                 end
                 if tonumber(PDesc.Shirt) then
                     Wear:InvokeServer(tonumber(PDesc.Shirt))
-                    task.wait(0.3)
+                    task.wait(0.2)
                 end
                 if tonumber(PDesc.Pants) then
                     Wear:InvokeServer(tonumber(PDesc.Pants))
-                    task.wait(0.3)
+                    task.wait(0.2)
                 end
                 if tonumber(PDesc.Face) then
                     Wear:InvokeServer(tonumber(PDesc.Face))
-                    task.wait(0.3)
+                    task.wait(0.2)
                 end
                 local SkinColor = TPlayer.Character:FindFirstChild("Body Colors")
                 if SkinColor then

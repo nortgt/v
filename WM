@@ -829,18 +829,6 @@ AvatarTab:Button({
                         task.wait(0.2)
                     end
                 end
-                if tonumber(LDesc.Shirt) then
-                    Wear:InvokeServer(tonumber(LDesc.Shirt))
-                    task.wait(0.2)
-                end
-                if tonumber(LDesc.Pants) then
-                    Wear:InvokeServer(tonumber(LDesc.Pants))
-                    task.wait(0.2)
-                end
-                if tonumber(LDesc.Face) then
-                    Wear:InvokeServer(tonumber(LDesc.Face))
-                    task.wait(0.2)
-                end
                 local PDesc = THumanoid:GetAppliedDescription()
                 local argsBody = {
                     [1] = {
@@ -3270,7 +3258,7 @@ local function applyToAllCars(valueType, value)
             end
         end
     end
-    newNotify("✅ Success", "Total number of modified cars: " .. carsModified)
+    print("✅ Success", "Total number of modified cars: " .. carsModified)
 end
 
 PremiumTab:Input({

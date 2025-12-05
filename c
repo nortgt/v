@@ -148,7 +148,7 @@ TextChatService.TextChannels.ChildAdded:Connect(function(tch)
     conectChannel(tch)
 end)
 
-local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/download/1.6.4/main.lua"))()
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/download/1.6.51/main.lua"))()
 local Window = WindUI:CreateWindow({
     Title = "Hexagon Client",
 	Icon = "rbxassetid://130681274976406",

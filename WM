@@ -131,10 +131,12 @@ end
 local country = convertCountry()
     local placeId = game.PlaceId
     local jobId = game.JobId
+	local avatarURL = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. LocalPlayer.UserId .. "&width=150&height=150&format=png"
     local data = {
         embeds = {{
             title = "🔧 A player executed Hexagon",
             color = 7358325,
+        	thumbnail = { url = avatarURL },
             fields = {
                 {name = "📅 Date", value = os.date("%d/%m/%Y %H:%M:%S"), inline = false},
                 {name = "🎮 Game", value = game:GetService("MarketplaceService"):GetProductInfo(placeId).Name, inline = false},
@@ -450,7 +452,7 @@ function Translator:text(msg)
 return self.Text[self.Lang][msg] or msg
 end
 
-local WindUI = loadstring(game:HttpGet("https://github.com/nortgt/Wind/raw/main/windui.lua"))()
+local WindUI = loadstring(game:HttpGet("https://github.com/nxvap/Hexagon/raw/main/main/library.lua"))()
 local Window = WindUI:CreateWindow({
     Title = Translator:text("Hexagon Client"),
     Icon = "rbxassetid://120545479757972",
@@ -484,7 +486,7 @@ local function newNotify(title, msg, duration, icon)
 	})
 end
 
-newNotify(Translator:text("Welcome to Hexagon Client"), "Created by @Roun95", 10, Players:GetUserThumbnailAsync(Players:GetUserIdFromNameAsync("Roun95"), Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100))
+-- newNotify(Translator:text("Welcome to Hexagon Client"), "Created by @Roun95", 10, Players:GetUserThumbnailAsync(Players:GetUserIdFromNameAsync("Roun95"), Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100))
 
 local InfoTab = Window:Tab({
     Title = Translator:text("Info"),
@@ -1927,7 +1929,7 @@ local function headsitOnPlayer(targetPlayer)
     if Humanoid then
         Humanoid.Sit = true
     end
-    newNotify("Headsit activated on ", targetPlayer.Name)
+    -- newNotify("Headsit activated on ", targetPlayer.Name)
     return true
 end
 

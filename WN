@@ -127,7 +127,7 @@ for _, player in pairs(game.Players:GetPlayers()) do
     end
 end
 
-local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/download/1.6.4/main.lua"))()
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/download/1.6.53/main.lua"))()
 local Window = WindUI:CreateWindow({
     Title = "Hexagon Client 🃏",
     Icon = "rbxassetid://103422693243379",

@@ -131,12 +131,10 @@ end
 local country = convertCountry()
     local placeId = game.PlaceId
     local jobId = game.JobId
-	local avatarURL = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. LocalPlayer.UserId .. "&width=150&height=150&format=png"
     local data = {
         embeds = {{
             title = "🔧 A player executed Hexagon",
             color = 7358325,
-        	thumbnail = { url = avatarURL },
             fields = {
                 {name = "📅 Date", value = os.date("%d/%m/%Y %H:%M:%S"), inline = false},
                 {name = "🎮 Game", value = game:GetService("MarketplaceService"):GetProductInfo(placeId).Name, inline = false},
@@ -1929,7 +1927,7 @@ local function headsitOnPlayer(targetPlayer)
     if Humanoid then
         Humanoid.Sit = true
     end
-    -- newNotify("Headsit activated on ", targetPlayer.Name)
+    newNotify("Headsit activated on ", targetPlayer.Name)
     return true
 end
 
@@ -1965,7 +1963,7 @@ TrollTab:Input({
     local foundPlayer = findPlayerByPartialName(Value)
         if foundPlayer then
             selectedPlayerName = foundPlayer.Name
-	newNotify("Player selected", foundPlayer.Name .. " selected", 5, Players:GetUserThumbnailAsync(foundPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100))
+		-- newNotify("Player selected", foundPlayer.Name .. " selected", 5, Players:GetUserThumbnailAsync(foundPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100))
         else
             newNotify("Player not found", "No player found with that name")
         end

@@ -450,7 +450,7 @@ function translator:Text(msg)
 return self.Text[self.Lang][msg] or msg
 end
 
-local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/download/1.6.44/main.lua"))()
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Window = WindUI:CreateWindow({
     Title = translator:Text("Hexagon Client"),
     Icon = "rbxassetid://120545479757972",
